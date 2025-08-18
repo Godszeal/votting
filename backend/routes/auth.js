@@ -13,25 +13,33 @@ router.post(
   [
     check('matricNumber', 'Matric number is required').not().isEmpty(),
     check('university', 'University is required').not().isEmpty(),
+    check('department', 'Department is required').not().isEmpty(),
     check('password', 'Password must be 6 or more characters').isLength({ min: 6 })
   ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ 
+        errors: errors.array(),
+        message: 'Validation failed'
+      });
     }
 
-    const { matricNumber, university, email, password } = req.body;
+    const { matricNumber, university, department, email, password } = req.body;
 
     try {
       let user = await User.findOne({ matricNumber });
       if (user) {
-        return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
+        return res.status(400).json({ 
+          errors: [{ msg: 'User already exists' }], 
+          message: 'User already exists'
+        });
       }
 
       user = new User({
         matricNumber,
         university,
+        department,  // ADDED THIS FIELD
         email,
         password
       });
@@ -62,11 +70,13 @@ router.post(
       );
     } catch (err) {
       console.error('Signup Error:', err.message);
-      res.status(500).send('Server error');
+      res.status(500).json({ 
+        message: 'Server error during signup',
+        error: err.message 
+      });
     }
   }
 );
-
 // @route   POST api/auth/login
 // @desc    Authenticate user
 router.post(
