@@ -3,34 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Student Voting System</title>
+  <title>Dashboard - VoteSphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="images/logo.svg">
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>Student Voting System</h1>
-      <nav>
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <img src="images/logo.svg" alt="VoteSphere Logo">
+        <span class="logo-text">VoteSphere</span>
+      </a>
+      <nav class="nav-links">
         <button id="logout-btn" class="btn btn-danger">Logout</button>
+        <button class="theme-toggle" id="theme-toggle">
+          <span id="theme-icon">🌙</span>
+        </button>
       </nav>
     </div>
   </header>
 
   <main class="container">
-    <h1>Your Dashboard</h1>
-    <p>Welcome to the Student Voting System. Below are the active elections where you can cast your vote.</p>
+    <div class="text-center mb-6">
+      <h1>Welcome to VoteSphere</h1>
+      <p class="text-gray">Cast your vote in upcoming elections and view results in real-time</p>
+    </div>
     
     <div id="elections-container" class="dashboard-grid">
       <!-- Elections will be loaded here -->
+      <div class="card text-center" style="padding: 3rem; grid-column: 1 / -1;">
+        <div style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;">🔄</div>
+        <h2 style="margin-bottom: 1rem;">Loading Elections...</h2>
+        <p style="color: var(--gray);">Please wait while we check for available elections</p>
+      </div>
     </div>
   </main>
 
   <footer>
-    <div class="container">
-      <p>&copy; 2023 Student Voting System. All rights reserved.</p>
+    <div class="container footer-content">
+      <p>&copy; 2023 VoteSphere. All rights reserved.</p>
+      <div>
+        <a href="#" class="text-gray" style="margin-right: 1rem;">Privacy Policy</a>
+        <a href="#" class="text-gray">Terms of Service</a>
+      </div>
     </div>
   </footer>
 
   <script src="js/script.js"></script>
+  
+  <script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    // Check for saved theme preference or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeIcon.textContent = '☀️';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+  </script>
 </body>
 </html>
