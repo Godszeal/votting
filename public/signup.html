@@ -88,6 +88,8 @@
               <input type="password" id="password2" class="form-control" placeholder="Confirm your password" required minlength="6">
             </div>
             
+            <div id="error-message" class="alert alert-danger hidden"></div>
+            
             <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
           </form>
         </div>
@@ -109,6 +111,42 @@
     </div>
   </footer>
 
+  <script>
+    // Form validation enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+      const signupForm = document.getElementById('signup-form');
+      
+      if (signupForm) {
+        // Add validation feedback for required fields
+        const requiredFields = signupForm.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+          field.addEventListener('blur', function() {
+            if (!this.value) {
+              this.style.borderColor = 'var(--danger)';
+            } else {
+              this.style.borderColor = '';
+            }
+          });
+          
+          field.addEventListener('focus', function() {
+            this.style.borderColor = '';
+          });
+        });
+        
+        // Add department validation
+        const departmentSelect = document.getElementById('department');
+        departmentSelect.addEventListener('change', function() {
+          if (this.value && this.value !== "Select your department") {
+            this.style.borderColor = 'var(--success)';
+            setTimeout(() => {
+              this.style.borderColor = '';
+            }, 1000);
+          }
+        });
+      }
+    });
+  </script>
+  
   <script src="js/script.js"></script>
   
   <script>
