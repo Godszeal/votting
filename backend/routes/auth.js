@@ -130,7 +130,7 @@ router.post('/admin-login', async (req, res) => {
   if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
     const payload = {
       user: {
-        id: 'admin',
+        id: 'admin',  // This is the special ID for admin
         role: 'admin'
       }
     };
@@ -145,11 +145,20 @@ router.post('/admin-login', async (req, res) => {
           console.error('Admin JWT Sign Error:', err);
           return res.status(500).send('Token generation error');
         }
-        res.json({ token, role: 'admin' });
+        res.json({ 
+          token, 
+          role: 'admin',
+          message: 'Admin login successful'
+        });
       }
     );
   } else {
-    res.status(400).json({ errors: [{ msg: 'Invalid admin credentials' }] });
+    res.status(400).json({ 
+      errors: [{ 
+        msg: 'Invalid admin credentials' 
+      }],
+      providedEmail: email
+    });
   }
 });
 
