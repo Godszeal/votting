@@ -1,13 +1,15 @@
+require('dotenv').config({ path: './backend/.env' });
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const path = require('path');
 
-dotenv.config();
+// Ensure environment variables are loaded first
+console.log('MONGO_URI:', process.env.MONGO_URI); // Debugging line
+
 connectDB();
 
 const app = express();
