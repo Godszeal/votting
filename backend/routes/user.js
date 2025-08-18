@@ -7,20 +7,50 @@ const User = require('../models/User');
 const mongoose = require('mongoose');
 
 // @route   GET api/user/elections
-// @desc    Get active elections
+// @desc    Get active elections (only those user is eligible for)
 router.get('/elections', auth, async (req, res) => {
   try {
     const now = new Date();
-    const elections = await Election.find({
+    const user = await User.findById(req.user.id);
+    
+    // Find all active elections
+    let elections = await Election.find({
       isActive: true,
       startDate: { $lte: now },
       endDate: { $gte: now }
     });
-
-    res.json(elections);
+    
+    // Filter elections based on user's university/department
+    const eligibleElections = elections.filter(election => {
+      // No restrictions - everyone can vote
+      if (!election.universityRestriction && !election.departmentRestriction) {
+        return true;
+      }
+      
+      // University restriction check
+      if (election.universityRestriction && election.universityRestriction !== 'All Universities') {
+        if (user.university !== election.universityRestriction) {
+          return false;
+        }
+      }
+      
+      // Department restriction check
+      if (election.departmentRestriction && election.departmentRestriction !== 'All Departments') {
+        if (user.department !== election.departmentRestriction) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+    
+    res.json(eligibleElections);
   } catch (err) {
-    console.error('Get Elections Error:', err.message);
-    res.status(500).send('Server error');
+    console.error('Get Eligible Elections Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching elections',
+      error: err.message 
+    });
   }
 });
 
@@ -43,6 +73,22 @@ router.post('/vote', auth, async (req, res) => {
     const election = await Election.findById(electionId);
     if (!election || !election.isActive || new Date() > election.endDate) {
       return res.status(400).json({ msg: 'Election is not active' });
+    }
+    
+    // Check if user is eligible based on university/department
+    const user = await User.findById(req.user.id);
+    if (election.universityRestriction && election.universityRestriction !== 'All Universities' && 
+        user.university !== election.universityRestriction) {
+      return res.status(403).json({ 
+        msg: `This election is restricted to ${election.universityRestriction} students` 
+      });
+    }
+    
+    if (election.departmentRestriction && election.departmentRestriction !== 'All Departments' && 
+        user.department !== election.departmentRestriction) {
+      return res.status(403).json({ 
+        msg: `This election is restricted to ${election.departmentRestriction} students` 
+      });
     }
 
     // Check candidate exists
@@ -80,8 +126,11 @@ router.post('/vote', auth, async (req, res) => {
       session.endSession();
     }
   } catch (err) {
-    console.error('Vote Error:', err.message);
-    res.status(500).send('Server error');
+    console.error('Vote Error:', err);
+    res.status(500).json({ 
+      message: 'Server error recording vote',
+      error: err.message 
+    });
   }
 });
 
@@ -94,13 +143,35 @@ router.get('/results/:id', auth, async (req, res) => {
       return res.status(404).json({ msg: 'Election not found' });
     }
 
+    // Check if user is eligible to view results
+    const user = await User.findById(req.user.id);
+    if (election.universityRestriction && election.universityRestriction !== 'All Universities' && 
+        user.university !== election.universityRestriction) {
+      return res.status(403).json({ 
+        msg: `Results are restricted to ${election.universityRestriction} students` 
+      });
+    }
+    
+    if (election.departmentRestriction && election.departmentRestriction !== 'All Departments' && 
+        user.department !== election.departmentRestriction) {
+      return res.status(403).json({ 
+        msg: `Results are restricted to ${election.departmentRestriction} students` 
+      });
+    }
+
     res.json({
       title: election.title,
+      description: election.description,
+      universityRestriction: election.universityRestriction,
+      departmentRestriction: election.departmentRestriction,
       candidates: election.candidates
     });
   } catch (err) {
-    console.error('Results Error:', err.message);
-    res.status(500).send('Server error');
+    console.error('Results Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching results',
+      error: err.message 
+    });
   }
 });
 
