@@ -1,100 +1,365 @@
+:root {
+  --sidebar-width: 280px;
+}
+
 .admin-container {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - 160px);
+  margin-top: 2rem;
+  gap: 1.5rem;
 }
 
 .sidebar {
-  width: 250px;
-  background: var(--dark);
-  color: white;
-  padding: 20px 0;
+  width: var(--sidebar-width);
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  height: fit-content;
+  position: sticky;
+  top: 80px;
+  overflow: hidden;
 }
 
-.sidebar h2 {
-  text-align: center;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #555;
-  margin-bottom: 20px;
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.sidebar ul {
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar-nav {
   list-style: none;
 }
 
-.sidebar li {
-  padding: 15px 20px;
+.sidebar-item {
+  padding: 0.75rem 1.5rem;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-left: 4px solid transparent;
 }
 
-.sidebar li:hover {
-  background: #2c3e50;
+.sidebar-item:hover {
+  background-color: rgba(99, 102, 241, 0.05);
+  color: var(--primary);
 }
 
-.sidebar li.active {
-  background: var(--secondary);
-  font-weight: bold;
+.sidebar-item.active {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 600;
+}
+
+.sidebar-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .content {
   flex: 1;
-  padding: 30px;
+  min-width: 0;
 }
 
-.form-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.candidate-inputs {
-  margin: 15px 0;
-}
-
-.candidate-inputs input {
-  margin: 5px 0;
-  width: 80%;
-}
-
-.add-candidate {
-  background: var(--success);
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-.election-list {
-  margin-top: 30px;
-}
-
-.election-item {
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 15px;
-  margin-bottom: 15px;
+.admin-header {
+  margin-bottom: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.election-actions button {
-  margin-left: 5px;
+.admin-title {
+  font-size: 1.75rem;
+  font-weight: 700;
 }
 
-.status-badge {
-  padding: 5px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+/* Election management */
+.election-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.election-item {
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.election-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.election-item-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.election-item-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.election-item-description {
+  color: var(--gray);
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.election-item-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.election-item-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gray);
+  font-size: 0.875rem;
+}
+
+.election-item-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
 }
 
 .status-active {
-  background: #d4edda;
-  color: #155724;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success);
 }
 
 .status-inactive {
-  background: #f8d7da;
-  color: #721c24;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+.election-actions {
+  display: flex;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+/* Form styles */
+.form-container {
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  padding: 2rem;
+}
+
+.form-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.candidate-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.candidate-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.candidate-input input {
+  flex: 1;
+}
+
+.remove-candidate {
+  background-color: var(--danger);
+  color: white;
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.remove-candidate:hover {
+  background-color: #dc2626;
+  transform: scale(1.1);
+}
+
+.add-candidate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0.5rem 0;
+}
+
+.add-candidate:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Results page */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.result-card {
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.result-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.result-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.result-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.result-body {
+  padding: 1.5rem;
+}
+
+.candidate-result {
+  margin-bottom: 1rem;
+}
+
+.candidate-name {
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.progress-bar {
+  height: 0.5rem;
+  background-color: var(--border);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0.25rem 0;
+}
+
+.progress {
+  height: 100%;
+  background-color: var(--primary);
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+.audit-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Voters management */
+.voters-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1rem;
+}
+
+.voters-table th {
+  background-color: rgba(99, 102, 241, 0.05);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--primary);
+  border-bottom: 2px solid var(--border);
+}
+
+.voters-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.voters-table tr:last-child td {
+  border-bottom: none;
+}
+
+.voters-table tr:hover {
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+.search-bar {
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 992px) {
+  .admin-container {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+  }
 }
