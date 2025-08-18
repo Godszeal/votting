@@ -4,6 +4,7 @@ const auth = require('../middleware/auth');
 const Election = require('../models/Election');
 const Vote = require('../models/Vote');
 const User = require('../models/User');
+const mongoose = require('mongoose');
 
 // @route   GET api/user/elections
 // @desc    Get active elections
@@ -15,10 +16,10 @@ router.get('/elections', auth, async (req, res) => {
       startDate: { $lte: now },
       endDate: { $gte: now }
     });
-    
+
     res.json(elections);
   } catch (err) {
-    console.error(err.message);
+    console.error('Get Elections Error:', err.message);
     res.status(500).send('Server error');
   }
 });
@@ -30,46 +31,46 @@ router.post('/vote', auth, async (req, res) => {
   
   try {
     // Check if user has already voted
-    const hasVoted = req.user.hasVoted.some(vote =>
+    const hasVoted = req.user.hasVoted.some(vote => 
       vote.election.toString() === electionId
     );
     
     if (hasVoted) {
       return res.status(400).json({ msg: 'You have already voted in this election' });
     }
-    
+
     // Check election validity
     const election = await Election.findById(electionId);
     if (!election || !election.isActive || new Date() > election.endDate) {
       return res.status(400).json({ msg: 'Election is not active' });
     }
-    
+
     // Check candidate exists
     const candidateIndex = election.candidates.findIndex(c => c.name === candidate);
     if (candidateIndex === -1) {
       return res.status(400).json({ msg: 'Invalid candidate' });
     }
-    
+
     // Record vote in transaction
     const session = await mongoose.startSession();
     session.startTransaction();
     
     try {
       // Create vote record
-      await Vote.create([{
-        user: req.user._id,
-        election: electionId,
-        candidate
+      await Vote.create([{ 
+        user: req.user._id, 
+        election: electionId, 
+        candidate 
       }], { session });
-      
+
       // Update candidate vote count
       election.candidates[candidateIndex].votes += 1;
       await election.save({ session });
-      
+
       // Mark user as voted
       req.user.hasVoted.push({ election: electionId });
       await req.user.save({ session });
-      
+
       await session.commitTransaction();
       res.json({ msg: 'Vote recorded successfully' });
     } catch (err) {
@@ -79,7 +80,7 @@ router.post('/vote', auth, async (req, res) => {
       session.endSession();
     }
   } catch (err) {
-    console.error(err.message);
+    console.error('Vote Error:', err.message);
     res.status(500).send('Server error');
   }
 });
@@ -92,13 +93,13 @@ router.get('/results/:id', auth, async (req, res) => {
     if (!election) {
       return res.status(404).json({ msg: 'Election not found' });
     }
-    
+
     res.json({
       title: election.title,
       candidates: election.candidates
     });
   } catch (err) {
-    console.error(err.message);
+    console.error('Results Error:', err.message);
     res.status(500).send('Server error');
   }
 });
