@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/User');
 const { check, validationResult } = require('express-validator');
+const jwtConfig = require('../config/jwt'); // Import our verified JWT config
 
 // @route   POST api/auth/signup
 // @desc    Register user
@@ -46,17 +47,21 @@ router.post(
         }
       };
 
+      // Use our verified JWT config
       jwt.sign(
         payload,
-        process.env.JWT_SECRET,
-        { expiresIn: '5d' },
+        jwtConfig.secret,
+        { expiresIn: jwtConfig.expiresIn },
         (err, token) => {
-          if (err) throw err;
+          if (err) {
+            console.error('JWT Sign Error:', err);
+            return res.status(500).send('Token generation error');
+          }
           res.json({ token, role: user.role });
         }
       );
     } catch (err) {
-      console.error(err.message);
+      console.error('Signup Error:', err.message);
       res.status(500).send('Server error');
     }
   }
@@ -97,17 +102,21 @@ router.post(
         }
       };
 
+      // Use our verified JWT config
       jwt.sign(
         payload,
-        process.env.JWT_SECRET,
-        { expiresIn: '5d' },
+        jwtConfig.secret,
+        { expiresIn: jwtConfig.expiresIn },
         (err, token) => {
-          if (err) throw err;
+          if (err) {
+            console.error('JWT Sign Error:', err);
+            return res.status(500).send('Token generation error');
+          }
           res.json({ token, role: user.role });
         }
       );
     } catch (err) {
-      console.error(err.message);
+      console.error('Login Error:', err.message);
       res.status(500).send('Server error');
     }
   }
@@ -126,12 +135,16 @@ router.post('/admin-login', async (req, res) => {
       }
     };
 
+    // Use our verified JWT config
     jwt.sign(
       payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '5d' },
+      jwtConfig.secret,
+      { expiresIn: jwtConfig.expiresIn },
       (err, token) => {
-        if (err) throw err;
+        if (err) {
+          console.error('Admin JWT Sign Error:', err);
+          return res.status(500).send('Token generation error');
+        }
         res.json({ token, role: 'admin' });
       }
     );
