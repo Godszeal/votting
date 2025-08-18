@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const admin = require('../middleware/admin');
 const Election = require('../models/Election');
+const jwtConfig = require('../config/jwt'); // Import our verified JWT config
 
 // @route   POST api/admin/elections
 // @desc    Create new election
@@ -19,7 +20,7 @@ router.post('/elections', admin, async (req, res) => {
     await election.save();
     res.json(election);
   } catch (err) {
-    console.error(err.message);
+    console.error('Create Election Error:', err.message);
     res.status(500).send('Server error');
   }
 });
@@ -35,8 +36,8 @@ router.put('/elections/:id', admin, async (req, res) => {
     
     // Prevent candidate changes after election starts
     if (election.startDate < new Date() && candidates) {
-      return res.status(400).json({
-        msg: 'Cannot modify candidates after election starts'
+      return res.status(400).json({ 
+        msg: 'Cannot modify candidates after election starts' 
       });
     }
     
@@ -55,7 +56,7 @@ router.put('/elections/:id', admin, async (req, res) => {
     await election.save();
     res.json(election);
   } catch (err) {
-    console.error(err.message);
+    console.error('Update Election Error:', err.message);
     res.status(500).send('Server error');
   }
 });
@@ -70,7 +71,7 @@ router.delete('/elections/:id', admin, async (req, res) => {
     await election.remove();
     res.json({ msg: 'Election removed' });
   } catch (err) {
-    console.error(err.message);
+    console.error('Delete Election Error:', err.message);
     res.status(500).send('Server error');
   }
 });
@@ -82,7 +83,7 @@ router.get('/elections', admin, async (req, res) => {
     const elections = await Election.find().sort({ createdAt: -1 });
     res.json(elections);
   } catch (err) {
-    console.error(err.message);
+    console.error('Get Elections Error:', err.message);
     res.status(500).send('Server error');
   }
 });
