@@ -65,71 +65,88 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle signup
-  const signupForm = document.getElementById('signup-form');
-  if (signupForm) {
-    signupForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+// Handle signup
+const signupForm = document.getElementById('signup-form');
+if (signupForm) {
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const matricNumber = document.getElementById('matricNumber').value;
+    const university = document.getElementById('university').value;
+    const department = document.getElementById('department').value; // ADDED THIS LINE
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const password2 = document.getElementById('password2').value;
+    const errorDiv = document.getElementById('error-message');
+    
+    // Validate department selection
+    if (!department || department === "" || department === "Select your department") {
+      errorDiv.innerHTML = 'Please select your department';
+      errorDiv.classList.remove('hidden');
       
-      const matricNumber = document.getElementById('matricNumber').value;
-      const university = document.getElementById('university').value;
-      const department = document.getElementById('department').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const password2 = document.getElementById('password2').value;
-      const errorDiv = document.getElementById('error-message');
+      setTimeout(() => {
+        errorDiv.classList.add('hidden');
+      }, 5000);
+      return;
+    }
+    
+    if (password !== password2) {
+      errorDiv.innerHTML = 'Passwords do not match';
+      errorDiv.classList.remove('hidden');
       
-      if (password !== password2) {
-        errorDiv.innerHTML = 'Passwords do not match';
-        errorDiv.classList.remove('hidden');
-        
-        setTimeout(() => {
-          errorDiv.classList.add('hidden');
-        }, 5000);
-        return;
-      }
+      setTimeout(() => {
+        errorDiv.classList.add('hidden');
+      }, 5000);
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          matricNumber, 
+          university, 
+          department, // ADDED THIS FIELD
+          email, 
+          password 
+        })
+      });
       
-      try {
-        const res = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ matricNumber, university, department, email, password })
-        });
-        
-        const data = await res.json();
-        
-        if (res.ok) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('role', data.role);
-          window.location.href = 'user-dashboard.html';
-        } else {
-          let errorMessage = 'Registration failed';
-          if (data.errors && Array.isArray(data.errors)) {
-            errorMessage = data.errors.map(err => err.msg).join('<br>');
-          } else if (data.message) {
-            errorMessage = data.message;
-          }
-          
-          errorDiv.innerHTML = errorMessage;
-          errorDiv.classList.remove('hidden');
-          
-          setTimeout(() => {
-            errorDiv.classList.add('hidden');
-          }, 5000);
+      const data = await res.json();
+      
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.role);
+        window.location.href = 'user-dashboard.html';
+      } else {
+        let errorMessage = 'Registration failed';
+        if (data.errors && Array.isArray(data.errors)) {
+          errorMessage = data.errors.map(err => err.msg).join('<br>');
+        } else if (data.message) {
+          errorMessage = data.message;
         }
-      } catch (err) {
-        console.error('Signup error:', err);
-        errorDiv.innerHTML = 'Server error. Please try again.';
+        
+        errorDiv.innerHTML = errorMessage;
         errorDiv.classList.remove('hidden');
         
         setTimeout(() => {
           errorDiv.classList.add('hidden');
         }, 5000);
       }
-    });
-  }
+    } catch (err) {
+      console.error('Signup error:', err);
+      errorDiv.innerHTML = 'Server error. Please try again.';
+      errorDiv.classList.remove('hidden');
+      
+      setTimeout(() => {
+        errorDiv.classList.add('hidden');
+      }, 5000);
+    }
+  });
+}
 
   // User dashboard functionality
   if (currentPath === 'user-dashboard.html') {
