@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Student Voting System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Student Voting System</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="signup.html">Sign Up</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card" style="max-width: 500px; margin: 50px auto;">
+      <h2 style="text-align: center; margin-bottom: 20px;">Student Login</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="matricNumber">Matriculation Number</label>
+          <input type="text" id="matricNumber" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" required>
+        </div>
+        <div id="error-message" class="error hidden"></div>
+        <button type="submit" class="btn" style="width: 100%;">Login</button>
+      </form>
+      <p style="text-align: center; margin-top: 15px;">
+        Don't have an account? <a href="signup.html">Sign Up</a>
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2023 Student Voting System. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

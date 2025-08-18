@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Student Voting System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Student Voting System</h1>
+      <nav>
+        <button id="logout-btn" class="btn btn-danger">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="admin-container">
+    <div class="sidebar">
+      <h2>Admin Panel</h2>
+      <ul>
+        <li class="active" data-view="elections">Elections Management</li>
+        <li data-view="results">View Results</li>
+      </ul>
+    </div>
+    
+    <div class="content">
+      <div id="admin-content" class="form-container">
+        <!-- Content will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2023 Student Voting System. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
