@@ -3,59 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up - Student Voting System</title>
+  <title>Sign Up - VoteSphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="images/logo.svg">
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>Student Voting System</h1>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="login.html">Login</a>
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="images/logo.svg" alt="VoteSphere Logo">
+        <span class="logo-text">VoteSphere</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="login.html" class="nav-link">Student Login</a>
+        <a href="admin-login.html" class="nav-link">Admin</a>
+        <button class="theme-toggle" id="theme-toggle">
+          <span id="theme-icon">🌙</span>
+        </button>
       </nav>
     </div>
   </header>
 
   <main class="container">
-    <div class="card" style="max-width: 500px; margin: 50px auto;">
-      <h2 style="text-align: center; margin-bottom: 20px;">Create Account</h2>
-      <form id="signup-form">
-        <div class="form-group">
-          <label for="matricNumber">Matriculation Number</label>
-          <input type="text" id="matricNumber" class="form-control" required>
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h1 class="auth-title">Create Account</h1>
+          <p class="auth-subtitle">Join VoteSphere to participate in student elections</p>
         </div>
-        <div class="form-group">
-          <label for="university">University</label>
-          <input type="text" id="university" class="form-control" required>
+        
+        <div class="auth-body">
+          <form id="signup-form" class="auth-form">
+            <div class="form-group">
+              <label for="matricNumber" class="form-label">Matriculation Number</label>
+              <input type="text" id="matricNumber" class="form-control" placeholder="E.g., CSC/2019/001" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="university" class="form-label">University</label>
+              <select id="university" class="form-control form-select" required>
+                <option value="" disabled selected>Select your university</option>
+                <option value="University of Lagos">University of Lagos</option>
+                <option value="Covenant University">Covenant University</option>
+                <option value="University of Ibadan">University of Ibadan</option>
+                <option value="Obafemi Awolowo University">Obafemi Awolowo University</option>
+                <option value="University of Benin">University of Benin</option>
+                <option value="Ahmadu Bello University">Ahmadu Bello University</option>
+                <option value="Other">Other University</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="department" class="form-label">Department</label>
+              <select id="department" class="form-control form-select" required>
+                <option value="" disabled selected>Select your department</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Electrical Engineering">Electrical Engineering</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Law">Law</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="Economics">Economics</option>
+                <option value="Political Science">Political Science</option>
+                <option value="Other">Other Department</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="email" class="form-label">Email (Optional)</label>
+              <input type="email" id="email" class="form-control" placeholder="you@example.com">
+            </div>
+            
+            <div class="form-group">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" id="password" class="form-control" placeholder="Create a strong password" required minlength="6">
+            </div>
+            
+            <div class="form-group">
+              <label for="password2" class="form-label">Confirm Password</label>
+              <input type="password" id="password2" class="form-control" placeholder="Confirm your password" required minlength="6">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
+          </form>
         </div>
-        <div class="form-group">
-          <label for="email">Email (Optional)</label>
-          <input type="email" id="email" class="form-control">
+        
+        <div class="auth-footer">
+          <p>Already have an account? <a href="login.html" class="auth-link">Login</a></p>
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" class="form-control" required minlength="6">
-        </div>
-        <div class="form-group">
-          <label for="password2">Confirm Password</label>
-          <input type="password" id="password2" class="form-control" required minlength="6">
-        </div>
-        <div id="error-message" class="error hidden"></div>
-        <button type="submit" class="btn" style="width: 100%;">Sign Up</button>
-      </form>
-      <p style="text-align: center; margin-top: 15px;">
-        Already have an account? <a href="login.html">Login</a>
-      </p>
+      </div>
     </div>
   </main>
 
   <footer>
-    <div class="container">
-      <p>&copy; 2023 Student Voting System. All rights reserved.</p>
+    <div class="container footer-content">
+      <p>&copy; 2023 VoteSphere. All rights reserved.</p>
+      <div>
+        <a href="#" class="text-gray" style="margin-right: 1rem;">Privacy Policy</a>
+        <a href="#" class="text-gray">Terms of Service</a>
+      </div>
     </div>
   </footer>
 
   <script src="js/script.js"></script>
+  
+  <script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    // Check for saved theme preference or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeIcon.textContent = '☀️';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+  </script>
 </body>
 </html>
