@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoteSphere - Secure Student Voting System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='18' y1='20' x2='18' y2='10'/><line x1='12' y1='20' x2='12' y2='4'/><line x1='6' y1='20' x2='6' y2='14'/></svg>">
+  <style>
+    /* The complete style.css content goes here */
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+      --light: #f3f4f6;
+      --dark: #1f2937;
+      --gray: #9ca3af;
+      --white: #ffffff;
+      --black: #000000;
+      --card-bg: #ffffff;
+      --bg: #f9fafb;
+      --text: #1f2937;
+      --border: #e5e7eb;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --transition: all 0.3s ease;
+      --animation-speed: 0.3s;
+      --z-index-header: 100;
+      --z-index-mobile-menu: 99;
+      --z-index-notification: 1000;
+      --z-index-fab: 100;
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 2.5rem;
+      --spacing-3xl: 3rem;
+      --border-radius-sm: 0.25rem;
+      --border-radius-md: 0.5rem;
+      --border-radius-lg: 0.75rem;
+      --border-radius-xl: 1rem;
+      --border-radius-2xl: 1.5rem;
+      --border-radius-full: 9999px;
+      --max-width: 1280px;
+    }
+
+    [data-theme="dark"] {
+      --card-bg: #1f2937;
+      --bg: #111827;
+      --text: #f3f4f6;
+      --border: #374151;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      --light: #374151;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.5;
+      color: var(--text);
+      background-color: var(--bg);
+      transition: var(--transition);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: var(--spacing-md);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+    }
+
+    h2 {
+      font-size: 2rem;
+    }
+
+    h3 {
+      font-size: 1.75rem;
+    }
+
+    h4 {
+      font-size: 1.5rem;
+    }
+
+    h5 {
+      font-size: 1.25rem;
+    }
+
+    h6 {
+      font-size: 1rem;
+    }
+
+    p {
+      margin-bottom: var(--spacing-md);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      font-size: 1rem;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: #7c3aed;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #0da26e;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-warning {
+      background-color: var(--warning);
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background-color: #d97706;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .btn-lg {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.125rem;
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    .btn-icon {
+      padding: 0.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--border-radius-full);
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: var(--spacing-xs);
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.875rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: var(--border-radius-md);
+      border: 1px solid var(--border);
+      background-color: var(--card-bg);
+      color: var(--text);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .form-select {
+      appearance: none;
+      background-image: url("image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.5em;
+    }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+
+    .form-check-input {
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid var(--border);
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .form-check-input:checked {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      position: relative;
+    }
+
+    .form-check-input:checked::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 5px;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .form-check-label {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* Containers */
+    .container {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+
+    .container-fluid {
+      width: 100%;
+      padding: 0 var(--spacing-md);
+    }
+
+    /* Cards */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-xl);
+      box-shadow: var(--shadow);
+      padding: var(--spacing-lg);
+      transition: var(--transition);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .card-body {
+      padding: 0;
+    }
+
+    /* Layout */
+    header {
+      background-color: var(--card-bg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: var(--spacing-sm) 0;
+      position: sticky;
+      top: 0;
+      z-index: var(--z-index-header);
+      transition: var(--transition);
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 4rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      height: 100%;
+      align-items: center;
+    }
+
+    .logo img, .logo svg {
+      height: 2.5rem;
+      width: 2.5rem;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--spacing-lg);
+      align-items: center;
+      height: 100%;
+    }
+
+    .nav-link {
+      color: var(--text);
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--spacing-sm);
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background-color: var(--primary);
+      transition: var(--transition);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.25rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .theme-toggle:hover {
+      background-color: var(--light);
+      color: var(--primary);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .mobile-menu-btn:hover {
+      background-color: var(--light);
+      color: var(--primary);
+    }
+
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 80%;
+      max-width: 300px;
+      height: 100vh;
+      background-color: var(--card-bg);
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+      z-index: var(--z-index-mobile-menu);
+      transition: right 0.3s ease;
+      padding: 4rem 1.5rem 1.5rem;
+      overflow-y: auto;
+    }
+
+    .mobile-menu.active {
+      right: 0;
+    }
+
+    .mobile-menu-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .mobile-nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding-top: 1rem;
+    }
+
+    .mobile-nav-link {
+      color: var(--text);
+      font-weight: 500;
+      font-size: 1.25rem;
+      transition: var(--transition);
+      padding: 0.5rem 0;
+      display: block;
+    }
+
+    .mobile-nav-link:hover {
+      color: var(--primary);
+    }
+
+    .main-content {
+      min-height: calc(100vh - 140px);
+      padding: var(--spacing-xl) 0;
+    }
+
+    footer {
+      background-color: var(--card-bg);
+      padding: var(--spacing-xl) 0;
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    /* Dashboard */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--spacing-lg);
+      margin-top: var(--spacing-lg);
+    }
+
+    .election-card {
+      transition: var(--transition);
+      border-left: 4px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .election-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+    }
+
+    .election-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .election-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .election-restriction {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background-color: var(--primary);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--border-radius-full);
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-top: var(--spacing-sm);
+      white-space: nowrap;
+    }
+
+    .election-description {
+      color: var(--gray);
+      margin-bottom: var(--spacing-lg);
+      flex-grow: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .election-candidates {
+      margin: var(--spacing-md) 0;
+    }
+
+    .candidate {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .candidate:last-child {
+      border-bottom: none;
+    }
+
+    .candidate-name {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .candidate-votes {
+      color: var(--gray);
+      font-size: 0.875rem;
+      white-space: nowrap;
+      margin-left: var(--spacing-sm);
+    }
+
+    .progress-bar {
+      height: 0.5rem;
+      background-color: var(--border);
+      border-radius: var(--border-radius-full);
+      overflow: hidden;
+      margin: 0.5rem 0;
+      width: 100%;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--primary);
+      border-radius: var(--border-radius-full);
+      transition: width var(--animation-speed) ease;
+    }
+
+    .vote-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-md);
+      flex-wrap: wrap;
+    }
+
+    .vote-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    /* Results */
+    .results-container {
+      margin-top: var(--spacing-xl);
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .results-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .results-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .stat-card {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-lg);
+      padding: var(--spacing-md);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .stat-label {
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+
+    /* Forms */
+    .auth-container {
+      max-width: 500px;
+      margin: 4rem auto;
+    }
+
+    .auth-card {
+      border-radius: var(--border-radius-2xl);
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .auth-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: var(--spacing-2xl);
+      text-align: center;
+    }
+
+    .auth-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .auth-subtitle {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .auth-body {
+      padding: var(--spacing-2xl);
+      background-color: var(--card-bg);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+    }
+
+    .auth-footer {
+      padding: var(--spacing-md) var(--spacing-2xl);
+      background-color: var(--card-bg);
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .auth-link {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius-md);
+      margin-bottom: var(--spacing-md);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .alert-info {
+      background-color: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      color: var(--info);
+    }
+
+    .alert-success {
+      background-color: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+
+    .alert-warning {
+      background-color: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+    }
+
+    .alert-danger {
+      background-color: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+
+    /* Tables */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .voters-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 600px;
+    }
+
+    .voters-table th {
+      background-color: rgba(99, 102, 241, 0.05);
+      padding: var(--spacing-sm) var(--spacing-md);
+      text-align: left;
+      font-weight: 600;
+      color: var(--primary);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .voters-table td {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .voters-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .voters-table tr:hover {
+      background-color: rgba(99, 102, 241, 0.05);
+    }
+
+    /* Admin Dashboard */
+    .admin-container {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 160px);
+      margin-top: var(--spacing-md);
+      gap: var(--spacing-lg);
+    }
+
+    .sidebar {
+      width: 100%;
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-xl);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .sidebar-nav {
+      list-style: none;
+    }
+
+    .sidebar-item {
+      padding: var(--spacing-md) var(--spacing-lg);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      border-left: 4px solid transparent;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-item:last-child {
+      border-bottom: none;
+    }
+
+    .sidebar-item:hover {
+      background-color: rgba(99, 102, 241, 0.05);
+      color: var(--primary);
+    }
+
+    .sidebar-item.active {
+      background-color: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+      border-left-color: var(--primary);
+      font-weight: 600;
+    }
+
+    .sidebar-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .admin-header {
+      margin-bottom: var(--spacing-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .admin-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    /* Election management */
+    .election-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--spacing-lg);
+      margin-top: var(--spacing-md);
+    }
+
+    .election-item {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .election-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .election-item-content {
+      padding: var(--spacing-lg);
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .election-item-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .election-item-description {
+      color: var(--gray);
+      margin-bottom: var(--spacing-md);
+      flex-grow: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .election-item-meta {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .election-item-date {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+
+    .election-item-status {
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--border-radius-full);
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .status-active {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .status-inactive {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .election-actions {
+      display: flex;
+      gap: var(--spacing-xs);
+      border-top: 1px solid var(--border);
+      padding-top: var(--spacing-md);
+      flex-wrap: wrap;
+    }
+
+    /* Form styles */
+    .form-container {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-xl);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: var(--spacing-xl);
+    }
+
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .candidate-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .candidate-input {
+      display: flex;
+      gap: var(--spacing-sm);
+      align-items: center;
+    }
+
+    .candidate-input input {
+      flex: 1;
+    }
+
+    .remove-candidate {
+      background-color: var(--danger);
+      color: white;
+      border: none;
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--border-radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: bold;
+    }
+
+    .remove-candidate:hover {
+      background-color: #dc2626;
+      transform: scale(1.1);
+    }
+
+    .add-candidate {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+      padding: var(--spacing-sm) 0;
+      font-weight: 500;
+    }
+
+    .add-candidate:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-lg);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    /* Utility classes */
+    .text-center {
+      text-align: center;
+    }
+
+    .mt-0 { margin-top: 0; }
+    .mt-1 { margin-top: var(--spacing-xs); }
+    .mt-2 { margin-top: var(--spacing-sm); }
+    .mt-3 { margin-top: var(--spacing-md); }
+    .mt-4 { margin-top: var(--spacing-lg); }
+    .mt-5 { margin-top: var(--spacing-xl); }
+    .mt-6 { margin-top: var(--spacing-2xl); }
+    .mt-7 { margin-top: var(--spacing-3xl); }
+
+    .mb-0 { margin-bottom: 0; }
+    .mb-1 { margin-bottom: var(--spacing-xs); }
+    .mb-2 { margin-bottom: var(--spacing-sm); }
+    .mb-3 { margin-bottom: var(--spacing-md); }
+    .mb-4 { margin-bottom: var(--spacing-lg); }
+    .mb-5 { margin-bottom: var(--spacing-xl); }
+    .mb-6 { margin-bottom: var(--spacing-2xl); }
+    .mb-7 { margin-bottom: var(--spacing-3xl); }
+
+    .pt-0 { padding-top: 0; }
+    .pt-1 { padding-top: var(--spacing-xs); }
+    .pt-2 { padding-top: var(--spacing-sm); }
+    .pt-3 { padding-top: var(--spacing-md); }
+    .pt-4 { padding-top: var(--spacing-lg); }
+    .pt-5 { padding-top: var(--spacing-xl); }
+
+    .pb-0 { padding-bottom: 0; }
+    .pb-1 { padding-bottom: var(--spacing-xs); }
+    .pb-2 { padding-bottom: var(--spacing-sm); }
+    .pb-3 { padding-bottom: var(--spacing-md); }
+    .pb-4 { padding-bottom: var(--spacing-lg); }
+    .pb-5 { padding-bottom: var(--spacing-xl); }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn var(--animation-speed) ease forwards;
+    }
+
+    /* Notification system */
+    .notification {
+      position: fixed;
+      top: var(--spacing-md);
+      right: var(--spacing-md);
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--border-radius-md);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      z-index: var(--z-index-notification);
+      box-shadow: var(--shadow);
+      max-width: 350px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all var(--animation-speed) ease;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background-color: var(--success);
+    }
+
+    .notification.error {
+      background-color: var(--danger);
+    }
+
+    .notification.warning {
+      background-color: var(--warning);
+    }
+
+    .notification.info {
+      background-color: var(--info);
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-close {
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity var(--animation-speed);
+    }
+
+    .notification-close:hover {
+      opacity: 1;
+    }
+
+    /* Floating action button */
+    .fab {
+      position: fixed;
+      bottom: var(--spacing-2xl);
+      right: var(--spacing-2xl);
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: var(--border-radius-full);
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: var(--z-index-fab);
+      font-size: 1.5rem;
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    .fab.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .fab:hover {
+      transform: scale(1.1);
+      background-color: var(--primary-dark);
+    }
+
+    /* Responsive design */
+    @media (min-width: 768px) {
+      .container {
+        padding: 0 var(--spacing-lg);
+      }
+      
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      h1 {
+        font-size: 2.25rem;
+      }
+      
+      h2 {
+        font-size: 1.75rem;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+      
+      .election-list {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --max-width: 100%;
+      }
+      
+      .container {
+        padding: 0 var(--spacing-md);
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      .logo-text {
+        display: none;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .results-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      
+      .election-list {
+        grid-template-columns: 1fr;
+      }
+      
+      .admin-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+      }
+      
+      .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .form-actions {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.75rem;
+      }
+      
+      h2 {
+        font-size: 1.25rem;
+      }
+      
+      .hero-title {
+        font-size: 1.75rem;
+      }
+      
+      .hero-buttons {
+        flex-direction: column;
+      }
+      
+      .hero-buttons .btn {
+        width: 100%;
+      }
+      
+      .section-title {
+        font-size: 1.5rem;
+      }
+      
+      .cta-title {
+        font-size: 1.5rem;
+      }
+      
+      .fab {
+        bottom: var(--spacing-lg);
+        right: var(--spacing-lg);
+        width: 3rem;
+        height: 3rem;
+      }
+      
+      .vote-btn {
+        min-width: auto;
+        flex: 1 1 100%;
+      }
+      
+      .candidate-votes {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav-container">
+      <a href="#" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span class="logo-text">VoteSphere</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#testimonials" class="nav-link">Testimonials</a>
+        <a href="login.html" class="nav-link btn btn-outline btn-sm">Student Login</a>
+        <a href="admin-login.html" class="nav-link btn btn-primary btn-sm">Admin Login</a>
+        <button class="theme-toggle" id="theme-toggle">
+          <span id="theme-icon">🌙</span>
+        </button>
+      </nav>
+      <button class="mobile-menu-btn" id="mobile-menu-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="mobile-menu" id="mobile-menu">
+      <button class="mobile-menu-close" id="mobile-menu-close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="mobile-nav-links">
+        <a href="#features" class="mobile-nav-link">Features</a>
+        <a href="#how-it-works" class="mobile-nav-link">How It Works</a>
+        <a href="#testimonials" class="mobile-nav-link">Testimonials</a>
+        <a href="login.html" class="mobile-nav-link">Student Login</a>
+        <a href="admin-login.html" class="mobile-nav-link">Admin Login</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="hero-title fade-in">Secure & Transparent Student Voting System</h1>
+          <p class="hero-subtitle fade-in">VoteSphere provides a modern, secure platform for student union elections with university and department-specific voting capabilities. No more paper ballots or manual counting!</p>
+          
+          <div class="hero-buttons fade-in">
+            <a href="login.html" class="btn btn-primary btn-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="20" y1="11" x2="22" y2="11"></line>
+              </svg>
+              Student Login
+            </a>
+            <a href="admin-login.html" class="btn btn-outline btn-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Admin Login
+            </a>
+          </div>
+          
+          <div class="hero-stats">
+            <div class="stat-item fade-in">
+              <div class="stat-value">100+</div>
+              <div class="stat-label">Universities</div>
+            </div>
+            <div class="stat-item fade-in">
+              <div class="stat-value">50K+</div>
+              <div class="stat-label">Students</div>
+            </div>
+            <div class="stat-item fade-in">
+              <div class="stat-value">100%</div>
+              <div class="stat-label">Secure Voting</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features" id="features">
+      <div class="container">
+        <div class="section-header fade-in">
+          <h2 class="section-title">Why Choose VoteSphere?</h2>
+          <p class="section-subtitle">Built with security, transparency, and ease of use in mind</p>
+        </div>
+        
+        <div class="features-grid">
+          <div class="feature-card fade-in">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <h3 class="feature-title">Secure Voting</h3>
+            <p>End-to-end encryption, secure authentication, and blockchain-inspired vote recording prevent tampering and ensure vote integrity. Each vote is cryptographically secured and cannot be altered after submission.</p>
+          </div>
+          
+          <div class="feature-card fade-in">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <h3 class="feature-title">One-Person-One-Vote</h3>
+            <p>Unique voter verification using matriculation numbers ensures each student votes only once with no possibility of duplicate voting. Our system tracks voting history to prevent fraud while maintaining voter anonymity.</p>
+          </div>
+          
+          <div class="feature-card fade-in">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <h3 class="feature-title">Targeted Elections</h3>
+            <p>Create elections restricted to specific universities or departments, giving you complete control over voter eligibility. Admins can tailor elections to specific student groups with just a few clicks.</p>
+          </div>
+          
+          <div class="feature-card fade-in">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+            </div>
+            <h3 class="feature-title">Real-time Analytics</h3>
+            <p>Monitor election progress with detailed analytics, visualizations, and comprehensive audit trails for complete transparency. View results as they come in with live updating charts and statistics.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works" id="how-it-works">
+      <div class="container">
+        <div class="section-header fade-in">
+          <h2 class="section-title">How It Works</h2>
+          <p class="section-subtitle">Simple steps to conduct secure elections</p>
+        </div>
+        
+        <div class="steps">
+          <div class="step fade-in">
+            <div class="step-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <polyline points="17 11 19 13 23 9"></polyline>
+              </svg>
+            </div>
+            <h3 class="step-title">Admin Creates Election</h3>
+            <p>Set up elections with specific candidates, dates, and voter restrictions in minutes. Customize your election with university and department targeting options.</p>
+          </div>
+          
+          <div class="step fade-in">
+            <div class="step-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <h3 class="step-title">Students Vote Securely</h3>
+            <p>Eligible students cast their votes with verified identities through our intuitive interface. Each vote is securely recorded and cannot be altered.</p>
+          </div>
+          
+          <div class="step fade-in">
+            <div class="step-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              </svg>
+            </div>
+            <h3 class="step-title">Real-time Results</h3>
+            <p>Monitor election progress with live updates and analytics. View comprehensive results with detailed breakdowns by university and department.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="testimonials" id="testimonials">
+      <div class="container">
+        <div class="section-header fade-in">
+          <h2 class="section-title">What Our Users Say</h2>
+          <p class="section-subtitle">Trusted by universities and student unions across the country</p>
+        </div>
+        
+        <div class="testimonial-grid">
+          <div class="testimonial fade-in">
+            <div class="testimonial-content">
+              VoteSphere transformed our student union elections. The platform is intuitive, secure, and saved us countless hours of manual vote counting. The department-specific election feature was particularly useful for our faculty elections.
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">JD</div>
+              <div class="author-info">
+                <h4>John Doe</h4>
+                <p>Student Union President, University of Lagos</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="testimonial fade-in">
+            <div class="testimonial-content">
+              As an admin, I appreciate the granular control over election parameters. Being able to restrict voting to specific departments has been invaluable for our faculty-level elections. The audit trail gives us complete confidence in the results.
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">AS</div>
+              <div class="author-info">
+                <h4>Amina Suleiman</h4>
+                <p>Elections Coordinator, Covenant University</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="testimonial fade-in">
+            <div class="testimonial-content">
+              The voting process was seamless and secure. I loved being able to see real-time results as votes came in. The system prevented me from voting twice, which gave me confidence in the integrity of the election.
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">CB</div>
+              <div class="author-info">
+                <h4>Chinedu Brown</h4>
+                <p>Computer Science Student, University of Ibadan</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="container">
+        <div class="cta-content">
+          <h2 class="cta-title fade-in">Ready to Transform Your Student Elections?</h2>
+          <p class="cta-subtitle fade-in">Join hundreds of universities already using VoteSphere for secure, transparent, and efficient student union elections.</p>
+          
+          <div class="cta-buttons fade-in">
+            <a href="login.html" class="btn btn-lg" style="background-color: white; color: var(--primary);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="20" y1="11" x2="22" y2="11"></line>
+              </svg>
+              Get Started as Student
+            </a>
+            <a href="admin-login.html" class="btn btn-outline btn-lg" style="background-color: white; color: var(--primary);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Get Started as Admin
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <p>&copy; 2023 VoteSphere. All rights reserved.</p>
+      <div>
+        <a href="#" class="text-gray" style="margin-right: var(--spacing-md);">Privacy Policy</a>
+        <a href="#" class="text-gray">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="fab" id="scroll-top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5"></line>
+      <polyline points="5 12 12 5 19 12"></polyline>
+    </svg>
+  </div>
+
+  <div id="notification-container"></div>
+
+  <script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    // Check for saved theme preference or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeIcon.textContent = '☀️';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+    
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+    
+    mobileMenuClose.addEventListener('click', () => {
+      mobileMenu.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+    
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+    });
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          
+          // Close mobile menu if open
+          mobileMenu.classList.remove('active');
+          document.body.style.overflow = 'auto';
+        }
+      });
+    });
+    
+    // Scroll to top button
+    const scrollTopBtn = document.getElementById('scroll-top');
+    
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.style.opacity = '1';
+        scrollTopBtn.style.transform = 'scale(1)';
+      } else {
+        scrollTopBtn.style.opacity = '0';
+        scrollTopBtn.style.transform = 'scale(0.5)';
+      }
+    });
+    
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+    
+    // Notification system
+    function showNotification(message, type = 'info', duration = 5000) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.innerHTML = `
+        <div class="notification-content">${message}</div>
+        <div class="notification-close">&times;</div>
+      `;
+      
+      document.getElementById('notification-container').appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+      
+      // Auto close
+      const closeTimeout = setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, duration);
+      
+      // Close on click
+      notification.querySelector('.notification-close').addEventListener('click', () => {
+        clearTimeout(closeTimeout);
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      });
+    }
+    
+    // Initialize animations when elements are in view
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = 1;
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+    
+    // Observe elements that should animate when in view
+    document.querySelectorAll('.fade-in').forEach(element => {
+      element.style.opacity = 0;
+      element.style.transform = 'translateY(20px)';
+      element.style.transition = 'opacity var(--animation-speed) ease, transform var(--animation-speed) ease';
+      observer.observe(element);
+    });
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Show welcome notification on first visit
+      if (!localStorage.getItem('visited')) {
+        showNotification('Welcome to VoteSphere! Secure student voting made simple.', 'success', 8000);
+        localStorage.setItem('visited', 'true');
+      }
+      
+      // Initialize scroll top button
+      scrollTopBtn.style.opacity = '0';
+      scrollTopBtn.style.transform = 'scale(0.5)';
+      
+      // Add parallax effect to hero image
+      window.addEventListener('scroll', () => {
+        const heroImage = document.querySelector('.hero-image');
+        if (heroImage) {
+          const scrollPosition = window.pageYOffset;
+          heroImage.style.transform = `translateY(${scrollPosition * 0.1}px)`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
