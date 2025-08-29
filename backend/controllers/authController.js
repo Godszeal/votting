@@ -113,7 +113,14 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     //   message: `You have requested a password reset. Please make a PUT request to: \n\n ${resetUrl}`
     // });
 
-    res.status(200).json({ success: true,  'Reset token generated' });
+    // Return a proper JSON object. For development, include the token so you can test the flow.
+    const responsePayload = { success: true, message: 'Reset token generated' };
+    if (process.env.NODE_ENV !== 'production') {
+      responsePayload.resetToken = resetToken;
+      responsePayload.resetUrl = resetUrl;
+    }
+
+    res.status(200).json(responsePayload);
   } catch (err) {
     console.error(err);
     user.resetPasswordToken = undefined;
@@ -130,6 +137,10 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 exports.resetPassword = asyncHandler(async (req, res, next) => {
   // Get password from request body
   const { password } = req.body;
+
+  if (!password) {
+    return next(new ErrorResponse('Please provide a new password', 400));
+  }
 
   // Hash password
   const salt = await bcrypt.genSalt(10);
