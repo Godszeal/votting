@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Elections - Admin Panel</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-vote-yea"></i>
+                <h1>Admin Panel</h1>
+            </div>
+            
+            <nav class="admin-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="create-election.html">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Create Election</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="manage-elections.html">
+                            <i class="fas fa-list"></i>
+                            <span>Manage Elections</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="results.html">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Results</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="manage-users.html">
+                            <i class="fas fa-users"></i>
+                            <span>Manage Users</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="settings.html">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="../images/avatars/default.jpg" alt="Admin">
+                    <div>
+                        <h4>Admin User</h4>
+                        <p>admin@university.edu</p>
+                    </div>
+                </div>
+                <button class="btn logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="admin-header">
+                <div class="header-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2>Manage Elections</h2>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search elections...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <a href="create-election.html" class="btn">
+                        <i class="fas fa-plus"></i> Create Election
+                    </a>
+                </div>
+            </header>
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="status-filter">Status:</label>
+                    <select id="status-filter">
+                        <option value="all">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="faculty-filter">Faculty:</label>
+                    <select id="faculty-filter">
+                        <option value="all">All Faculties</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Science">Science</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Medicine">Medicine</option>
+                        <option value="Business">Business</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="elections-grid">
+                <!-- Election cards will be loaded here -->
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>
