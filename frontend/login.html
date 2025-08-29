@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Student Voting System</title>
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-form">
+            <div class="logo">
+                <i class="fas fa-vote-yea"></i>
+                <h1>Student Voting System</h1>
+            </div>
+            
+            <h2>Welcome Back</h2>
+            <p>Log in to your account to vote in student elections</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="matricNumber">Matric Number</label>
+                    <div class="input-icon">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="matricNumber" name="matricNumber" placeholder="Enter your 10-digit matric number" maxlength="10" required>
+                    </div>
+                    <div class="error-message" id="matricNumberError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <button type="button" class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="forgot-password.html" class="forgot-password">Forgot Password?</a>
+                </div>
+                
+                <button type="submit" class="btn">Login</button>
+                
+                <div class="divider">
+                    <span>or</span>
+                </div>
+                
+                <a href="signup.html" class="btn secondary">Create New Account</a>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="signup.html">Sign up now</a></p>
+            </div>
+        </div>
+        
+        <div class="auth-illustration">
+            <img src="images/voting.jpg" alt="Student Voting">
+            <div class="overlay">
+                <h3>Secure & Transparent Elections</h3>
+                <p>Our system ensures one-person-one-vote and prevents any form of tampering</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>
