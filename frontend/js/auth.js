@@ -78,6 +78,88 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Admin login form submission
+    const adminLoginForm = document.getElementById('adminLoginForm');
+    if (adminLoginForm) {
+        adminLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Reset error messages
+            document.getElementById('matricNumberError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+            
+            const matricNumber = document.getElementById('matricNumber').value;
+            const password = document.getElementById('password').value;
+            let isValid = true;
+            
+            // Validate matric number
+            if (!/^\d{10}$/.test(matricNumber)) {
+                document.getElementById('matricNumberError').textContent = 'Matric number must be exactly 10 digits';
+                isValid = false;
+            }
+            
+            // Validate password
+            if (password.length < 6) {
+                document.getElementById('passwordError').textContent = 'Password must be at least 6 characters';
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            try {
+                // Show loading state
+                const submitBtn = adminLoginForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+                submitBtn.disabled = true;
+                
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ matricNumber, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Check if user is admin
+                    if (data.user.role === 'admin') {
+                        // Save token to localStorage
+                        localStorage.setItem('token', data.token);
+                        
+                        // Redirect to admin dashboard
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        document.getElementById('matricNumberError').textContent = 'You do not have admin privileges';
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                } else {
+                    // Handle specific error messages
+                    if (data.error.includes('Invalid credentials')) {
+                        document.getElementById('passwordError').textContent = 'Invalid credentials. Please try again.';
+                    } else {
+                        document.getElementById('matricNumberError').textContent = data.error || 'Login failed. Please try again.';
+                    }
+                    
+                    // Reset button state
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Admin login error:', error);
+                document.getElementById('matricNumberError').textContent = 'Network error. Please check your connection.';
+                
+                // Reset button state
+                const submitBtn = adminLoginForm.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+    
     // Signup form submission
     const signupForm = document.getElementById('signupForm');
     if (signupForm) {
