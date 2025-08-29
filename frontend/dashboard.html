@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Student Voting System</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-vote-yea"></i>
+                    <span>Student Voting System</span>
+                </a>
+            </div>
+            <div class="header-right">
+                <div class="profile-dropdown">
+                    <div class="avatar">
+                        <img src="images/avatars/default.jpg" alt="Profile" class="avatar-img">
+                    </div>
+                    <span class="username">student123</span>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+                    <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <h1 class="page-title">Available Elections</h1>
+            
+            <div class="elections-section">
+                <div class="section-header">
+                    <h2>Active Elections</h2>
+                </div>
+                <div class="elections-grid" id="available-elections">
+                    <!-- Elections will be loaded here dynamically -->
+                </div>
+            </div>
+            
+            <div class="voted-section">
+                <div class="section-header">
+                    <h2>Voting History</h2>
+                </div>
+                <div class="voted-elections" id="voted-elections">
+                    <!-- Voted elections will be loaded here dynamically -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
