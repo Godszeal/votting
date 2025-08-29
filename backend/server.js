@@ -1,91 +1,46 @@
-// THIS MUST BE THE VERY FIRST LINE
-require('dotenv').config({
-  path: __dirname + '/.env'
-});
-
-// Verify critical environment variables
-if (!process.env.JWT_SECRET) {
-  console.error('\n\n❌ CRITICAL ERROR: JWT_SECRET is not loaded!');
-  console.error('Please check:');
-  console.error('1. You have a .env file in the backend directory');
-  console.error('2. The .env file contains JWT_SECRET=your_key_here');
-  console.error('3. The file path is correct: ' + __dirname + '/.env');
-  console.error('4. You restarted the server after making changes\n\n');
-  process.exit(1);
-}
-
-if (!process.env.MONGO_URI) {
-  console.error('\n\n❌ CRITICAL ERROR: MONGO_URI is not loaded!');
-  console.error('Please check your .env file contains MONGO_URI=mongodb://localhost:27017/student_voting\n\n');
-  process.exit(1);
-}
-
+require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const connectDB = require('./config/db');
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/user');
-const adminRoutes = require('./routes/admin');
+const errorHandler = require('./middleware/errorHandler');
 const path = require('path');
 
-// Verify environment variables
-console.log('✅ Environment verification:');
-console.log(`   MONGO_URI: ${process.env.MONGO_URI ? 'SET' : 'NOT SET'}`);
-console.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? `[${process.env.JWT_SECRET.length} characters]` : 'NOT SET'}`);
-console.log(`   ADMIN_EMAIL: ${process.env.ADMIN_EMAIL ? 'SET' : 'NOT SET'}`);
-console.log(`   ADMIN_PASSWORD: ${process.env.ADMIN_PASSWORD ? 'SET' : 'NOT SET'}`);
+const app = express();
 
 // Connect to database
 connectDB();
 
-const app = express();
-
 // Middleware
-app.use(express.json());
+app.use(express.json({ extended: false }));
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/admin', adminRoutes);
+// Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  app.use(express.static('frontend/build'));
 
-// Serve HTML files
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'index.html'));
-});
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send('API is running...');
+  });
+}
 
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'login.html'));
-});
-
-app.get('/signup', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'signup.html'));
-});
-
-app.get('/user-dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'user-dashboard.html'));
-});
-
-app.get('/admin-login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'admin-login.html'));
-});
-
-app.get('/admin-dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'admin-dashboard.html'));
-});
+// Error handling middleware
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n✅ Server started on port ${PORT}`);
-  console.log('🚀 Student Voting System is ready!');
-  console.log('----------------------------------------');
-  console.log('Access:');
-  console.log('  Student Portal: http://localhost:5000');
-  console.log('  Admin Login: http://localhost:5000/admin-login.html');
-  console.log('  Admin Credentials:');
-  console.log('    Email: babalolahephzibah2@gmail.com');
-  console.log('    Password: Godszeal');
-  console.log('----------------------------------------\n');
+
+const server = app.listen(PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`));
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err, promise) => {
+  console.log(`Error: ${err.message}`);
+  // Close server & exit process
+  server.close(() => process.exit(1));
 });
