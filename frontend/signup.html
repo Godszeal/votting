@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Student Voting System</title>
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-form">
+            <div class="logo">
+                <i class="fas fa-vote-yea"></i>
+                <h1>Student Voting System</h1>
+            </div>
+            
+            <h2>Create Your Account</h2>
+            <p>Register with your student details to participate in elections</p>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="matricNumber">Matric Number</label>
+                    <div class="input-icon">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="matricNumber" name="matricNumber" placeholder="Enter your 10-digit matric number" maxlength="10" required>
+                    </div>
+                    <div class="error-message" id="matricNumberError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" name="username" placeholder="Choose a username" required>
+                    </div>
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="Enter your university email" required>
+                    </div>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="faculty">Faculty</label>
+                        <div class="input-icon">
+                            <i class="fas fa-university"></i>
+                            <select id="faculty" name="faculty" required>
+                                <option value="">Select Faculty</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Science">Science</option>
+                                <option value="Arts">Arts</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Business">Business</option>
+                            </select>
+                        </div>
+                        <div class="error-message" id="facultyError"></div>
+                    </div>
+                    
+                    <div class="form-group half">
+                        <label for="department">Department</label>
+                        <div class="input-icon">
+                            <i class="fas fa-building"></i>
+                            <select id="department" name="department" required>
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+                        <div class="error-message" id="departmentError"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Create a secure password" required>
+                        <button type="button" class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                        <button type="button" class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="confirmPasswordError"></div>
+                </div>
+                
+                <button type="submit" class="btn">Create Account</button>
+                
+                <div class="divider">
+                    <span>or</span>
+                </div>
+                
+                <a href="login.html" class="btn secondary">Already have an account? Login</a>
+            </form>
+            
+            <div class="auth-footer">
+                <p>By creating an account, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+            </div>
+        </div>
+        
+        <div class="auth-illustration">
+            <img src="images/secure.jpg" alt="Secure Voting">
+            <div class="overlay">
+                <h3>One Person, One Vote</h3>
+                <p>Our system ensures fair elections with strict verification processes</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>
