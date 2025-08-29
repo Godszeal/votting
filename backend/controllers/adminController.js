@@ -43,7 +43,7 @@ exports.createElection = asyncHandler(async (req, res, next) => {
   
   res.status(201).json({
     success: true,
-    data: election
+     election
   });
 });
 
@@ -139,7 +139,7 @@ exports.endElection = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-    data: election
+     election
   });
 });
 
@@ -158,7 +158,7 @@ exports.getElectionResults = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-    data: {
+     {
       election: {
         _id: election._id,
         title: election.title,
