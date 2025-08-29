@@ -1,34 +1,13 @@
 {
-  "name": "student-voting-system",
-  "version": "2.1.1",
-  "description": "A secure and transparent student voting and election system for universities",
+  "name": "course-platform-server",
+  "version": "1.0.0",
+  "description": "Backend for course platform",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "server": "nodemon backend/server.js",
-    "client": "npm start --prefix frontend",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "npm install --prefix frontend && npm run build --prefix frontend",
-    "install": "npm install --prefix frontend",
-    "postinstall": "npm run build",
-    "test": "jest",
-    "lint": "eslint .",
-    "seed": "node backend/seeder.js",
-    "format": "prettier --write \"**/*.{js,jsx,json,css,scss,md}\"",
-    "validate": "npm ls"
+    "dev": "nodemon backend/server.js"
   },
-  "author": "Student Voting System Development Team",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yourusername/student-voting-system.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/student-voting-system/issues"
-  },
-  "homepage": "https://github.com/yourusername/student-voting-system#readme",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
+  "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -43,49 +22,5 @@
     "mongoose": "^7.5.2",
     "nodemailer": "^6.9.5",
     "xss-clean": "^0.1.1"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.0",
-    "eslint": "^8.48.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "jest": "^29.6.4",
-    "lint-staged": "^14.0.1",
-    "nodemon": "^3.0.1",
-    "prettier": "^3.0.3"
-  },
-  "engines": {
-    "node": "18.x",
-    "npm": "9.x"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "lint-staged": {
-    "*.{js,jsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.json": [
-      "prettier --write"
-    ]
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "collectCoverageFrom": [
-      "backend/**/*.js",
-      "!backend/server.js",
-      "!backend/seeder.js",
-      "!**/node_modules/**"
-    ]
-  }
+}
 }
