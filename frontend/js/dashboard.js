@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 if (document.querySelector('.matric-number')) {
-                    document.querySelector('.matric-number').textContent = user.matricNumber;
+                    document.querySelector('.matric-number').textContent = `Matric Number: ${user.matricNumber}`;
                 }
             }
         } catch (error) {
@@ -115,12 +115,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <h3>${election.title}</h3>
                                 <span class="status active">Active</span>
                             </div>
-                            <div class="election-details">
-                                <p><i class="fas fa-university"></i> ${election.faculty}</p>
-                                <p><i class="fas fa-building"></i> ${election.department}</p>
-                                <p><i class="fas fa-calendar"></i> ${new Date(election.startDate).toLocaleDateString()} - ${new Date(election.endDate).toLocaleDateString()}</p>
+                            <div class="election-body">
+                                <div class="election-info">
+                                    <p><i class="fas fa-university"></i> ${election.faculty}</p>
+                                    <p><i class="fas fa-building"></i> ${election.department}</p>
+                                    <p><i class="fas fa-calendar"></i> ${new Date(election.startDate).toLocaleDateString()} - ${new Date(election.endDate).toLocaleDateString()}</p>
+                                </div>
                             </div>
-                            <button class="btn vote-btn" data-id="${election._id}">Vote Now</button>
+                            <div class="election-footer">
+                                <button class="btn vote-btn" data-id="${election._id}">Vote Now</button>
+                            </div>
                         `;
                         electionsContainer.appendChild(electionCard);
                     });
