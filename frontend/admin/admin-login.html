@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Student Voting System</title>
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-form">
+            <div class="logo">
+                <i class="fas fa-vote-yea"></i>
+                <h1>Admin Panel</h1>
+            </div>
+            
+            <h2>Admin Login</h2>
+            <p>Access the admin dashboard to manage elections</p>
+            
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="matricNumber">Matric Number</label>
+                    <div class="input-icon">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="matricNumber" name="matricNumber" placeholder="Enter admin matric number" maxlength="10" required>
+                    </div>
+                    <div class="error-message" id="matricNumberError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Enter admin password" required>
+                        <button type="button" class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                
+                <button type="submit" class="btn">Login to Admin Panel</button>
+                
+                <div class="divider">
+                    <span>or</span>
+                </div>
+                
+                <a href="../login.html" class="btn secondary">User Login</a>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Only authorized administrators can access this panel</p>
+            </div>
+        </div>
+        
+        <div class="auth-illustration">
+            <img src="../images/admin.jpg" alt="Admin Panel">
+            <div class="overlay">
+                <h3>Secure Administration</h3>
+                <p>Full control over election management with advanced security features</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('adminLoginForm');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    // Reset error messages
+                    document.getElementById('matricNumberError').textContent = '';
+                    document.getElementById('passwordError').textContent = '';
+                    
+                    const matricNumber = document.getElementById('matricNumber').value;
+                    const password = document.getElementById('password').value;
+                    let isValid = true;
+                    
+                    // Validate matric number
+                    if (!/^\d{10}$/.test(matricNumber)) {
+                        document.getElementById('matricNumberError').textContent = 'Matric number must be exactly 10 digits';
+                        isValid = false;
+                    }
+                    
+                    // Validate password
+                    if (password.length < 6) {
+                        document.getElementById('passwordError').textContent = 'Password must be at least 6 characters';
+                        isValid = false;
+                    }
+                    
+                    if (!isValid) return;
+                    
+                    try {
+                        // Show loading state
+                        const submitBtn = loginForm.querySelector('button[type="submit"]');
+                        const originalText = submitBtn.innerHTML;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+                        submitBtn.disabled = true;
+                        
+                        const response = await fetch('/api/auth/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ matricNumber, password })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            // Check if user is admin
+                            if (data.user.role === 'admin') {
+                                // Save token to localStorage
+                                localStorage.setItem('token', data.token);
+                                
+                                // Redirect to admin dashboard
+                                window.location.href = 'dashboard.html';
+                            } else {
+                                document.getElementById('matricNumberError').textContent = 'You do not have admin privileges';
+                                submitBtn.innerHTML = originalText;
+                                submitBtn.disabled = false;
+                            }
+                        } else {
+                            // Handle specific error messages
+                            if (data.error.includes('Invalid credentials')) {
+                                document.getElementById('passwordError').textContent = 'Invalid credentials. Please try again.';
+                            } else {
+                                document.getElementById('matricNumberError').textContent = data.error || 'Login failed. Please try again.';
+                            }
+                            
+                            // Reset button state
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    } catch (error) {
+                        console.error('Admin login error:', error);
+                        document.getElementById('matricNumberError').textContent = 'Network error. Please check your connection.';
+                        
+                        // Reset button state
+                        const submitBtn = loginForm.querySelector('button[type="submit"]');
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+            
+            // Password visibility toggle
+            const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+            togglePasswordButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = this.previousElementSibling;
+                    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                    input.setAttribute('type', type);
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
