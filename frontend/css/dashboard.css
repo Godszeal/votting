@@ -71,6 +71,23 @@ body {
     color: #212529;
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #212529;
+}
+
+.logo i {
+    font-size: 1.5rem;
+}
+
+.logo span {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
 .dashboard-header h1 {
     font-size: 1.8rem;
     color: #212529;
@@ -165,16 +182,178 @@ body {
 }
 
 /* Main Content */
-.vote-content,
-.profile-content {
+.dashboard-content {
     padding: 30px 20px;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
 }
 
-.vote-info,
-.profile-header {
+.page-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: #212529;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    color: #212529;
+}
+
+.elections-grid,
+.voted-elections {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.election-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.election-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.election-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.election-header h3 {
+    font-size: 1.3rem;
+    color: #212529;
+    margin-bottom: 5px;
+}
+
+.election-body {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.election-info {
+    color: #6c757d;
+}
+
+.election-info p {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.election-stats {
+    padding: 15px 20px;
+    background: #f1f3f5;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.stat {
+    text-align: center;
+}
+
+.value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 5px;
+}
+
+.label {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.election-footer {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status.active {
+    background: rgba(76, 201, 240, 0.1);
+    color: var(--success);
+}
+
+.status.upcoming {
+    background: rgba(248, 150, 30, 0.1);
+    color: var(--warning);
+}
+
+.status.completed {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary);
+}
+
+.voted-election {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+}
+
+.voted-election-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.voted-election-header h3 {
+    font-size: 1.2rem;
+    color: #212529;
+}
+
+.voted-election-details {
+    color: #6c757d;
+}
+
+.voted-election-details p {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Vote Page Specific Styles */
+.vote-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.vote-info {
     background: white;
     border-radius: 15px;
     padding: 25px;
@@ -182,8 +361,7 @@ body {
     margin-bottom: 30px;
 }
 
-.vote-info h2,
-.profile-content h2 {
+.vote-info h2 {
     font-size: 1.8rem;
     margin-bottom: 20px;
     color: #212529;
@@ -200,7 +378,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #495057;
+    color: #6c757d;
 }
 
 .info-item i {
@@ -213,7 +391,7 @@ body {
     border-left: 4px solid var(--primary);
     padding: 15px 20px;
     border-radius: 0 8px 8px 0;
-    color: #495057;
+    color: #6c757d;
 }
 
 /* Candidates Section */
@@ -222,6 +400,7 @@ body {
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
 }
 
 .candidates-section h2 {
@@ -308,10 +487,14 @@ body {
 
 /* Profile Styles */
 .profile-header {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
     display: flex;
     align-items: center;
     gap: 30px;
-    margin-bottom: 30px;
 }
 
 .avatar-upload {
@@ -508,8 +691,7 @@ body {
         height: 35px;
     }
     
-    .vote-content,
-    .profile-content {
+    .dashboard-content {
         padding: 20px 15px;
     }
     
@@ -527,5 +709,10 @@ body {
     
     .half {
         width: 100%;
+    }
+    
+    .elections-grid,
+    .voted-elections {
+        grid-template-columns: 1fr;
     }
 }
