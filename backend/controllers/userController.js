@@ -9,10 +9,12 @@ const bcrypt = require('bcryptjs');
 // @access  Private
 exports.getProfile = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('-password');
-  
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
   res.status(200).json({
     success: true,
-     user
+    user,
   });
 });
 
@@ -21,32 +23,32 @@ exports.getProfile = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.updateProfile = asyncHandler(async (req, res, next) => {
   const { username, email, department, faculty } = req.body;
-  
+
   const user = await User.findById(req.user.id);
-  
+
   if (!user) {
     return next(new ErrorResponse('User not found', 404));
   }
-  
+
   // Update fields
   user.username = username || user.username;
   user.email = email || user.email;
   user.department = department || user.department;
   user.faculty = faculty || user.faculty;
-  
+
   const updatedUser = await user.save();
-  
+
   res.status(200).json({
     success: true,
-     {
+    user: {
       _id: updatedUser._id,
       matricNumber: updatedUser.matricNumber,
       username: updatedUser.username,
       email: updatedUser.email,
       department: updatedUser.department,
       faculty: updatedUser.faculty,
-      avatar: updatedUser.avatar
-    }
+      avatar: updatedUser.avatar,
+    },
   });
 });
 
@@ -55,24 +57,25 @@ exports.updateProfile = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.changePassword = asyncHandler(async (req, res, next) => {
   const { currentPassword, newPassword } = req.body;
-  
+
   const user = await User.findById(req.user.id).select('+password');
-  
+
   if (!user) {
     return next(new ErrorResponse('User not found', 404));
   }
-  
+
   // Check current password
   if (!(await user.matchPassword(currentPassword))) {
     return next(new ErrorResponse('Current password is incorrect', 401));
   }
-  
-  user.password = newPassword;
+
+  // Hash new password before saving
+  user.password = await bcrypt.hash(newPassword, 10);
   await user.save();
-  
+
   res.status(200).json({
     success: true,
-    message: 'Password updated successfully'
+    message: 'Password updated successfully',
   });
 });
 
@@ -81,19 +84,25 @@ exports.changePassword = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.getAvailableElections = asyncHandler(async (req, res, next) => {
   const now = new Date();
-  
+
   // Find elections that are active, match user's faculty/department, and user hasn't voted in
   const elections = await Election.find({
     faculty: req.user.faculty,
     department: { $in: [req.user.department, 'All Departments'] },
     startDate: { $lte: now },
     endDate: { $gte: now },
-    isActive: true
+    isActive: true,
   }).sort('-createdAt');
-  
+
+  // Optional: Filter out elections user has already voted in
+  const user = await User.findById(req.user.id);
+  const availableElections = elections.filter(election =>
+    !(user.votedElections || []).map(eid => String(eid)).includes(String(election._id))
+  );
+
   res.status(200).json({
     success: true,
-     elections
+    elections: availableElections,
   });
 });
 
@@ -102,44 +111,48 @@ exports.getAvailableElections = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.castVote = asyncHandler(async (req, res, next) => {
   const { electionId, candidateId } = req.body;
-  
+
   // Check if user has already voted in this election
   const user = await User.findById(req.user.id);
-  if (user.votedElections.includes(electionId)) {
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+  if ((user.votedElections || []).map(eid => String(eid)).includes(String(electionId))) {
     return next(new ErrorResponse('You have already voted in this election', 400));
   }
-  
+
   // Find the election
   const election = await Election.findById(electionId);
   if (!election) {
     return next(new ErrorResponse('Election not found', 404));
   }
-  
+
   // Check if election is still active
   const now = new Date();
   if (now < election.startDate || now > election.endDate || !election.isActive) {
     return next(new ErrorResponse('Election is not currently active', 400));
   }
-  
+
   // Find the candidate
   const candidate = election.candidates.id(candidateId);
   if (!candidate) {
     return next(new ErrorResponse('Candidate not found', 404));
   }
-  
+
   // Increment vote count
   candidate.votes += 1;
-  
+
   // Mark user as having voted in this election
-  user.votedElections.push(electionId);
-  
+  user.votedElections = user.votedElections || [];
+  user.votedElections.push(election._id);
+
   // Save changes
   await election.save();
   await user.save();
-  
+
   res.status(200).json({
     success: true,
-    message: 'Vote cast successfully'
+    message: 'Vote cast successfully',
   });
 });
 
@@ -148,13 +161,13 @@ exports.castVote = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.getVotingHistory = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).populate('votedElections', 'title faculty department startDate endDate');
-  
+
   if (!user) {
     return next(new ErrorResponse('User not found', 404));
   }
-  
+
   res.status(200).json({
     success: true,
-     user.votedElections
+    votingHistory: user.votedElections,
   });
 });
