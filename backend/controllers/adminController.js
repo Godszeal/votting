@@ -54,7 +54,7 @@ exports.createElection = asyncHandler(async (req, res, next) => {
   
   res.status(201).json({
     success: true,
-     election
+    election
   });
 });
 
@@ -67,7 +67,7 @@ exports.getAllElections = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     count: elections.length,
-     elections
+    elections
   });
 });
 
@@ -83,7 +83,7 @@ exports.getElection = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     election
+    election
   });
 });
 
@@ -111,7 +111,7 @@ exports.updateElection = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     election
+    election
   });
 });
 
@@ -150,7 +150,7 @@ exports.endElection = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     election
+    election
   });
 });
 
@@ -169,15 +169,13 @@ exports.getElectionResults = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     {
-      election: {
-        _id: election._id,
-        title: election.title,
-        faculty: election.faculty,
-        department: election.department
-      },
-      results
-    }
+    election: {
+      _id: election._id,
+      title: election.title,
+      faculty: election.faculty,
+      department: election.department
+    },
+    results
   });
 });
 
@@ -190,7 +188,7 @@ exports.manageUsers = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     count: users.length,
-     users
+    users
   });
 });
 
@@ -206,7 +204,7 @@ exports.getUserDetails = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     user
+    user
   });
 });
 
@@ -228,12 +226,10 @@ exports.updateUserRole = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     {
-      _id: updatedUser._id,
-      matricNumber: updatedUser.matricNumber,
-      username: updatedUser.username,
-      email: updatedUser.email,
-      role: updatedUser.role
-    }
+    _id: updatedUser._id,
+    matricNumber: updatedUser.matricNumber,
+    username: updatedUser.username,
+    email: updatedUser.email,
+    role: updatedUser.role
   });
 });
