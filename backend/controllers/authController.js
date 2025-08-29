@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const sendEmail = require('../utils/email');
 
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -81,7 +82,22 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-    data: user
+     user
+  });
+});
+
+// @desc    Logout user / clear cookie
+// @route   GET /api/auth/logout
+// @access  Private
+exports.logout = asyncHandler(async (req, res, next) => {
+  res.cookie('token', 'none', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+
+  res.status(200).json({
+    success: true,
+     {}
   });
 });
 
@@ -106,21 +122,13 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
 
   try {
-    // In production, send email with reset link
-    // await sendEmail({
-    //   email: user.email,
-    //   subject: 'Password Reset Request',
-    //   message: `You have requested a password reset. Please make a PUT request to: \n\n ${resetUrl}`
-    // });
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset Request',
+      message: `You have requested a password reset. Please make a PUT request to: \n\n ${resetUrl}`
+    });
 
-    // Return a proper JSON object. For development, include the token so you can test the flow.
-    const responsePayload = { success: true, message: 'Reset token generated' };
-    if (process.env.NODE_ENV !== 'production') {
-      responsePayload.resetToken = resetToken;
-      responsePayload.resetUrl = resetUrl;
-    }
-
-    res.status(200).json(responsePayload);
+    res.status(200).json({ success: true,  'Reset token sent to email' });
   } catch (err) {
     console.error(err);
     user.resetPasswordToken = undefined;
@@ -132,30 +140,29 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Reset password
-// @route   PUT /api/auth/reset-password
-// @access  Private
+// @route   PUT /api/auth/reset-password/:resettoken
+// @access  Public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
-  // Get password from request body
-  const { password } = req.body;
+  // Get hashed token
+  const resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(req.params.resettoken)
+    .digest('hex');
 
-  if (!password) {
-    return next(new ErrorResponse('Please provide a new password', 400));
-  }
-
-  // Hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-
-  // Update user password
-  const user = await User.findByIdAndUpdate(
-    req.user.id,
-    { password: hashedPassword },
-    { new: true, runValidators: true }
-  );
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() }
+  });
 
   if (!user) {
-    return next(new ErrorResponse('User not found', 404));
+    return next(new ErrorResponse('Invalid token', 400));
   }
+
+  // Set new password
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
 
   sendTokenResponse(user, 200, res);
 });
