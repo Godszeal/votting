@@ -1165,7 +1165,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         labels: labels,
                         datasets: [{
                             label: 'Votes',
-                            data: votesData,
+                             votesData,
                             borderColor: '#4361ee',
                             backgroundColor: 'rgba(67, 97, 238, 0.1)',
                             tension: 0.3,
@@ -1200,7 +1200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         labels: departments,
                         datasets: [{
                             label: 'Votes',
-                            data: votesByDepartment,
+                             votesByDepartment,
                             backgroundColor: '#4cc9f0'
                         }]
                     },
