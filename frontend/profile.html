@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Student Voting System</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="profile-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <a href="dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1>Profile Settings</h1>
+            </div>
+            <div class="header-right">
+                <div class="profile-dropdown">
+                    <div class="avatar">
+                        <img src="images/avatars/default.jpg" alt="Profile" class="avatar-img">
+                    </div>
+                    <span class="username">student123</span>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+                    <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="profile-content">
+            <div class="profile-header">
+                <div class="avatar-upload">
+                    <img src="images/avatars/default.jpg" alt="Profile" class="avatar-preview">
+                    <div class="upload-btn-wrapper">
+                        <button class="btn"><i class="fas fa-camera"></i> Change Photo</button>
+                        <input type="file" id="avatar" name="avatar" accept="image/*">
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h2>student123</h2>
+                    <p class="matric-number">Matric Number: 2019012345</p>
+                </div>
+            </div>
+
+            <div class="profile-form">
+                <h2>Personal Information</h2>
+                <form id="profileForm">
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                        <div class="form-group half">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="matricNumber">Matric Number</label>
+                            <input type="text" id="matricNumber" name="matricNumber" disabled>
+                        </div>
+                        <div class="form-group half">
+                            <label for="faculty">Faculty</label>
+                            <select id="faculty" name="faculty" disabled>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Science">Science</option>
+                                <option value="Arts">Arts</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Business">Business</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" name="department" disabled>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electrical Engineering">Electrical Engineering</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                            <option value="Civil Engineering">Civil Engineering</option>
+                            <option value="Chemical Engineering">Chemical Engineering</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn">Update Profile</button>
+                </form>
+            </div>
+            
+            <div class="profile-form">
+                <h2>Change Password</h2>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter your current password" required>
+                            <button type="button" class="toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="newPassword" name="newPassword" placeholder="Enter your new password" required>
+                            <button type="button" class="toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your new password" required>
+                            <button type="button" class="toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Change Password</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
