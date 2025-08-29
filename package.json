@@ -1,25 +1,66 @@
 {
   "name": "student-voting-system",
-  "version": "1.0.0",
-  "description": "A secure online voting system for student union elections",
+  "version": "2.1.0",
+  "description": "A secure and transparent student voting and election system for universities",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
-    "seed": "node backend/seeder.js"
+    "server": "nodemon backend/server.js",
+    "client": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install": "npm install --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "test": "jest",
+    "lint": "eslint .",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --prefix frontend",
+    "seed": "node backend/seeder.js",
+    "prepare": "husky install"
   },
-  "author": "Your Name",
+  "author": "Student Voting System Development Team",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/student-voting-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/student-voting-system/issues"
+  },
+  "homepage": "https://github.com/yourusername/student-voting-system#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "express-validator": "^7.0.1",
-    "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.5.2"
+    "express-fileupload": "^1.4.0",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^6.1.5",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.2",
+    "nodemailer": "^6.9.5",
+    "xss-clean": "^0.1.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "concurrently": "^8.2.0",
+    "eslint": "^8.48.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.3",
+    "jest": "^29.6.4",
+    "lint-staged": "^14.0.1",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
