@@ -11,7 +11,7 @@ const {
 const { protect } = require('../middleware/auth');
 
 // Verify controller functions exist
-console.log('Auth controller functions available:', {
+console.log('\n🔍 Auth controller functions available:', {
   register: typeof register === 'function',
   login: typeof login === 'function',
   forgotPassword: typeof forgotPassword === 'function',
@@ -26,12 +26,13 @@ const safeRoute = (method, path, ...middlewares) => {
   const validMiddlewares = middlewares.filter(mw => typeof mw === 'function');
   
   if (validMiddlewares.length === 0) {
-    console.error(`No valid middleware functions for ${method.toUpperCase()} ${path}`);
+    console.error(`❌ No valid middleware functions for ${method.toUpperCase()} ${path}`);
     return;
   }
   
   // Define the route with the valid middleware chain
   router[method](path, ...validMiddlewares);
+  console.log(`✓ Defined ${method.toUpperCase()} ${path} with ${validMiddlewares.length} middleware`);
 };
 
 // Public routes
@@ -45,7 +46,8 @@ safeRoute('put', '/reset-password', protect, resetPassword);
 safeRoute('get', '/logout', protect, logout);
 
 // Verify router is valid before exporting
-console.log('Auth routes initialized with', router.stack.length, 'routes');
+console.log(`\n📦 Auth routes initialized with ${router.stack.length} routes`);
 
 // Ensure we're always exporting a valid router
+console.log('✅ Auth routes module ready for export');
 module.exports = router;
