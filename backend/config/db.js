@@ -1,10 +1,10 @@
-require('dotenv').config(); // Ensure this is at the very top
+require('dotenv').config(); // Must be at the very top
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
     // Get environment variables
-    const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://godwinhephzibah25_db_user:Ku66Sbbtcb8sIwbJ@cluster0.v4tzdiq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+    const MONGO_URI = process.env.MONGO_URI;
     const MONGO_LOCAL = process.env.MONGO_LOCAL || 'mongodb://localhost:27017/studentvoting';
     const NODE_ENV = process.env.NODE_ENV || 'development';
     
@@ -24,15 +24,18 @@ const connectDB = async () => {
       console.log(`Using local MongoDB: ${MONGO_LOCAL.replace(/:(.*)@/, ':*****@')}`);
     }
     
-    // Connect to MongoDB
+    // Connect to MongoDB with Mongoose 7.x+ compatible options
     const conn = await mongoose.connect(uri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false
+      useUnifiedTopology: true
+      // Removed deprecated options: useCreateIndex, useFindAndModify
     });
     
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+    
+    // Set up Mongoose schema options globally
+    mongoose.set('strictQuery', false);
+    
     return conn;
   } catch (error) {
     console.error(`Database connection error: ${error.message}`);
