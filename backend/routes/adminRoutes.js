@@ -1,20 +1,66 @@
 const express = require('express');
 const router = express.Router();
 const { protect, admin } = require('../middleware/auth');
-const adminController = require('../controllers/adminController');
 
-// Verify controller functions are properly loaded
-console.log('Admin controller loaded:', {
-  createElection: typeof adminController.createElection,
-  getAllElections: typeof adminController.getAllElections
-});
+// Use dynamic require to avoid circular dependencies
+let adminController;
+try {
+  adminController = require('../controllers/adminController');
+  console.log('Admin controller loaded successfully');
+} catch (error) {
+  console.error('Failed to load adminController:', error);
+  // Create fallback functions to prevent server crash
+  adminController = {
+    createElection: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    }),
+    getAllElections: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    }),
+    // Add fallbacks for all other controller functions
+    getElection: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    }),
+    updateElection: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    }),
+    deleteElection: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    }),
+    endElection: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    }),
+    getElectionResults: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    }),
+    manageUsers: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    }),
+    getUserDetails: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    }),
+    updateUserRole: (req, res) => res.status(500).json({ 
+      success: false, 
+      error: 'Admin controller failed to load. Check server logs.' 
+    })
+  };
+}
 
 // @desc    Create new election
 // @route   POST /api/admin/elections
 // @access  Private/Admin
 router.post('/elections', protect, admin, (req, res, next) => {
   if (typeof adminController.createElection !== 'function') {
-    console.error('createElection function is undefined. Check adminController.js');
+    console.error('createElection function is undefined');
     return res.status(500).json({ 
       success: false, 
       error: 'Internal server error: createElection function is not defined'
