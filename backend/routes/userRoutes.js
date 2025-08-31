@@ -11,7 +11,7 @@ const {
 } = require('../controllers/userController');
 
 // Verify controller functions exist
-console.log('User controller functions available:', {
+console.log('\n🔍 User controller functions available:', {
   getProfile: typeof getProfile === 'function',
   updateProfile: typeof updateProfile === 'function',
   changePassword: typeof changePassword === 'function',
@@ -26,12 +26,13 @@ const safeRoute = (method, path, ...middlewares) => {
   const validMiddlewares = middlewares.filter(mw => typeof mw === 'function');
   
   if (validMiddlewares.length === 0) {
-    console.error(`No valid middleware functions for ${method.toUpperCase()} ${path}`);
+    console.error(`❌ No valid middleware functions for ${method.toUpperCase()} ${path}`);
     return;
   }
   
   // Define the route with the valid middleware chain
   router[method](path, ...validMiddlewares);
+  console.log(`✓ Defined ${method.toUpperCase()} ${path} with ${validMiddlewares.length} middleware`);
 };
 
 // @desc    Get user profile
@@ -65,7 +66,8 @@ safeRoute('post', '/vote', protect, castVote);
 safeRoute('get', '/voting-history', protect, getVotingHistory);
 
 // Verify router is valid before exporting
-console.log('User routes initialized with', router.stack.length, 'routes');
+console.log(`\n📦 User routes initialized with ${router.stack.length} routes`);
 
 // Ensure we're always exporting a valid router
+console.log('✅ User routes module ready for export');
 module.exports = router;
