@@ -33,21 +33,47 @@ try {
   process.exit(1);
 }
 
-// Function to safely require routes
+// Function to safely require routes with detailed diagnostics
 const safeRequireRoutes = (routePath) => {
   try {
+    console.log(`\nAttempting to load routes from ${routePath}...`);
+    
+    // Clear require cache to avoid stale modules
+    const modulePath = require.resolve(routePath);
+    delete require.cache[modulePath];
+    
     const routes = require(routePath);
+    
+    console.log(`Loaded routes from ${routePath}:`, {
+      type: typeof routes,
+      isFunction: typeof routes === 'function',
+      hasHandle: routes && typeof routes.handle === 'function',
+      stackLength: routes && routes.stack ? routes.stack.length : 'N/A',
+      routePath: routePath
+    });
     
     // Verify it's a valid Express router
     if (routes && typeof routes === 'function' && routes.handle) {
-      console.log(`Routes loaded successfully from ${routePath}`);
+      console.log(`✓ Routes loaded successfully from ${routePath}`);
       return routes;
     } else {
-      console.error(`Invalid routes from ${routePath}: not a valid Express router`);
+      console.error(`✗ Invalid routes from ${routePath}: not a valid Express router`);
+      
+      // Detailed diagnostics
+      console.log('Route object details:');
+      console.log('typeof routes:', typeof routes);
+      console.log('routes is function:', typeof routes === 'function');
+      console.log('routes has handle:', routes && typeof routes.handle === 'function');
+      console.log('routes stack length:', routes && routes.stack ? routes.stack.length : 'N/A');
+      
+      if (routes && typeof routes !== 'function') {
+        console.log('routes contents:', JSON.stringify(routes, null, 2));
+      }
+      
       return null;
     }
   } catch (error) {
-    console.error(`Failed to load routes from ${routePath}:`, error);
+    console.error(`✗ Failed to load routes from ${routePath}:`, error);
     return null;
   }
 };
@@ -115,15 +141,60 @@ connectDB()
       });
     }
 
-    // Routes - with enhanced safety checks
+    // Routes - with enhanced safety checks and diagnostics
     const authRoutes = safeRequireRoutes('./routes/authRoutes');
     const userRoutes = safeRequireRoutes('./routes/userRoutes');
     const adminRoutes = safeRequireRoutes('./routes/adminRoutes');
 
+    // Function to safely use routes with detailed diagnostics
+    const safeUseRoutes = (path, routes) => {
+      if (!routes) {
+        console.error(`Cannot use routes for ${path}: routes are null or undefined`);
+        return false;
+      }
+      
+      console.log(`\nAttempting to use routes for ${path}:`, {
+        type: typeof routes,
+        isFunction: typeof routes === 'function',
+        hasHandle: routes && typeof routes.handle === 'function',
+        stackLength: routes && routes.stack ? routes.stack.length : 'N/A'
+      });
+      
+      try {
+        app.use(path, routes);
+        console.log(`✓ Successfully mounted routes at ${path}`);
+        return true;
+      } catch (error) {
+        console.error(`✗ Failed to mount routes at ${path}:`, error);
+        
+        // Detailed diagnostics
+        console.log('Route object details at mount time:');
+        console.log('typeof routes:', typeof routes);
+        console.log('routes is function:', typeof routes === 'function');
+        console.log('routes has handle:', routes && typeof routes.handle === 'function');
+        console.log('routes stack length:', routes && routes.stack ? routes.stack.length : 'N/A');
+        
+        if (routes && typeof routes !== 'function') {
+          try {
+            console.log('routes contents:', JSON.stringify(routes, null, 2));
+          } catch (e) {
+            console.log('Could not stringify routes object');
+          }
+        }
+        
+        return false;
+      }
+    };
+
     // Only use routes if they're valid
+    let allRoutesLoaded = true;
+    
     if (authRoutes) {
-      app.use('/api/auth', authRoutes);
+      if (!safeUseRoutes('/api/auth', authRoutes)) {
+        allRoutesLoaded = false;
+      }
     } else {
+      allRoutesLoaded = false;
       // Fallback route for auth
       app.use('/api/auth/*', (req, res) => {
         res.status(500).json({ 
@@ -131,11 +202,15 @@ connectDB()
           error: 'Auth routes failed to load. Server configuration error.' 
         });
       });
+      console.log('✓ Set up fallback routes for /api/auth/*');
     }
 
     if (userRoutes) {
-      app.use('/api/users', userRoutes);
+      if (!safeUseRoutes('/api/users', userRoutes)) {
+        allRoutesLoaded = false;
+      }
     } else {
+      allRoutesLoaded = false;
       // Fallback route for users
       app.use('/api/users/*', (req, res) => {
         res.status(500).json({ 
@@ -143,11 +218,15 @@ connectDB()
           error: 'User routes failed to load. Server configuration error.' 
         });
       });
+      console.log('✓ Set up fallback routes for /api/users/*');
     }
 
     if (adminRoutes) {
-      app.use('/api/admin', adminRoutes);
+      if (!safeUseRoutes('/api/admin', adminRoutes)) {
+        allRoutesLoaded = false;
+      }
     } else {
+      allRoutesLoaded = false;
       // Fallback route for admin
       app.use('/api/admin/*', (req, res) => {
         res.status(500).json({ 
@@ -155,6 +234,11 @@ connectDB()
           error: 'Admin routes failed to load. Server configuration error.' 
         });
       });
+      console.log('✓ Set up fallback routes for /api/admin/*');
+    }
+
+    if (!allRoutesLoaded) {
+      console.warn('⚠️ Warning: Not all routes were successfully loaded');
     }
 
     // Error handler
@@ -163,14 +247,17 @@ connectDB()
     const PORT = process.env.PORT || 5000;
 
     const server = app.listen(PORT, () => {
-      console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+      console.log(`\n✅ Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
       console.log('Server initialization complete');
       
       // Log all registered routes for debugging
-      console.log('\nRegistered routes:');
+      console.log('\n📋 Registered routes:');
       app._router.stack.forEach((middleware) => {
         if (middleware.route) {
-          console.log(`  ${Object.keys(middleware.route.methods).join(', ').toUpperCase()} ${middleware.route.path}`);
+          const methods = Object.keys(middleware.route.methods)
+            .map(method => method.toUpperCase())
+            .join(', ');
+          console.log(`  ${methods} ${middleware.route.path}`);
         }
       });
       console.log('');
@@ -178,15 +265,15 @@ connectDB()
 
     // Handle unhandled promise rejections
     process.on('unhandledRejection', (err, promise) => {
-      console.error('Unhandled Rejection at:', promise, 'reason:', err);
+      console.error('\n🔥 Unhandled Rejection at:', promise, 'reason:', err);
       // Close server & exit process
       server.close(() => {
-        console.error('Server closed due to unhandled promise rejection');
+        console.error('🛑 Server closed due to unhandled promise rejection');
         process.exit(1);
       });
     });
   })
   .catch(dbError => {
-    console.error('Database connection failed:', dbError);
+    console.error('\n❌ Database connection failed:', dbError);
     process.exit(1);
   });
