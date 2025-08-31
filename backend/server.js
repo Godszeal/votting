@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); // Must be the very first line
 const express = require('express');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
@@ -10,6 +10,28 @@ const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
 const fileupload = require('express-fileupload');
+
+// Validate environment variables before starting
+const validateEnv = () => {
+  const requiredVars = ['NODE_ENV'];
+  
+  if (process.env.NODE_ENV === 'production') {
+    requiredVars.push('MONGO_URI');
+  }
+  
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+  }
+};
+
+try {
+  validateEnv();
+} catch (error) {
+  console.error(`Environment validation failed: ${error.message}`);
+  process.exit(1);
+}
 
 const app = express();
 
@@ -55,7 +77,16 @@ connectDB()
       });
     } else {
       app.get('/', (req, res) => {
-        res.send('API is running...');
+        res.send(`
+          <h1>Student Voting System API</h1>
+          <p>Server is running in ${process.env.NODE_ENV} mode</p>
+          <p>Environment variables loaded:</p>
+          <ul>
+            <li>NODE_ENV: ${process.env.NODE_ENV}</li>
+            <li>MONGO_URI: ${process.env.MONGO_URI ? 'SET (masked)' : 'NOT SET'}</li>
+            <li>MONGO_LOCAL: ${process.env.MONGO_LOCAL || 'Default used'}</li>
+          </ul>
+        `);
       });
     }
 
