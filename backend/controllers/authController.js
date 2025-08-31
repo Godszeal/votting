@@ -82,7 +82,7 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     user
+    data: user
   });
 });
 
@@ -97,7 +97,7 @@ exports.logout = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-     {}
+    data: {}
   });
 });
 
@@ -128,7 +128,10 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
       message: `You have requested a password reset. Please make a PUT request to: \n\n ${resetUrl}`
     });
 
-    res.status(200).json({ success: true,  'Reset token sent to email' });
+    res.status(200).json({ 
+      success: true, 
+      data: 'Reset token sent to email' 
+    });
   } catch (err) {
     console.error(err);
     user.resetPasswordToken = undefined;
@@ -188,7 +191,7 @@ const sendTokenResponse = (user, statusCode, res) => {
     .json({
       success: true,
       token,
-      user: {
+      data: {
         id: user._id,
         matricNumber: user.matricNumber,
         username: user.username,
