@@ -33,6 +33,25 @@ try {
   process.exit(1);
 }
 
+// Function to safely require routes
+const safeRequireRoutes = (routePath) => {
+  try {
+    const routes = require(routePath);
+    
+    // Verify it's a valid Express router
+    if (routes && typeof routes === 'function' && routes.handle) {
+      console.log(`Routes loaded successfully from ${routePath}`);
+      return routes;
+    } else {
+      console.error(`Invalid routes from ${routePath}: not a valid Express router`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`Failed to load routes from ${routePath}:`, error);
+    return null;
+  }
+};
+
 const app = express();
 
 // Connect to database
@@ -96,56 +115,44 @@ connectDB()
       });
     }
 
-    // Routes - with detailed error handling
-    try {
-      // Test if auth routes work
-      try {
-        app.use('/api/auth', require('./routes/authRoutes'));
-        console.log('Auth routes loaded successfully');
-      } catch (authError) {
-        console.error('Failed to load auth routes:', authError);
-        app.use('/api/auth', (req, res) => {
-          res.status(500).json({ 
-            success: false, 
-            error: 'Auth routes failed to load. Check server logs.' 
-          });
-        });
-      }
-      
-      // Test if user routes work
-      try {
-        app.use('/api/users', require('./routes/userRoutes'));
-        console.log('User routes loaded successfully');
-      } catch (userError) {
-        console.error('Failed to load user routes:', userError);
-        app.use('/api/users', (req, res) => {
-          res.status(500).json({ 
-            success: false, 
-            error: 'User routes failed to load. Check server logs.' 
-          });
-        });
-      }
-      
-      // Test if admin routes work
-      try {
-        app.use('/api/admin', require('./routes/adminRoutes'));
-        console.log('Admin routes loaded successfully');
-      } catch (adminError) {
-        console.error('Failed to load admin routes:', adminError);
-        app.use('/api/admin', (req, res) => {
-          res.status(500).json({ 
-            success: false, 
-            error: 'Admin routes failed to load. Check server logs.' 
-          });
-        });
-      }
-    } catch (routeError) {
-      console.error('Critical route loading error:', routeError);
-      // Fallback route for when routes fail to load
-      app.use('/api/*', (req, res) => {
+    // Routes - with enhanced safety checks
+    const authRoutes = safeRequireRoutes('./routes/authRoutes');
+    const userRoutes = safeRequireRoutes('./routes/userRoutes');
+    const adminRoutes = safeRequireRoutes('./routes/adminRoutes');
+
+    // Only use routes if they're valid
+    if (authRoutes) {
+      app.use('/api/auth', authRoutes);
+    } else {
+      // Fallback route for auth
+      app.use('/api/auth/*', (req, res) => {
         res.status(500).json({ 
           success: false, 
-          error: 'API routes failed to load. Server configuration error.' 
+          error: 'Auth routes failed to load. Server configuration error.' 
+        });
+      });
+    }
+
+    if (userRoutes) {
+      app.use('/api/users', userRoutes);
+    } else {
+      // Fallback route for users
+      app.use('/api/users/*', (req, res) => {
+        res.status(500).json({ 
+          success: false, 
+          error: 'User routes failed to load. Server configuration error.' 
+        });
+      });
+    }
+
+    if (adminRoutes) {
+      app.use('/api/admin', adminRoutes);
+    } else {
+      // Fallback route for admin
+      app.use('/api/admin/*', (req, res) => {
+        res.status(500).json({ 
+          success: false, 
+          error: 'Admin routes failed to load. Server configuration error.' 
         });
       });
     }
@@ -158,6 +165,15 @@ connectDB()
     const server = app.listen(PORT, () => {
       console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
       console.log('Server initialization complete');
+      
+      // Log all registered routes for debugging
+      console.log('\nRegistered routes:');
+      app._router.stack.forEach((middleware) => {
+        if (middleware.route) {
+          console.log(`  ${Object.keys(middleware.route.methods).join(', ').toUpperCase()} ${middleware.route.path}`);
+        }
+      });
+      console.log('');
     });
 
     // Handle unhandled promise rejections
