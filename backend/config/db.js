@@ -1,4 +1,4 @@
-variables('dotenv').config(); // Ensure this is at the very top
+require('dotenv').config(); // Ensure this is at the very top
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
