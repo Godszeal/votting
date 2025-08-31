@@ -14,66 +14,79 @@ const fileupload = require('express-fileupload');
 const app = express();
 
 // Connect to database
-connectDB();
+connectDB()
+  .then(() => {
+    console.log('Database connected successfully');
+    
+    // Body parser
+    app.use(express.json());
 
-// Body parser
-app.use(express.json());
+    // Cookie parser
+    app.use(cookieParser());
 
-// Cookie parser
-app.use(cookieParser());
+    // Sanitize data
+    app.use(mongoSanitize());
 
-// Sanitize data
-app.use(mongoSanitize());
+    // Set security headers
+    app.use(helmet());
 
-// Set security headers
-app.use(helmet());
+    // Prevent XSS attacks
+    app.use(xss());
 
-// Prevent XSS attacks
-app.use(xss());
+    // Rate limiting
+    const limiter = rateLimit({
+      windowMs: 10 * 60 * 1000, // 10 mins
+      max: 100
+    });
+    app.use(limiter);
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 mins
-  max: 100
-});
-app.use(limiter);
+    // Prevent http param pollution
+    app.use(hpp());
 
-// Prevent http param pollution
-app.use(hpp());
+    // Enable file upload
+    app.use(fileupload());
 
-// Enable file upload
-app.use(fileupload());
+    // Set static folder
+    if (process.env.NODE_ENV === 'production') {
+      app.use(express.static(path.join(__dirname, '../frontend/build')));
+      
+      app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'));
+      });
+    } else {
+      app.get('/', (req, res) => {
+        res.send('API is running...');
+      });
+    }
 
-// Set static folder
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'));
+    // Routes
+    try {
+      app.use('/api/auth', require('./routes/authRoutes'));
+      app.use('/api/users', require('./routes/userRoutes'));
+      app.use('/api/admin', require('./routes/adminRoutes'));
+      console.log('Routes loaded successfully');
+    } catch (routeError) {
+      console.error('Failed to load routes:', routeError);
+      process.exit(1);
+    }
+
+    // Error handler
+    app.use(errorHandler);
+
+    const PORT = process.env.PORT || 5000;
+
+    const server = app.listen(PORT, () => {
+      console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    });
+
+    // Handle unhandled promise rejections
+    process.on('unhandledRejection', (err, promise) => {
+      console.log(`Error: ${err.message}`);
+      // Close server & exit process
+      server.close(() => process.exit(1));
+    });
+  })
+  .catch(dbError => {
+    console.error('Database connection failed:', dbError);
+    process.exit(1);
   });
-} else {
-  app.get('/', (req, res) => {
-    res.send('API is running...');
-  });
-}
-
-// Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/admin', require('./routes/adminRoutes'));
-
-// Error handler
-app.use(errorHandler);
-
-const PORT = process.env.PORT || 5000;
-
-const server = app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
-  console.log(`Error: ${err.message}`);
-  // Close server & exit process
-  server.close(() => process.exit(1));
-});
