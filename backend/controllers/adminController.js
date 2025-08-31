@@ -4,10 +4,21 @@ const ErrorResponse = require('../middleware/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { v4: uuidv4 } = require('uuid');
 
+// Verify all required modules are loaded
+console.log('Admin controller initializing...');
+console.log('Modules loaded:', {
+  User: !!User,
+  Election: !!Election,
+  ErrorResponse: !!ErrorResponse,
+  asyncHandler: !!asyncHandler,
+  uuidv4: !!uuidv4
+});
+
 // @desc    Create new election
 // @route   POST /api/admin/elections
 // @access  Private/Admin
 exports.createElection = asyncHandler(async (req, res, next) => {
+  console.log('createElection function called');
   const { title, description, faculty, department, candidates, startDate, endDate } = req.body;
   
   // Validate required fields
@@ -43,7 +54,7 @@ exports.createElection = asyncHandler(async (req, res, next) => {
   
   res.status(201).json({
     success: true,
-     election
+    data: election
   });
 });
 
@@ -51,12 +62,13 @@ exports.createElection = asyncHandler(async (req, res, next) => {
 // @route   GET /api/admin/elections
 // @access  Private/Admin
 exports.getAllElections = asyncHandler(async (req, res, next) => {
+  console.log('getAllElections function called');
   const elections = await Election.find({}).sort('-createdAt');
   
   res.status(200).json({
     success: true,
     count: elections.length,
-     elections
+    data: elections
   });
 });
 
@@ -64,6 +76,7 @@ exports.getAllElections = asyncHandler(async (req, res, next) => {
 // @route   GET /api/admin/elections/:id
 // @access  Private/Admin
 exports.getElection = asyncHandler(async (req, res, next) => {
+  console.log('getElection function called with ID:', req.params.id);
   const election = await Election.findById(req.params.id);
   
   if (!election) {
@@ -72,7 +85,7 @@ exports.getElection = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     election
+    data: election
   });
 });
 
@@ -80,6 +93,7 @@ exports.getElection = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/admin/elections/:id
 // @access  Private/Admin
 exports.updateElection = asyncHandler(async (req, res, next) => {
+  console.log('updateElection function called with ID:', req.params.id);
   let election = await Election.findById(req.params.id);
   
   if (!election) {
@@ -100,7 +114,7 @@ exports.updateElection = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     election
+    data: election
   });
 });
 
@@ -108,6 +122,7 @@ exports.updateElection = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/admin/elections/:id
 // @access  Private/Admin
 exports.deleteElection = asyncHandler(async (req, res, next) => {
+  console.log('deleteElection function called with ID:', req.params.id);
   const election = await Election.findById(req.params.id);
   
   if (!election) {
@@ -126,6 +141,7 @@ exports.deleteElection = asyncHandler(async (req, res, next) => {
 // @route   POST /api/admin/elections/:id/end
 // @access  Private/Admin
 exports.endElection = asyncHandler(async (req, res, next) => {
+  console.log('endElection function called with ID:', req.params.id);
   const election = await Election.findById(req.params.id);
   
   if (!election) {
@@ -139,7 +155,7 @@ exports.endElection = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     election
+    data: election
   });
 });
 
@@ -147,6 +163,7 @@ exports.endElection = asyncHandler(async (req, res, next) => {
 // @route   GET /api/admin/elections/:id/results
 // @access  Private/Admin
 exports.getElectionResults = asyncHandler(async (req, res, next) => {
+  console.log('getElectionResults function called with ID:', req.params.id);
   const election = await Election.findById(req.params.id);
   
   if (!election) {
@@ -158,7 +175,7 @@ exports.getElectionResults = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     {
+    data: {
       election: {
         _id: election._id,
         title: election.title,
@@ -174,12 +191,13 @@ exports.getElectionResults = asyncHandler(async (req, res, next) => {
 // @route   GET /api/admin/users
 // @access  Private/Admin
 exports.manageUsers = asyncHandler(async (req, res, next) => {
+  console.log('manageUsers function called');
   const users = await User.find({}).select('-password').sort('-createdAt');
   
   res.status(200).json({
     success: true,
     count: users.length,
-     users
+    data: users
   });
 });
 
@@ -187,6 +205,7 @@ exports.manageUsers = asyncHandler(async (req, res, next) => {
 // @route   GET /api/admin/users/:id
 // @access  Private/Admin
 exports.getUserDetails = asyncHandler(async (req, res, next) => {
+  console.log('getUserDetails function called with ID:', req.params.id);
   const user = await User.findById(req.params.id).select('-password');
   
   if (!user) {
@@ -195,7 +214,7 @@ exports.getUserDetails = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     user
+    data: user
   });
 });
 
@@ -203,6 +222,7 @@ exports.getUserDetails = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/admin/users/:id/role
 // @access  Private/Admin
 exports.updateUserRole = asyncHandler(async (req, res, next) => {
+  console.log('updateUserRole function called with ID:', req.params.id);
   const { role } = req.body;
   
   const user = await User.findById(req.params.id);
@@ -217,7 +237,7 @@ exports.updateUserRole = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-     {
+    data: {
       _id: updatedUser._id,
       matricNumber: updatedUser.matricNumber,
       username: updatedUser.username,
