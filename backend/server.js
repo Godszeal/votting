@@ -86,19 +86,68 @@ connectDB()
             <li>MONGO_URI: ${process.env.MONGO_URI ? 'SET (masked)' : 'NOT SET'}</li>
             <li>MONGO_LOCAL: ${process.env.MONGO_LOCAL || 'Default used'}</li>
           </ul>
+          <p>Routes status:</p>
+          <ul>
+            <li>Auth routes: /api/auth</li>
+            <li>User routes: /api/users</li>
+            <li>Admin routes: /api/admin</li>
+          </ul>
         `);
       });
     }
 
-    // Routes
+    // Routes - with detailed error handling
     try {
-      app.use('/api/auth', require('./routes/authRoutes'));
-      app.use('/api/users', require('./routes/userRoutes'));
-      app.use('/api/admin', require('./routes/adminRoutes'));
-      console.log('Routes loaded successfully');
+      // Test if auth routes work
+      try {
+        app.use('/api/auth', require('./routes/authRoutes'));
+        console.log('Auth routes loaded successfully');
+      } catch (authError) {
+        console.error('Failed to load auth routes:', authError);
+        app.use('/api/auth', (req, res) => {
+          res.status(500).json({ 
+            success: false, 
+            error: 'Auth routes failed to load. Check server logs.' 
+          });
+        });
+      }
+      
+      // Test if user routes work
+      try {
+        app.use('/api/users', require('./routes/userRoutes'));
+        console.log('User routes loaded successfully');
+      } catch (userError) {
+        console.error('Failed to load user routes:', userError);
+        app.use('/api/users', (req, res) => {
+          res.status(500).json({ 
+            success: false, 
+            error: 'User routes failed to load. Check server logs.' 
+          });
+        });
+      }
+      
+      // Test if admin routes work
+      try {
+        app.use('/api/admin', require('./routes/adminRoutes'));
+        console.log('Admin routes loaded successfully');
+      } catch (adminError) {
+        console.error('Failed to load admin routes:', adminError);
+        app.use('/api/admin', (req, res) => {
+          res.status(500).json({ 
+            success: false, 
+            error: 'Admin routes failed to load. Check server logs.' 
+          });
+        });
+      }
     } catch (routeError) {
-      console.error('Failed to load routes:', routeError);
-      process.exit(1);
+      console.error('Critical route loading error:', routeError);
+      // Fallback route for when routes fail to load
+      app.use('/api/*', (req, res) => {
+        res.status(500).json({ 
+          success: false, 
+          error: 'API routes failed to load. Server configuration error.' 
+        });
+      });
     }
 
     // Error handler
@@ -108,13 +157,17 @@ connectDB()
 
     const server = app.listen(PORT, () => {
       console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+      console.log('Server initialization complete');
     });
 
     // Handle unhandled promise rejections
     process.on('unhandledRejection', (err, promise) => {
-      console.log(`Error: ${err.message}`);
+      console.error('Unhandled Rejection at:', promise, 'reason:', err);
       // Close server & exit process
-      server.close(() => process.exit(1));
+      server.close(() => {
+        console.error('Server closed due to unhandled promise rejection');
+        process.exit(1);
+      });
     });
   })
   .catch(dbError => {
