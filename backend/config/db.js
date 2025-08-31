@@ -1,10 +1,10 @@
-require('dotenv').config(); // Ensure this is at the very top
+variables('dotenv').config(); // Ensure this is at the very top
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
     // Get environment variables
-    const MONGO_URI = process.env.MONGO_URI;
+    const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://godwinhephzibah25_db_user:Ku66Sbbtcb8sIwbJ@cluster0.v4tzdiq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
     const MONGO_LOCAL = process.env.MONGO_LOCAL || 'mongodb://localhost:27017/studentvoting';
     const NODE_ENV = process.env.NODE_ENV || 'development';
     
