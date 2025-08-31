@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { protect, admin } = require('../middleware/auth');
 
-// Use dynamic require to avoid circular dependencies
+// Use dynamic import pattern to avoid circular dependencies
 let adminController;
 try {
   adminController = require('../controllers/adminController');
@@ -19,7 +19,6 @@ try {
       success: false, 
       error: 'Admin controller failed to load. Check server logs.' 
     }),
-    // Add fallbacks for all other controller functions
     getElection: (req, res) => res.status(500).json({ 
       success: false, 
       error: 'Admin controller failed to load. Check server logs.' 
@@ -55,135 +54,68 @@ try {
   };
 }
 
-// @desc    Create new election
-// @route   POST /api/admin/elections
-// @access  Private/Admin
-router.post('/elections', protect, admin, (req, res, next) => {
-  if (typeof adminController.createElection !== 'function') {
-    console.error('createElection function is undefined');
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: createElection function is not defined'
-    });
+// Verify all controller functions exist before defining routes
+const verifyController = (funcName) => {
+  if (typeof adminController[funcName] !== 'function') {
+    console.error(`Controller function ${funcName} is not defined or not a function`);
+    return false;
   }
-  adminController.createElection(req, res, next);
-});
+  return true;
+};
 
-// @desc    Get all elections
-// @route   GET /api/admin/elections
-// @access  Private/Admin
-router.get('/elections', protect, admin, (req, res, next) => {
-  if (typeof adminController.getAllElections !== 'function') {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: getAllElections function is not defined'
-    });
+// Helper function to safely define routes
+const safeRoute = (method, path, ...middlewares) => {
+  // Remove any undefined middleware functions
+  const validMiddlewares = middlewares.filter(mw => typeof mw === 'function');
+  
+  if (validMiddlewares.length === 0) {
+    console.error(`No valid middleware functions for ${method.toUpperCase()} ${path}`);
+    return;
   }
-  adminController.getAllElections(req, res, next);
-});
+  
+  // Define the route with the valid middleware chain
+  router[method](path, ...validMiddlewares);
+};
 
-// @desc    Get single election
-// @route   GET /api/admin/elections/:id
-// @access  Private/Admin
-router.get('/elections/:id', protect, admin, (req, res, next) => {
-  if (typeof adminController.getElection !== 'function') {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: getElection function is not defined'
-    });
-  }
-  adminController.getElection(req, res, next);
-});
+// Define routes with verification
+if (verifyController('createElection')) {
+  safeRoute('post', '/elections', protect, admin, adminController.createElection);
+}
 
-// @desc    Update election
-// @route   PUT /api/admin/elections/:id
-// @access  Private/Admin
-router.put('/elections/:id', protect, admin, (req, res, next) => {
-  if (typeof adminController.updateElection !== 'function') {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: updateElection function is not defined'
-    });
-  }
-  adminController.updateElection(req, res, next);
-});
+if (verifyController('getAllElections')) {
+  safeRoute('get', '/elections', protect, admin, adminController.getAllElections);
+}
 
-// @desc    Delete election
-// @route   DELETE /api/admin/elections/:id
-// @access  Private/Admin
-router.delete('/elections/:id', protect, admin, (req, res, next) => {
-  if (typeof adminController.deleteElection !== 'function') {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: deleteElection function is not defined'
-    });
-  }
-  adminController.deleteElection(req, res, next);
-});
+if (verifyController('getElection')) {
+  safeRoute('get', '/elections/:id', protect, admin, adminController.getElection);
+}
 
-// @desc    End election early
-// @route   POST /api/admin/elections/:id/end
-// @access  Private/Admin
-router.post('/elections/:id/end', protect, admin, (req, res, next) => {
-  if (typeof adminController.endElection !== 'function') {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: endElection function is not defined'
-    });
-  }
-  adminController.endElection(req, res, next);
-});
+if (verifyController('updateElection')) {
+  safeRoute('put', '/elections/:id', protect, admin, adminController.updateElection);
+}
 
-// @desc    Get election results
-// @route   GET /api/admin/elections/:id/results
-// @access  Private/Admin
-router.get('/elections/:id/results', protect, admin, (req, res, next) => {
-  if (typeof adminController.getElectionResults !== 'function') {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: getElectionResults function is not defined'
-    });
-  }
-  adminController.getElectionResults(req, res, next);
-});
+if (verifyController('deleteElection')) {
+  safeRoute('delete', '/elections/:id', protect, admin, adminController.deleteElection);
+}
 
-// @desc    Manage users
-// @route   GET /api/admin/users
-// @access  Private/Admin
-router.get('/users', protect, admin, (req, res, next) => {
-  if (typeof adminController.manageUsers !== 'function') {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: manageUsers function is not defined'
-    });
-  }
-  adminController.manageUsers(req, res, next);
-});
+if (verifyController('endElection')) {
+  safeRoute('post', '/elections/:id/end', protect, admin, adminController.endElection);
+}
 
-// @desc    Get user details
-// @route   GET /api/admin/users/:id
-// @access  Private/Admin
-router.get('/users/:id', protect, admin, (req, res, next) => {
-  if (typeof adminController.getUserDetails !== 'function') {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: getUserDetails function is not defined'
-    });
-  }
-  adminController.getUserDetails(req, res, next);
-});
+if (verifyController('getElectionResults')) {
+  safeRoute('get', '/elections/:id/results', protect, admin, adminController.getElectionResults);
+}
 
-// @desc    Update user role
-// @route   PUT /api/admin/users/:id/role
-// @access  Private/Admin
-router.put('/users/:id/role', protect, admin, (req, res, next) => {
-  if (typeof adminController.updateUserRole !== 'function') {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error: updateUserRole function is not defined'
-    });
-  }
-  adminController.updateUserRole(req, res, next);
-});
+if (verifyController('manageUsers')) {
+  safeRoute('get', '/users', protect, admin, adminController.manageUsers);
+}
+
+if (verifyController('getUserDetails')) {
+  safeRoute('get', '/users/:id', protect, admin, adminController.getUserDetails);
+}
+
+if (verifyController('updateUserRole')) {
+  safeRoute('put', '/users/:id/role', protect, admin, adminController.updateUserRole);
+}
 
 module.exports = router;
