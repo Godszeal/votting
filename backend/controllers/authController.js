@@ -82,7 +82,7 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   
   res.status(200).json({
     success: true,
-    user
+     user
   });
 });
 
@@ -97,7 +97,7 @@ exports.logout = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: 'Logged out successfully'
+     {}
   });
 });
 
@@ -128,7 +128,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
       message: `You have requested a password reset. Please make a PUT request to: \n\n ${resetUrl}`
     });
 
-    res.status(200).json({ success: true, message: 'Reset token sent to email' });
+    res.status(200).json({ success: true,  'Reset token sent to email' });
   } catch (err) {
     console.error(err);
     user.resetPasswordToken = undefined;
@@ -173,7 +173,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
 
   const options = {
-    expires: new Date(Date.now() + (parseInt(process.env.JWT_COOKIE_EXPIRE) || 30) * 24 * 60 * 60 * 1000),
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
     httpOnly: true
   };
 
