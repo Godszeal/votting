@@ -113,6 +113,22 @@ connectDB()
     // Enable file upload
     app.use(fileupload());
 
+    // Specific route handling
+// For direct access to admin root, redirect to admin login
+     app.get('/admin/', (req, res) => {
+       res.redirect('/admin/admin-login.html');
+    });
+
+// Handle /signup to go to signup page
+    app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend', 'signup.html'));
+   });
+
+   // Handle /login to go to login page
+   app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend', 'login.html'));
+   });
+
     // Set static folder
     if (process.env.NODE_ENV === 'production') {
       app.use(express.static(path.join(__dirname, '../frontend')));
