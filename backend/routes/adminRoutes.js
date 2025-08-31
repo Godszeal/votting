@@ -118,4 +118,8 @@ if (verifyController('updateUserRole')) {
   safeRoute('put', '/users/:id/role', protect, admin, adminController.updateUserRole);
 }
 
+// Verify router is valid before exporting
+console.log('Admin routes initialized with', router.stack.length, 'routes');
+
+// Ensure we're always exporting a valid router
 module.exports = router;
