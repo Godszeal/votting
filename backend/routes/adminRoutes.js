@@ -6,9 +6,9 @@ const { protect, admin } = require('../middleware/auth');
 let adminController;
 try {
   adminController = require('../controllers/adminController');
-  console.log('Admin controller loaded successfully');
+  console.log('\n✅ Admin controller loaded successfully');
 } catch (error) {
-  console.error('Failed to load adminController:', error);
+  console.error('❌ Failed to load adminController:', error);
   // Create fallback functions to prevent server crash
   adminController = {
     createElection: (req, res) => res.status(500).json({ 
@@ -57,9 +57,10 @@ try {
 // Verify all controller functions exist before defining routes
 const verifyController = (funcName) => {
   if (typeof adminController[funcName] !== 'function') {
-    console.error(`Controller function ${funcName} is not defined or not a function`);
+    console.error(`❌ Controller function ${funcName} is not defined or not a function`);
     return false;
   }
+  console.log(`✓ Controller function ${funcName} is valid`);
   return true;
 };
 
@@ -69,12 +70,13 @@ const safeRoute = (method, path, ...middlewares) => {
   const validMiddlewares = middlewares.filter(mw => typeof mw === 'function');
   
   if (validMiddlewares.length === 0) {
-    console.error(`No valid middleware functions for ${method.toUpperCase()} ${path}`);
+    console.error(`❌ No valid middleware functions for ${method.toUpperCase()} ${path}`);
     return;
   }
   
   // Define the route with the valid middleware chain
   router[method](path, ...validMiddlewares);
+  console.log(`✓ Defined ${method.toUpperCase()} ${path} with ${validMiddlewares.length} middleware`);
 };
 
 // Define routes with verification
@@ -119,7 +121,8 @@ if (verifyController('updateUserRole')) {
 }
 
 // Verify router is valid before exporting
-console.log('Admin routes initialized with', router.stack.length, 'routes');
+console.log(`\n📦 Admin routes initialized with ${router.stack.length} routes`);
 
 // Ensure we're always exporting a valid router
+console.log('✅ Admin routes module ready for export');
 module.exports = router;
