@@ -115,9 +115,9 @@ connectDB()
 
     // Specific route handling
 // For direct access to admin root, redirect to admin login
-     app.get('/admin/', (req, res) => {
-       res.redirect('../frontend', 'admin', 'admin-login.html);
-    });
+ app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend', 'admin', 'admin-login.html'));
+   });
 
 // Handle /signup to go to signup page
     app.get('/signup', (req, res) => {
