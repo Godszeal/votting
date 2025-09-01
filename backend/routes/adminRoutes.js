@@ -1,128 +1,203 @@
 const express = require('express');
 const router = express.Router();
-const { protect, admin } = require('../middleware/auth');
+const admin = require('../middleware/admin');
+const Election = require('../models/Election');
+const Vote = require('../models/Vote');
+const User = require('../models/User');
+const jwtConfig = require('../config/jwt');
 
-// Use dynamic import pattern to avoid circular dependencies
-let adminController;
-try {
-  adminController = require('../controllers/adminController');
-  console.log('\n✅ Admin controller loaded successfully');
-} catch (error) {
-  console.error('❌ Failed to load adminController:', error);
-  // Create fallback functions to prevent server crash
-  adminController = {
-    createElection: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    }),
-    getAllElections: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    }),
-    getElection: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    }),
-    updateElection: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    }),
-    deleteElection: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    }),
-    endElection: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    }),
-    getElectionResults: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    }),
-    manageUsers: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    }),
-    getUserDetails: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    }),
-    updateUserRole: (req, res) => res.status(500).json({ 
-      success: false, 
-      error: 'Admin controller failed to load. Check server logs.' 
-    })
-  };
-}
-
-// Verify all controller functions exist before defining routes
-const verifyController = (funcName) => {
-  if (typeof adminController[funcName] !== 'function') {
-    console.error(`❌ Controller function ${funcName} is not defined or not a function`);
-    return false;
-  }
-  console.log(`✓ Controller function ${funcName} is valid`);
-  return true;
-};
-
-// Helper function to safely define routes
-const safeRoute = (method, path, ...middlewares) => {
-  // Remove any undefined middleware functions
-  const validMiddlewares = middlewares.filter(mw => typeof mw === 'function');
+// @route   POST api/admin/elections
+// @desc    Create new election
+router.post('/elections', admin, async (req, res) => {
+  const { title, description, candidates, endDate, isActive, facultyRestriction, departmentRestrictions } = req.body;
   
-  if (validMiddlewares.length === 0) {
-    console.error(`❌ No valid middleware functions for ${method.toUpperCase()} ${path}`);
-    return;
+  try {
+    if (!title || !description || !candidates || !endDate) {
+      return res.status(400).json({ 
+        message: 'Missing required fields',
+        received: Object.keys(req.body)
+      });
+    }
+    
+    if (candidates.length < 2) {
+      return res.status(400).json({ 
+        message: 'At least 2 candidates are required' 
+      });
+    }
+    
+    const election = new Election({
+      title,
+      description,
+      candidates: candidates.map(name => ({ name })),
+      endDate: new Date(endDate),
+      isActive: isActive !== undefined ? isActive : true,
+      facultyRestriction: facultyRestriction || null,
+      departmentRestrictions: departmentRestrictions || []
+    });
+    
+    await election.save();
+    
+    // Generate the voting link
+    const votingLink = `${process.env.BASE_URL}/voting/${election.votingLinkToken}`;
+    
+    res.status(201).json({
+      ...election.toObject(),
+      votingLink
+    });
+  } catch (err) {
+    console.error('Create Election Error:', err);
+    res.status(500).json({ 
+      message: 'Server error creating election',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
+});
+
+// @route   PUT api/admin/elections/:id
+// @desc    Update election
+router.put('/elections/:id', admin, async (req, res) => {
+  const { title, description, candidates, endDate, isActive, facultyRestriction, departmentRestrictions } = req.body;
   
-  // Define the route with the valid middleware chain
-  router[method](path, ...validMiddlewares);
-  console.log(`✓ Defined ${method.toUpperCase()} ${path} with ${validMiddlewares.length} middleware`);
-};
+  try {
+    let election = await Election.findById(req.params.id);
+    if (!election) return res.status(404).json({ message: 'Election not found' });
+    
+    // Prevent candidate changes after election starts
+    if (election.startDate < new Date() && candidates && election.candidates.length !== candidates.length) {
+      return res.status(400).json({ 
+        message: 'Cannot modify the number of candidates after election starts' 
+      });
+    }
+    
+    election.title = title || election.title;
+    election.description = description || election.description;
+    election.endDate = endDate ? new Date(endDate) : election.endDate;
+    election.isActive = isActive !== undefined ? isActive : election.isActive;
+    election.facultyRestriction = facultyRestriction !== undefined ? facultyRestriction : election.facultyRestriction;
+    election.departmentRestrictions = departmentRestrictions !== undefined ? departmentRestrictions : election.departmentRestrictions;
+    
+    if (candidates) {
+      // Update candidates while preserving vote counts
+      const updatedCandidates = [];
+      for (const name of candidates) {
+        const existingCandidate = election.candidates.find(c => c.name === name);
+        updatedCandidates.push({
+          name,
+          votes: existingCandidate ? existingCandidate.votes : 0
+        });
+      }
+      election.candidates = updatedCandidates;
+    }
+    
+    await election.save();
+    
+    // Generate the voting link
+    const votingLink = `${process.env.BASE_URL}/voting/${election.votingLinkToken}`;
+    
+    res.json({
+      ...election.toObject(),
+      votingLink
+    });
+  } catch (err) {
+    console.error('Update Election Error:', err);
+    res.status(500).json({ 
+      message: 'Server error updating election',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+});
 
-// Define routes with verification
-if (verifyController('createElection')) {
-  safeRoute('post', '/elections', protect, admin, adminController.createElection);
-}
+// @route   GET api/admin/elections/:id/link
+// @desc    Get voting link for election
+router.get('/elections/:id/link', admin, async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    
+    if (!election) {
+      return res.status(404).json({ 
+        message: 'Election not found' 
+      });
+    }
+    
+    const votingLink = `${process.env.BASE_URL}/voting/${election.votingLinkToken}`;
+    
+    res.json({
+      votingLink,
+      electionId: election._id,
+      title: election.title,
+      facultyRestriction: election.facultyRestriction,
+      departmentRestrictions: election.departmentRestrictions
+    });
+  } catch (err) {
+    console.error('Get Voting Link Error:', err);
+    res.status(500).json({ 
+      message: 'Server error getting voting link',
+      error: err.message
+    });
+  }
+});
 
-if (verifyController('getAllElections')) {
-  safeRoute('get', '/elections', protect, admin, adminController.getAllElections);
-}
+// @route   GET api/admin/elections
+// @desc    Get all elections
+router.get('/elections', admin, async (req, res) => {
+  try {
+    const elections = await Election.find().sort({ createdAt: -1 });
+    
+    // Add voting links to each election
+    const electionsWithLinks = elections.map(election => {
+      return {
+        ...election.toObject(),
+        votingLink: `${process.env.BASE_URL}/voting/${election.votingLinkToken}`
+      };
+    });
+    
+    res.json(electionsWithLinks);
+  } catch (err) {
+    console.error('Get Elections Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching elections',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+});
 
-if (verifyController('getElection')) {
-  safeRoute('get', '/elections/:id', protect, admin, adminController.getElection);
-}
+// @route   GET api/admin/elections/:id/votes
+// @desc    Get all votes for an election (with voter details)
+router.get('/elections/:id/votes', admin, async (req, res) => {
+  try {
+    // Get votes with populated user details
+    const votes = await Vote.find({ election: req.params.id })
+      .populate('user', 'matricNumber faculty department')
+      .sort({ timestamp: -1 });
+    
+    res.json(votes);
+  } catch (err) {
+    console.error('Get Votes Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching votes',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+});
 
-if (verifyController('updateElection')) {
-  safeRoute('put', '/elections/:id', protect, admin, adminController.updateElection);
-}
+// @route   GET api/admin/voters
+// @desc    Get all voters
+router.get('/voters', admin, async (req, res) => {
+  try {
+    const voters = await User.find({ role: 'user' }).select('-password');
+    res.json(voters);
+  } catch (err) {
+    console.error('Get Voters Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching voters',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+});
 
-if (verifyController('deleteElection')) {
-  safeRoute('delete', '/elections/:id', protect, admin, adminController.deleteElection);
-}
-
-if (verifyController('endElection')) {
-  safeRoute('post', '/elections/:id/end', protect, admin, adminController.endElection);
-}
-
-if (verifyController('getElectionResults')) {
-  safeRoute('get', '/elections/:id/results', protect, admin, adminController.getElectionResults);
-}
-
-if (verifyController('manageUsers')) {
-  safeRoute('get', '/users', protect, admin, adminController.manageUsers);
-}
-
-if (verifyController('getUserDetails')) {
-  safeRoute('get', '/users/:id', protect, admin, adminController.getUserDetails);
-}
-
-if (verifyController('updateUserRole')) {
-  safeRoute('put', '/users/:id/role', protect, admin, adminController.updateUserRole);
-}
-
-// Verify router is valid before exporting
-console.log(`\n📦 Admin routes initialized with ${router.stack.length} routes`);
-
-// Ensure we're always exporting a valid router
-console.log('✅ Admin routes module ready for export');
 module.exports = router;
