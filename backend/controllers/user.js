@@ -6,7 +6,7 @@ const jwtConfig = require('../config/jwt');
 // @desc    Get user elections
 // @route   GET /api/user/elections
 // @access  Private
-const getUserElections = async (req, res) => {
+exports.getUserElections = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     
@@ -60,7 +60,7 @@ const getUserElections = async (req, res) => {
 // @desc    Cast a vote
 // @route   POST /api/user/vote
 // @access  Private
-const castVote = async (req, res) => {
+exports.castVote = async (req, res) => {
   const { electionId, candidate } = req.body;
   
   try {
@@ -152,7 +152,7 @@ const castVote = async (req, res) => {
 // @desc    Get election results
 // @route   GET /api/user/results/:id
 // @access  Private
-const getElectionResults = async (req, res) => {
+exports.getElectionResults = async (req, res) => {
   try {
     const election = await Election.findById(req.params.id);
     
@@ -196,11 +196,4 @@ const getElectionResults = async (req, res) => {
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
-};
-
-// Export as a single module object (more reliable pattern)
-module.exports = {
-  getUserElections,
-  castVote,
-  getElectionResults
 };
