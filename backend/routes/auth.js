@@ -1,12 +1,47 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const Election = require('../models/Election');
-const jwtConfig = require('../config/jwt');
-const authController = require('../controllers/auth');
+
+// Import controller with error handling
+let authController;
+try {
+  authController = require('../controllers/auth');
+  
+  // Verify exports are functions
+  if (typeof authController.signup !== 'function') {
+    throw new Error('signup is not a function');
+  }
+  if (typeof authController.login !== 'function') {
+    throw new Error('login is not a function');
+  }
+  if (typeof authController.adminLogin !== 'function') {
+    throw new Error('adminLogin is not a function');
+  }
+  if (typeof authController.getVotingLinkDetails !== 'function') {
+    throw new Error('getVotingLinkDetails is not a function');
+  }
+} catch (err) {
+  console.error('Critical error loading auth controller:', err);
+  // Create dummy functions to prevent server crash
+  authController = {
+    signup: (req, res) => res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Controller loading error'
+    }),
+    login: (req, res) => res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Controller loading error'
+    }),
+    adminLogin: (req, res) => res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Controller loading error'
+    }),
+    getVotingLinkDetails: (req, res) => res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Controller loading error'
+    })
+  };
+}
 
 // @route   POST api/auth/signup
 // @desc    Register user
