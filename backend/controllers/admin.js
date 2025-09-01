@@ -3,10 +3,19 @@ const Vote = require('../models/Vote');
 const User = require('../models/User');
 const jwtConfig = require('../config/jwt');
 
+// Initialize exports at the top to prevent circular dependency issues
+exports.createElection = () => {};
+exports.updateElection = () => {};
+exports.getAllElections = () => {};
+exports.getVotesForElection = () => {};
+exports.getAllVoters = () => {};
+exports.resetVoterVotes = () => {};
+exports.getElectionVotingLink = () => {};
+
 // @desc    Create election
 // @route   POST /api/admin/elections
 // @access  Private (Admin)
-const createElection = async (req, res) => {
+exports.createElection = async (req, res) => {
   const { title, description, candidates, endDate, isActive, facultyRestriction, departmentRestrictions } = req.body;
   
   try {
@@ -55,7 +64,7 @@ const createElection = async (req, res) => {
 // @desc    Update election
 // @route   PUT /api/admin/elections/:id
 // @access  Private (Admin)
-const updateElection = async (req, res) => {
+exports.updateElection = async (req, res) => {
   const { title, description, candidates, endDate, isActive, facultyRestriction, departmentRestrictions } = req.body;
   
   try {
@@ -111,7 +120,7 @@ const updateElection = async (req, res) => {
 // @desc    Get all elections
 // @route   GET /api/admin/elections
 // @access  Private (Admin)
-const getAllElections = async (req, res) => {
+exports.getAllElections = async (req, res) => {
   try {
     const elections = await Election.find().sort({ createdAt: -1 });
     
@@ -137,7 +146,7 @@ const getAllElections = async (req, res) => {
 // @desc    Get votes for election
 // @route   GET /api/admin/elections/:id/votes
 // @access  Private (Admin)
-const getVotesForElection = async (req, res) => {
+exports.getVotesForElection = async (req, res) => {
   try {
     // Get votes with populated user details
     const votes = await Vote.find({ election: req.params.id })
@@ -158,7 +167,7 @@ const getVotesForElection = async (req, res) => {
 // @desc    Get all voters
 // @route   GET /api/admin/voters
 // @access  Private (Admin)
-const getAllVoters = async (req, res) => {
+exports.getAllVoters = async (req, res) => {
   try {
     const voters = await User.find({ role: 'user' }).select('-password');
     res.json(voters);
@@ -175,7 +184,7 @@ const getAllVoters = async (req, res) => {
 // @desc    Reset voter votes
 // @route   PUT /api/admin/voters/:id/reset-votes
 // @access  Private (Admin)
-const resetVoterVotes = async (req, res) => {
+exports.resetVoterVotes = async (req, res) => {
   try {
     const voter = await User.findById(req.params.id);
     
@@ -209,7 +218,7 @@ const resetVoterVotes = async (req, res) => {
 // @desc    Get voting link for election
 // @route   GET /api/admin/elections/:id/link
 // @access  Private (Admin)
-const getElectionVotingLink = async (req, res) => {
+exports.getElectionVotingLink = async (req, res) => {
   try {
     const election = await Election.findById(req.params.id);
     
@@ -235,15 +244,4 @@ const getElectionVotingLink = async (req, res) => {
       error: err.message
     });
   }
-};
-
-// Export as a single module object (more reliable pattern)
-module.exports = {
-  createElection,
-  updateElection,
-  getAllElections,
-  getVotesForElection,
-  getAllVoters,
-  resetVoterVotes,
-  getElectionVotingLink
 };
