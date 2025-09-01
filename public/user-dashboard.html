@@ -54,77 +54,26 @@
 
   <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
-  <script src="js/script.js"></script>
-  
   <script>
-    // Theme toggle functionality
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    
-    // Check for saved theme preference or prefer-color-scheme
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      themeIcon.textContent = '☀️';
-    }
-    
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      
-      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-    });
-    
-    // Enhanced notification system
-    function showNotification(message, type = 'info', duration = 5000) {
-      const notification = document.createElement('div');
-      notification.className = `alert alert-${type}`;
-      notification.style.marginBottom = '1rem';
-      
-      let icon = '';
-      switch(type) {
-        case 'success':
-          icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-          break;
-        case 'error':
-        case 'danger':
-          icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
-          break;
-        case 'warning':
-          icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
-          break;
-        default:
-          icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
-      }
-      
-      notification.innerHTML = `${icon} ${message}`;
-      
-      const container = document.getElementById('notification-container');
-      container.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transition = 'opacity 0.5s';
-        setTimeout(() => {
-          container.removeChild(notification);
-        }, 500);
-      }, duration);
-    }
-    
     // Check if user is logged in
     document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('token');
       if (!token) {
         window.location.href = '../login.html';
+        return;
       }
       
-      // Load elections
-      loadElections();
+      // Check if there's an election ID in the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const electionId = urlParams.get('election');
+      
+      if (electionId) {
+        // Verify if user can vote in this election
+        verifyElectionEligibility(electionId);
+      } else {
+        // Load all eligible elections
+        loadElections();
+      }
       
       // Setup logout
       const logoutBtn = document.getElementById('logout-btn');
@@ -138,6 +87,164 @@
         });
       }
     });
+    
+    async function verifyElectionEligibility(electionId) {
+      try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          throw new Error('Authentication token missing. Please log in again.');
+        }
+        
+        const res = await fetch(`/api/user/elections/${electionId}/eligibility`, {
+          method: 'GET',
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.message || `Failed to verify election eligibility (Status: ${res.status})`);
+        }
+        
+        const data = await res.json();
+        
+        if (data.eligible) {
+          // User is eligible, load the voting interface
+          loadVotingInterface(electionId);
+        } else {
+          // User is not eligible, show error
+          showNotification('You are not eligible to vote in this election', 'error');
+          loadElections();
+        }
+      } catch (err) {
+        console.error('Error verifying election eligibility:', err);
+        showNotification(`Error: ${err.message}`, 'error');
+        loadElections();
+      }
+    }
+    
+    async function loadVotingInterface(electionId) {
+      try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          throw new Error('Authentication token missing. Please log in again.');
+        }
+        
+        const res = await fetch(`/api/user/elections/${electionId}`, {
+          method: 'GET',
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.message || `Failed to load election (Status: ${res.status})`);
+        }
+        
+        const election = await res.json();
+        
+        const electionsContainer = document.getElementById('elections-container');
+        electionsContainer.innerHTML = '';
+        
+        // Format restriction badges
+        let restrictionBadges = '';
+        if (election.facultyRestriction) {
+          restrictionBadges += `
+            <span class="election-restriction">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              ${election.facultyRestriction} Faculty
+            </span>
+          `;
+        }
+        
+        if (election.departmentRestrictions && election.departmentRestrictions.length > 0) {
+          restrictionBadges += `
+            <span class="election-restriction" style="background-color: var(--secondary);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              ${election.departmentRestrictions.join(', ')}
+            </span>
+          `;
+        }
+        
+        if (!restrictionBadges) {
+          restrictionBadges = `
+            <span class="election-restriction" style="background-color: var(--success);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              All Students
+            </span>
+          `;
+        }
+        
+        let candidatesHTML = '';
+        election.candidates.forEach(candidate => {
+          const percentage = calculatePercentage(election.candidates, candidate.votes);
+          candidatesHTML += `
+            <div class="candidate">
+              <div class="candidate-name">${candidate.name}</div>
+              <div class="candidate-votes">${candidate.votes} votes (${percentage}%)</div>
+              <div class="progress-bar">
+                <div class="progress" style="width: ${percentage}%"></div>
+              </div>
+            </div>
+          `;
+        });
+        
+        const electionCard = document.createElement('div');
+        electionCard.className = 'election-card card fade-in';
+        
+        electionCard.innerHTML = `
+          <div class="election-header">
+            <h2 class="election-title">${election.title}</h2>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              ${restrictionBadges}
+            </div>
+          </div>
+          
+          <p class="election-description">${election.description}</p>
+          
+          <div class="election-candidates">
+            ${candidatesHTML}
+          </div>
+          
+          <div class="vote-actions">
+            ${election.candidates.map(c => `
+              <button class="btn btn-primary vote-btn" 
+                      data-election="${election._id}" 
+                      data-candidate="${c.name}">
+                Vote for ${c.name}
+              </button>
+            `).join('')}
+          </div>
+        `;
+        
+        electionsContainer.appendChild(electionCard);
+        
+        // Add vote event listeners
+        document.querySelectorAll('.vote-btn').forEach(btn => {
+          btn.addEventListener('click', handleVote);
+        });
+        
+      } catch (err) {
+        console.error('Error loading election:', err);
+        showNotification(`Error: ${err.message}`, 'error');
+        loadElections();
+      }
+    }
     
     async function loadElections() {
       try {
@@ -400,6 +507,69 @@
         }, 5000);
       }
     }
+    
+    function showNotification(message, type = 'info', duration = 5000) {
+      const notification = document.createElement('div');
+      notification.className = `alert alert-${type}`;
+      notification.style.position = 'fixed';
+      notification.style.top = '20px';
+      notification.style.right = '20px';
+      notification.style.zIndex = '9999';
+      notification.style.maxWidth = '400px';
+      notification.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+      
+      let icon = '';
+      switch(type) {
+        case 'success':
+          icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          break;
+        case 'error':
+        case 'danger':
+          icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+          break;
+        case 'warning':
+          icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+          break;
+        default:
+          icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+      }
+      
+      notification.innerHTML = `${icon} ${message}`;
+      
+      const container = document.getElementById('notification-container');
+      container.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.5s';
+        setTimeout(() => {
+          container.removeChild(notification);
+        }, 500);
+      }, duration);
+    }
+    
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    // Check for saved theme preference or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeIcon.textContent = '☀️';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
   </script>
 </body>
 </html>
