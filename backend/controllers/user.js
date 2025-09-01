@@ -3,11 +3,6 @@ const Election = require('../models/Election');
 const Vote = require('../models/Vote');
 const jwtConfig = require('../config/jwt');
 
-// Initialize exports at the top to prevent circular dependency issues
-exports.getUserElections = () => {};
-exports.castVote = () => {};
-exports.getElectionResults = () => {};
-
 // @desc    Get user elections
 // @route   GET /api/user/elections
 // @access  Private
@@ -199,6 +194,34 @@ exports.getElectionResults = async (req, res) => {
       message: 'Server error fetching results',
       error: err.message,
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+};
+
+// @desc    Get voting link details
+// @route   GET /api/user/voting-link/:token
+// @access  Public
+exports.getVotingLinkDetails = async (req, res) => {
+  try {
+    const election = await Election.findOne({ votingLinkToken: req.params.token });
+    
+    if (!election) {
+      return res.status(404).json({ 
+        message: 'Invalid voting link' 
+      });
+    }
+    
+    res.json({
+      electionId: election._id,
+      title: election.title,
+      facultyRestriction: election.facultyRestriction,
+      departmentRestrictions: election.departmentRestrictions
+    });
+  } catch (err) {
+    console.error('Voting Link Error:', err);
+    res.status(500).json({ 
+      message: 'Server error',
+      error: err.message 
     });
   }
 };
