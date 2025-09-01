@@ -67,7 +67,7 @@ router.post(
             console.error('JWT Sign Error:', err);
             return res.status(500).send('Token generation error');
           }
-          res.json({ token, role: user.role, faculty, department });
+          res.json({ token, role: user.role, faculty, department, electionId: user.facultyToken ? getElectionIdFromToken(user.facultyToken) : null });
         }
       );
     } catch (err) {
@@ -79,33 +79,6 @@ router.post(
     }
   }
 );
-
-// @route   GET api/auth/voting-link/:token
-// @desc    Get voting link details
-router.get('/voting-link/:token', async (req, res) => {
-  try {
-    const election = await Election.findOne({ votingLinkToken: req.params.token });
-    
-    if (!election) {
-      return res.status(404).json({ 
-        message: 'Invalid voting link' 
-      });
-    }
-    
-    res.json({
-      electionId: election._id,
-      title: election.title,
-      facultyRestriction: election.facultyRestriction,
-      departmentRestrictions: election.departmentRestrictions
-    });
-  } catch (err) {
-    console.error('Voting Link Error:', err);
-    res.status(500).json({ 
-      message: 'Server error',
-      error: err.message 
-    });
-  }
-});
 
 // @route   POST api/auth/voting-signup
 // @desc    Register user through voting link
@@ -320,5 +293,15 @@ router.post('/admin-login', async (req, res) => {
     });
   }
 });
+
+// Helper function to get election ID from token
+function getElectionIdFromToken(token) {
+  try {
+    return Election.findOne({ votingLinkToken: token }).then(election => election ? election._id : null);
+  } catch (err) {
+    console.error('Error getting election ID from token:', err);
+    return null;
+  }
+}
 
 module.exports = router;
