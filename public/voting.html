@@ -138,10 +138,11 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
+      // Get the token from the URL path (not query parameter)
+      const path = window.location.pathname;
+      const token = path.split('/').pop(); // Extract the token from the last part of the path
       
-      if (!token) {
+      if (!token || token === 'voting') {
         showError('Invalid voting link. Please check the link and try again.');
         return;
       }
@@ -306,7 +307,7 @@
         }
         
         // Verify the token is still valid
-        const res = await fetch('/api/user/voting-link/' + token, {
+        const res = await fetch(`/api/voting/link/${token}`, {
           headers: {
             'x-auth-token': tokenFromStorage
           }
@@ -334,7 +335,7 @@
       const votingInstructions = document.getElementById('voting-instructions');
       const electionTitle = document.getElementById('election-title');
       
-      fetch(`/api/user/voting-link/${token}`)
+      fetch(`/api/voting/link/${token}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -344,7 +345,7 @@
         .then(data => {
           loadingSection.style.display = 'none';
           
-          if (data.message) {
+          if (data.message && data.message.includes('Invalid')) {
             showError(data.message);
             return;
           }
@@ -368,7 +369,7 @@
             restrictionList.appendChild(li);
           }
           
-          if (!data.facultyRestriction && data.departmentRestrictions.length === 0) {
+          if (!data.facultyRestriction && (!data.departmentRestrictions || data.departmentRestrictions.length === 0)) {
             const li = document.createElement('li');
             li.textContent = 'All students are eligible to vote';
             restrictionList.appendChild(li);
