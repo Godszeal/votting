@@ -16,10 +16,52 @@ const app = express();
 app.use(express.json({ extended: false }));
 app.use(cookieParser());
 
-// Define Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/user', require('./routes/user'));
-app.use('/api/admin', require('./routes/admin'));
+// Define Routes with error handling
+let authRoutes, userRoutes, adminRoutes;
+
+try {
+  authRoutes = require('./routes/auth');
+} catch (err) {
+  console.error('Error loading auth routes:', err);
+  authRoutes = express.Router();
+  authRoutes.use((req, res) => {
+    res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Auth routes loading error'
+    });
+  });
+}
+
+try {
+  userRoutes = require('./routes/user');
+} catch (err) {
+  console.error('Error loading user routes:', err);
+  userRoutes = express.Router();
+  userRoutes.use((req, res) => {
+    res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'User routes loading error'
+    });
+  });
+}
+
+try {
+  adminRoutes = require('./routes/admin');
+} catch (err) {
+  console.error('Error loading admin routes:', err);
+  adminRoutes = express.Router();
+  adminRoutes.use((req, res) => {
+    res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Admin routes loading error'
+    });
+  });
+}
+
+// Register routes
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
@@ -41,4 +83,19 @@ if (process.env.NODE_ENV === 'production') {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+  console.log('Server is ready to handle requests');
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  // Don't exit the process, keep the server running
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled Promise Rejection:', error);
+  // Don't exit the process, keep the server running
+});
