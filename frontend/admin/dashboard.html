@@ -6,6 +6,7 @@
     <title>Admin Dashboard - Student Voting System</title>
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css">
 </head>
 <body>
     <div class="admin-container">
@@ -46,6 +47,12 @@
                         <a href="manage-users.html">
                             <i class="fas fa-users"></i>
                             <span>Manage Users</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="security.html">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Security</span>
                         </a>
                     </li>
                     <li>
@@ -90,11 +97,49 @@
                         <i class="fas fa-bell"></i>
                         <span class="badge">3</span>
                     </div>
+                    <div class="user-avatar">
+                        <img src="../images/avatars/default.jpg" alt="Admin">
+                    </div>
                 </div>
             </header>
             
             <div class="dashboard-stats">
-                <!-- Stats will be loaded dynamically -->
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-users">1,245</h3>
+                        <p>Registered Voters</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-success">
+                        <i class="fas fa-vote-yea"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="active-elections">3</h3>
+                        <p>Active Elections</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="voting-rate">68.4%</h3>
+                        <p>Voting Rate</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-info">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>100%</h3>
+                        <p>Secure Votes</p>
+                    </div>
+                </div>
             </div>
             
             <div class="dashboard-content">
@@ -115,10 +160,19 @@
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="recent-elections">
                                     <!-- Data will be loaded dynamically -->
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <div class="activity-log">
+                            <!-- Activity will be loaded dynamically -->
                         </div>
                     </div>
                 </div>
@@ -130,6 +184,50 @@
                         </div>
                         <div class="chart-container">
                             <canvas id="electionChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>System Health</h3>
+                        </div>
+                        <div class="system-health">
+                            <div class="health-metric">
+                                <div class="metric-header">
+                                    <i class="fas fa-server"></i>
+                                    <span>Server Load</span>
+                                </div>
+                                <div class="metric-value">
+                                    <span id="server-load">24.5%</span>
+                                </div>
+                                <div class="metric-progress">
+                                    <div class="progress-bar" style="width: 24.5%"></div>
+                                </div>
+                            </div>
+                            <div class="health-metric">
+                                <div class="metric-header">
+                                    <i class="fas fa-database"></i>
+                                    <span>Database</span>
+                                </div>
+                                <div class="metric-value">
+                                    <span id="db-status"><i class="fas fa-check-circle success"></i> Connected</span>
+                                </div>
+                                <div class="metric-progress">
+                                    <div class="progress-bar" style="width: 100%; background: var(--success)"></div>
+                                </div>
+                            </div>
+                            <div class="health-metric">
+                                <div class="metric-header">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Email Service</span>
+                                </div>
+                                <div class="metric-value">
+                                    <span id="email-status"><i class="fas fa-check-circle success"></i> Active</span>
+                                </div>
+                                <div class="metric-progress">
+                                    <div class="progress-bar" style="width: 100%; background: var(--success)"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -161,7 +259,7 @@
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="../js/admin.js"></script>
 </body>
 </html>
