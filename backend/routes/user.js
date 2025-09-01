@@ -1,73 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/auth');
-const {
-  getProfile,
-  updateProfile,
-  changePassword,
-  getAvailableElections,
+const auth = require('../middleware/auth');
+const { 
+  getUserElections, 
   castVote,
-  getVotingHistory
-} = require('../controllers/userController');
+  getElectionResults
+} = require('../controllers/user');
 
-// Verify controller functions exist
-console.log('\n🔍 User controller functions available:', {
-  getProfile: typeof getProfile === 'function',
-  updateProfile: typeof updateProfile === 'function',
-  changePassword: typeof changePassword === 'function',
-  getAvailableElections: typeof getAvailableElections === 'function',
-  castVote: typeof castVote === 'function',
-  getVotingHistory: typeof getVotingHistory === 'function'
-});
-
-// Helper function to safely define routes
-const safeRoute = (method, path, ...middlewares) => {
-  // Remove any undefined middleware functions
-  const validMiddlewares = middlewares.filter(mw => typeof mw === 'function');
-  
-  if (validMiddlewares.length === 0) {
-    console.error(`❌ No valid middleware functions for ${method.toUpperCase()} ${path}`);
-    return;
-  }
-  
-  // Define the route with the valid middleware chain
-  router[method](path, ...validMiddlewares);
-  console.log(`✓ Defined ${method.toUpperCase()} ${path} with ${validMiddlewares.length} middleware`);
-};
-
-// @desc    Get user profile
-// @route   GET /api/users/profile
+// @route   GET /api/user/elections
+// @desc    Get user's eligible elections
 // @access  Private
-safeRoute('get', '/profile', protect, getProfile);
+router.get('/elections', auth, getUserElections);
 
-// @desc    Update user profile
-// @route   PUT /api/users/profile
+// @route   POST /api/user/vote
+// @desc    Cast a vote in an election
 // @access  Private
-safeRoute('put', '/profile', protect, updateProfile);
+router.post('/vote', auth, castVote);
 
-// @desc    Change password
-// @route   PUT /api/users/change-password
+// @route   GET /api/user/results/:id
+// @desc    Get election results
 // @access  Private
-safeRoute('put', '/change-password', protect, changePassword);
+router.get('/results/:id', auth, getElectionResults);
 
-// @desc    Get available elections for user
-// @route   GET /api/users/elections
-// @access  Private
-safeRoute('get', '/elections', protect, getAvailableElections);
-
-// @desc    Cast a vote
-// @route   POST /api/users/vote
-// @access  Private
-safeRoute('post', '/vote', protect, castVote);
-
-// @desc    Get voting history
-// @route   GET /api/users/voting-history
-// @access  Private
-safeRoute('get', '/voting-history', protect, getVotingHistory);
-
-// Verify router is valid before exporting
-console.log(`\n📦 User routes initialized with ${router.stack.length} routes`);
-
-// Ensure we're always exporting a valid router
-console.log('✅ User routes module ready for export');
 module.exports = router;
