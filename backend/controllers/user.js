@@ -198,30 +198,71 @@ exports.getElectionResults = async (req, res) => {
   }
 };
 
-// @desc    Get voting link details
-// @route   GET /api/user/voting-link/:token
-// @access  Public
-exports.getVotingLinkDetails = async (req, res) => {
+// @desc    Check if user is eligible for an election
+// @route   GET /api/user/elections/:id/eligibility
+// @access  Private
+exports.checkElectionEligibility = async (req, res) => {
   try {
-    const election = await Election.findOne({ votingLinkToken: req.params.token });
+    const election = await Election.findById(req.params.id);
     
     if (!election) {
       return res.status(404).json({ 
-        message: 'Invalid voting link' 
+        message: 'Election not found' 
       });
     }
     
-    res.json({
+    // Check if user is eligible to vote in this election
+    const user = await User.findById(req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        message: 'User not found' 
+      });
+    }
+    
+    // Check if user has already voted
+    if (user.hasVoted.some(vote => vote.election.toString() === req.params.id)) {
+      return res.json({ 
+        eligible: false,
+        reason: 'You have already voted in this election'
+      });
+    }
+    
+    // Check if election is still active
+    if (!election.isActive || new Date() > new Date(election.endDate)) {
+      return res.json({ 
+        eligible: false,
+        reason: 'This election is no longer active'
+      });
+    }
+    
+    // Check if user is eligible to vote in this election
+    if (election.facultyRestriction && election.facultyRestriction !== user.faculty) {
+      return res.json({ 
+        eligible: false,
+        reason: `This election is restricted to ${election.facultyRestriction} faculty`
+      });
+    }
+    
+    if (election.departmentRestrictions.length > 0 && 
+        !election.departmentRestrictions.includes(user.department)) {
+      return res.json({ 
+        eligible: false,
+        reason: 'This election is restricted to specific departments'
+      });
+    }
+    
+    res.json({ 
+      eligible: true,
       electionId: election._id,
-      title: election.title,
-      facultyRestriction: election.facultyRestriction,
-      departmentRestrictions: election.departmentRestrictions
+      title: election.title
     });
   } catch (err) {
-    console.error('Voting Link Error:', err);
+    console.error('Check Election Eligibility Error:', err);
     res.status(500).json({ 
-      message: 'Server error',
-      error: err.message 
+      message: 'Server error checking election eligibility',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
 };
