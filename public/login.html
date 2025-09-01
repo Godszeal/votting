@@ -3,47 +3,195 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Student Voting System</title>
+  <title>Login - VoteSphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="images/logo.svg">
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>Student Voting System</h1>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="signup.html">Sign Up</a>
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="images/logo.svg" alt="VoteSphere Logo">
+        <span class="logo-text">VoteSphere</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="signup.html" class="nav-link">Sign Up</a>
+        <a href="admin-login.html" class="nav-link">Admin</a>
+        <button class="theme-toggle" id="theme-toggle">
+          <span id="theme-icon">🌙</span>
+        </button>
       </nav>
     </div>
   </header>
 
   <main class="container">
-    <div class="card" style="max-width: 500px; margin: 50px auto;">
-      <h2 style="text-align: center; margin-bottom: 20px;">Student Login</h2>
-      <form id="login-form">
-        <div class="form-group">
-          <label for="matricNumber">Matriculation Number</label>
-          <input type="text" id="matricNumber" class="form-control" required>
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h1 class="auth-title">Student Login</h1>
+          <p class="auth-subtitle">Access your VoteSphere account to participate in elections</p>
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" class="form-control" required>
+        
+        <div class="auth-body">
+          <form id="login-form" class="auth-form">
+            <div class="form-group">
+              <label for="matricNumber" class="form-label">Matriculation Number</label>
+              <input type="text" id="matricNumber" class="form-control" placeholder="E.g., CSC/2019/001" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="password" class="form-label">Password</label>
+              <div class="password-input-group">
+                <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                <button type="button" class="password-toggle">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <div class="form-check">
+                <input type="checkbox" id="remember" class="form-check-input">
+                <label for="remember" class="form-check-label">Remember me</label>
+              </div>
+            </div>
+            
+            <div id="error-message" class="alert alert-danger hidden"></div>
+            
+            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+            
+            <div class="text-center mt-4">
+              <p>Don't have an account? <a href="signup.html" class="auth-link">Sign Up</a></p>
+              <p><a href="forgot-password.html" class="auth-link">Forgot your password?</a></p>
+            </div>
+          </form>
         </div>
-        <div id="error-message" class="error hidden"></div>
-        <button type="submit" class="btn" style="width: 100%;">Login</button>
-      </form>
-      <p style="text-align: center; margin-top: 15px;">
-        Don't have an account? <a href="signup.html">Sign Up</a>
-      </p>
+      </div>
     </div>
   </main>
 
   <footer>
-    <div class="container">
-      <p>&copy; 2023 Student Voting System. All rights reserved.</p>
+    <div class="container footer-content">
+      <p>&copy; 2023 VoteSphere. All rights reserved.</p>
+      <div>
+        <a href="#" class="text-gray" style="margin-right: 1rem;">Privacy Policy</a>
+        <a href="#" class="text-gray">Terms of Service</a>
+      </div>
     </div>
   </footer>
 
-  <script src="js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Password toggle functionality
+      const passwordToggle = document.querySelector('.password-toggle');
+      const passwordInput = document.getElementById('password');
+      
+      passwordToggle.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // Update icon
+        this.innerHTML = type === 'password' ? 
+          `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>` : 
+          `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+            <path d="M10.73 5.07A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.98M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+            <line x1="2" y1="2" x2="22" y2="22"></line>
+          </svg>`;
+      });
+      
+      // Handle login
+      const loginForm = document.getElementById('login-form');
+      if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const matricNumber = document.getElementById('matricNumber').value;
+          const password = document.getElementById('password').value;
+          const errorDiv = document.getElementById('error-message');
+          
+          try {
+            const res = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ matricNumber, password })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+              localStorage.setItem('token', data.token);
+              localStorage.setItem('role', data.role);
+              localStorage.setItem('faculty', data.faculty);
+              localStorage.setItem('department', data.department);
+              
+              // Redirect based on role
+              if (data.role === 'admin') {
+                window.location.href = 'admin-dashboard.html';
+              } else {
+                window.location.href = 'user-dashboard.html';
+              }
+            } else {
+              let errorMessage = 'Invalid credentials';
+              if (data.errors && data.errors[0] && data.errors[0].msg) {
+                errorMessage = data.errors[0].msg;
+              }
+              
+              errorDiv.innerHTML = errorMessage;
+              errorDiv.classList.remove('hidden');
+              
+              setTimeout(() => {
+                errorDiv.classList.add('hidden');
+              }, 5000);
+            }
+          } catch (err) {
+            console.error('Login error:', err);
+            errorDiv.innerHTML = 'Server error. Please try again.';
+            errorDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+              errorDiv.classList.add('hidden');
+            }, 5000);
+          }
+        });
+      }
+      
+      // Theme toggle functionality
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      
+      // Check for saved theme preference or prefer-color-scheme
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+      }
+      
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+      });
+    });
+  </script>
 </body>
 </html>
