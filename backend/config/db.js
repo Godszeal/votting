@@ -1,13 +1,54 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
-// Load environment variables from .env file
-dotenv.config({ path: path.join(__dirname, '../.env') });
+// Try to find .env file in multiple locations
+const findEnvFile = () => {
+  // Check common locations
+  const possiblePaths = [
+    path.join(__dirname, '../../.env'),  // Project root (most common)
+    path.join(__dirname, '../.env'),     // Backend directory
+    path.join(__dirname, '.env'),        // Config directory
+    path.join(process.cwd(), '.env')     // Current working directory
+  ];
+  
+  for (const envPath of possiblePaths) {
+    if (fs.existsSync(envPath)) {
+      console.log(`✅ Found .env file at: ${envPath}`);
+      return envPath;
+    }
+  }
+  
+  console.error('❌ Could not find .env file in any standard location');
+  console.error('Common locations checked:');
+  possiblePaths.forEach(p => console.error(`  - ${p}`));
+  
+  // In production, we must have environment variables
+  if (process.env.NODE_ENV === 'production') {
+    console.error('🚨 ERROR: In production, you MUST set environment variables directly (not via .env file)');
+    console.error('Set these environment variables in your hosting platform:');
+    console.error('  MONGODB_URI, JWT_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD, BASE_URL');
+    throw new Error('Missing required environment variables in production');
+  }
+  
+  // For development, create a warning but continue
+  console.warn('⚠️ Running in development mode without .env file');
+  return null;
+};
+
+// Load environment variables
+const envPath = findEnvFile();
+if (envPath) {
+  dotenv.config({ path: envPath });
+} else {
+  // Try to load from process.env directly (for production)
+  console.log('ℹ️ Loading environment variables from system environment');
+}
 
 // Validate required environment variables
 const validateEnvVars = () => {
-  const requiredVars = ['MONGODB_URI'];
+  const requiredVars = ['MONGODB_URI', 'JWT_SECRET', 'ADMIN_EMAIL', 'ADMIN_PASSWORD', 'BASE_URL'];
   const missingVars = [];
   
   requiredVars.forEach(varName => {
@@ -18,21 +59,41 @@ const validateEnvVars = () => {
   
   if (missingVars.length > 0) {
     console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
-    console.error('Please create a .env file with these variables or set them in your environment');
-    console.error('Example .env file content:');
-    console.error('MONGODB_URI=mongodb+srv://godwinhephzibah25_db_user:Ku66Sbbtcb8sIwbJ@cluster0.v4tzdiq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
-    console.error('JWT_SECRET=a3f8c1d4e5b6a7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2');
-    console.error('JWT_EXPIRES_IN=1h');
-    console.error('ADMIN_EMAIL=babalolahephzibah2@gmail.com');
-    console.error('ADMIN_PASSWORD=Godszeal');
-    console.error('BASE_URL=http://localhost:3000');
     
-    // Don't throw here, just log and provide fallback for development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ Using fallback MongoDB URI for development only!');
-      process.env.MONGODB_URI = 'mongodb://localhost:27017/votesphere';
-    } else {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('🚨 ERROR: In production, you MUST set these environment variables:');
+      missingVars.forEach(varName => {
+        console.error(`  - ${varName}`);
+      });
       throw new Error('Missing required environment variables');
+    } else {
+      console.warn('⚠️ Running in development mode with missing environment variables');
+      
+      // Provide development defaults
+      if (missingVars.includes('MONGODB_URI')) {
+        process.env.MONGODB_URI = 'mongodb://localhost:27017/votesphere';
+        console.log('ℹ️ Using default MONGODB_URI for development: mongodb://localhost:27017/votesphere');
+      }
+      
+      if (missingVars.includes('JWT_SECRET')) {
+        process.env.JWT_SECRET = 'a3f8c1d4e5b6a7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2';
+        console.log('ℹ️ Using default JWT_SECRET for development (INSECURE - CHANGE FOR PRODUCTION)');
+      }
+      
+      if (missingVars.includes('ADMIN_EMAIL')) {
+        process.env.ADMIN_EMAIL = 'admin@example.com';
+        console.log('ℹ️ Using default ADMIN_EMAIL for development: admin@example.com');
+      }
+      
+      if (missingVars.includes('ADMIN_PASSWORD')) {
+        process.env.ADMIN_PASSWORD = 'admin123';
+        console.log('ℹ️ Using default ADMIN_PASSWORD for development: admin123 (INSECURE - CHANGE FOR PRODUCTION)');
+      }
+      
+      if (missingVars.includes('BASE_URL')) {
+        process.env.BASE_URL = 'http://localhost:3000';
+        console.log('ℹ️ Using default BASE_URL for development: http://localhost:3000');
+      }
     }
   }
 };
@@ -55,7 +116,6 @@ const connectDB = async () => {
     const options = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      // useCreateIndex: true,  // REMOVED - no longer supported in Mongoose 6+
       useFindAndModify: false,
       connectTimeoutMS: 30000,
       serverSelectionTimeoutMS: 30000
@@ -102,7 +162,7 @@ const connectDB = async () => {
     }
     
     // Don't throw in development to allow server to start
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV !== 'production') {
       console.warn('⚠️ Continuing in development mode without database connection');
       return null;
     }
