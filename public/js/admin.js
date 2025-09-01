@@ -75,11 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (elections.length === 0) {
           html += `
-            <div class="card text-center" style="padding: 3rem;">
+            <div class="card text-center" style="padding: 3rem; grid-column: 1 / -1;">
               <div style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;">🗳️</div>
               <h2 style="margin-bottom: 1rem;">No Elections Created</h2>
               <p style="color: var(--gray); max-width: 500px; margin: 0 auto 1.5rem;">
-                Get started by creating your first election. You can set up voting for specific universities or departments.
+                Get started by creating your first election. You can set up voting for specific faculties or departments.
               </p>
               <button id="create-first-election" class="btn btn-primary btn-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
@@ -98,24 +98,24 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Format restriction badges
             let restrictionBadges = '';
-            if (election.universityRestriction && election.universityRestriction !== 'All Universities') {
+            if (election.facultyRestriction) {
               restrictionBadges += `
                 <span class="election-restriction">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                   </svg>
-                  ${election.universityRestriction}
+                  ${election.facultyRestriction} Faculty
                 </span>
               `;
             }
             
-            if (election.departmentRestriction && election.departmentRestriction !== 'All Departments') {
+            if (election.departmentRestrictions && election.departmentRestrictions.length > 0) {
               restrictionBadges += `
                 <span class="election-restriction" style="background-color: var(--secondary);">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                   </svg>
-                  ${election.departmentRestriction}
+                  ${election.departmentRestrictions.join(', ')}
                 </span>
               `;
             }
@@ -190,6 +190,14 @@ document.addEventListener('DOMContentLoaded', () => {
                          <line x1="2" y1="12" x2="22" y2="12"></line>
                        </svg> Activate`}
                   </button>
+                  <button class="btn btn-outline btn-sm" 
+                          onclick="adminFunctions.copyVotingLink('${election.votingLink}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy Link
+                  </button>
                 </div>
               </div>
             `;
@@ -256,33 +264,26 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             
             <div class="form-group">
-              <label class="form-label" for="universityRestriction">University Restriction</label>
-              <select id="universityRestriction" class="form-control form-select">
-                <option value="">No University Restriction (All Universities)</option>
-                <option value="All Universities">All Universities</option>
-                <option value="University of Lagos">University of Lagos</option>
-                <option value="Covenant University">Covenant University</option>
-                <option value="University of Ibadan">University of Ibadan</option>
-                <option value="Obafemi Awolowo University">Obafemi Awolowo University</option>
-                <option value="University of Benin">University of Benin</option>
-                <option value="Ahmadu Bello University">Ahmadu Bello University</option>
+              <label class="form-label" for="facultyRestriction">Faculty Restriction</label>
+              <select id="facultyRestriction" class="form-control form-select">
+                <option value="">No Faculty Restriction (All Faculties)</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Sciences">Sciences</option>
+                <option value="Arts & Humanities">Arts & Humanities</option>
+                <option value="Social Sciences">Social Sciences</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Law">Law</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="Education">Education</option>
               </select>
             </div>
             
             <div class="form-group">
-              <label class="form-label" for="departmentRestriction">Department Restriction</label>
-              <select id="departmentRestriction" class="form-control form-select">
-                <option value="">No Department Restriction (All Departments)</option>
-                <option value="All Departments">All Departments</option>
-                <option value="Computer Science">Computer Science</option>
-                <option value="Electrical Engineering">Electrical Engineering</option>
-                <option value="Mechanical Engineering">Mechanical Engineering</option>
-                <option value="Medicine">Medicine</option>
-                <option value="Law">Law</option>
-                <option value="Business Administration">Business Administration</option>
-                <option value="Economics">Economics</option>
-                <option value="Political Science">Political Science</option>
+              <label class="form-label" for="departmentRestrictions">Department Restrictions</label>
+              <select id="departmentRestrictions" class="form-control form-select" multiple>
+                <!-- Options will be populated based on faculty selection -->
               </select>
+              <small class="text-gray">Hold Ctrl/Cmd to select multiple departments</small>
             </div>
             
             <div class="form-group">
@@ -311,6 +312,80 @@ document.addEventListener('DOMContentLoaded', () => {
       const now = new Date();
       now.setDate(now.getDate() + 7);
       document.getElementById('endDate').value = now.toISOString().slice(0, 16);
+      
+      // Faculty to department mapping
+      const facultyDepartments = {
+        'Engineering': [
+          'Computer Science',
+          'Electrical Engineering',
+          'Mechanical Engineering',
+          'Civil Engineering',
+          'Chemical Engineering'
+        ],
+        'Sciences': [
+          'Physics',
+          'Chemistry',
+          'Mathematics',
+          'Biology',
+          'Geology'
+        ],
+        'Arts & Humanities': [
+          'English',
+          'History',
+          'Philosophy',
+          'Linguistics',
+          'Theatre Arts'
+        ],
+        'Social Sciences': [
+          'Economics',
+          'Political Science',
+          'Sociology',
+          'Psychology',
+          'Geography'
+        ],
+        'Medicine': [
+          'Medicine',
+          'Nursing',
+          'Dentistry',
+          'Pharmacy',
+          'Public Health'
+        ],
+        'Law': [
+          'Law'
+        ],
+        'Business Administration': [
+          'Accounting',
+          'Finance',
+          'Marketing',
+          'Management',
+          'Human Resources'
+        ],
+        'Education': [
+          'Primary Education',
+          'Secondary Education',
+          'Adult Education',
+          'Special Education',
+          'Curriculum Studies'
+        ]
+      };
+      
+      // Handle faculty selection change
+      const facultyRestriction = document.getElementById('facultyRestriction');
+      const departmentRestrictions = document.getElementById('departmentRestrictions');
+      
+      facultyRestriction.addEventListener('change', function() {
+        departmentRestrictions.innerHTML = '';
+        
+        const selectedFaculty = this.value;
+        if (selectedFaculty && facultyDepartments[selectedFaculty]) {
+          facultyDepartments[selectedFaculty].forEach(department => {
+            const option = document.createElement('option');
+            option.value = department;
+            option.textContent = department;
+            departmentRestrictions.appendChild(option);
+          });
+        }
+      });
       
       // Add event listeners
       document.querySelector('.add-candidate').addEventListener('click', () => {
@@ -351,8 +426,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const description = document.getElementById('description').value;
       const endDate = document.getElementById('endDate').value;
       const isActive = document.getElementById('isActive').checked;
-      const universityRestriction = document.getElementById('universityRestriction').value || null;
-      const departmentRestriction = document.getElementById('departmentRestriction').value || null;
+      const facultyRestriction = document.getElementById('facultyRestriction').value || null;
+      
+      // Get selected departments
+      const departmentRestrictions = [];
+      const selectedOptions = document.getElementById('departmentRestrictions').selectedOptions;
+      for (let i = 0; i < selectedOptions.length; i++) {
+        departmentRestrictions.push(selectedOptions[i].value);
+      }
+      
       const candidateInputs = document.querySelectorAll('.candidate-name');
       
       const candidates = Array.from(candidateInputs)
@@ -382,18 +464,16 @@ document.addEventListener('DOMContentLoaded', () => {
             candidates, 
             endDate,
             isActive,
-            universityRestriction,
-            departmentRestriction
+            facultyRestriction,
+            departmentRestrictions
           })
         });
         
-        if (!res.ok) {
-          const error = await res.json().catch(() => ({}));
-          throw new Error(error.message || `Failed to create election (Status: ${res.status})`);
-        }
+        const data = await res.json();
         
-        const election = await res.json();
-        console.log('Election created:', election);
+        if (!res.ok) {
+          throw new Error(data.message || `Failed to create election (Status: ${res.status})`);
+        }
         
         adminJS.showSuccess('Election created successfully!');
         adminJS.loadElectionsManagement();
@@ -438,6 +518,62 @@ document.addEventListener('DOMContentLoaded', () => {
           `;
         });
         
+        // Faculty to department mapping
+        const facultyDepartments = {
+          'Engineering': [
+            'Computer Science',
+            'Electrical Engineering',
+            'Mechanical Engineering',
+            'Civil Engineering',
+            'Chemical Engineering'
+          ],
+          'Sciences': [
+            'Physics',
+            'Chemistry',
+            'Mathematics',
+            'Biology',
+            'Geology'
+          ],
+          'Arts & Humanities': [
+            'English',
+            'History',
+            'Philosophy',
+            'Linguistics',
+            'Theatre Arts'
+          ],
+          'Social Sciences': [
+            'Economics',
+            'Political Science',
+            'Sociology',
+            'Psychology',
+            'Geography'
+          ],
+          'Medicine': [
+            'Medicine',
+            'Nursing',
+            'Dentistry',
+            'Pharmacy',
+            'Public Health'
+          ],
+          'Law': [
+            'Law'
+          ],
+          'Business Administration': [
+            'Accounting',
+            'Finance',
+            'Marketing',
+            'Management',
+            'Human Resources'
+          ],
+          'Education': [
+            'Primary Education',
+            'Secondary Education',
+            'Adult Education',
+            'Special Education',
+            'Curriculum Studies'
+          ]
+        };
+        
         const html = `
           <div class="form-container">
             <h2 class="form-title">Edit Election: ${election.title}</h2>
@@ -468,33 +604,26 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
               
               <div class="form-group">
-                <label class="form-label" for="universityRestriction">University Restriction</label>
-                <select id="universityRestriction" class="form-control form-select">
-                  <option value="" ${!election.universityRestriction ? 'selected' : ''}>No University Restriction (All Universities)</option>
-                  <option value="All Universities" ${election.universityRestriction === 'All Universities' ? 'selected' : ''}>All Universities</option>
-                  <option value="University of Lagos" ${election.universityRestriction === 'University of Lagos' ? 'selected' : ''}>University of Lagos</option>
-                  <option value="Covenant University" ${election.universityRestriction === 'Covenant University' ? 'selected' : ''}>Covenant University</option>
-                  <option value="University of Ibadan" ${election.universityRestriction === 'University of Ibadan' ? 'selected' : ''}>University of Ibadan</option>
-                  <option value="Obafemi Awolowo University" ${election.universityRestriction === 'Obafemi Awolowo University' ? 'selected' : ''}>Obafemi Awolowo University</option>
-                  <option value="University of Benin" ${election.universityRestriction === 'University of Benin' ? 'selected' : ''}>University of Benin</option>
-                  <option value="Ahmadu Bello University" ${election.universityRestriction === 'Ahmadu Bello University' ? 'selected' : ''}>Ahmadu Bello University</option>
+                <label class="form-label" for="facultyRestriction">Faculty Restriction</label>
+                <select id="facultyRestriction" class="form-control form-select">
+                  <option value="" ${!election.facultyRestriction ? 'selected' : ''}>No Faculty Restriction (All Faculties)</option>
+                  <option value="Engineering" ${election.facultyRestriction === 'Engineering' ? 'selected' : ''}>Engineering</option>
+                  <option value="Sciences" ${election.facultyRestriction === 'Sciences' ? 'selected' : ''}>Sciences</option>
+                  <option value="Arts & Humanities" ${election.facultyRestriction === 'Arts & Humanities' ? 'selected' : ''}>Arts & Humanities</option>
+                  <option value="Social Sciences" ${election.facultyRestriction === 'Social Sciences' ? 'selected' : ''}>Social Sciences</option>
+                  <option value="Medicine" ${election.facultyRestriction === 'Medicine' ? 'selected' : ''}>Medicine</option>
+                  <option value="Law" ${election.facultyRestriction === 'Law' ? 'selected' : ''}>Law</option>
+                  <option value="Business Administration" ${election.facultyRestriction === 'Business Administration' ? 'selected' : ''}>Business Administration</option>
+                  <option value="Education" ${election.facultyRestriction === 'Education' ? 'selected' : ''}>Education</option>
                 </select>
               </div>
               
               <div class="form-group">
-                <label class="form-label" for="departmentRestriction">Department Restriction</label>
-                <select id="departmentRestriction" class="form-control form-select">
-                  <option value="" ${!election.departmentRestriction ? 'selected' : ''}>No Department Restriction (All Departments)</option>
-                  <option value="All Departments" ${election.departmentRestriction === 'All Departments' ? 'selected' : ''}>All Departments</option>
-                  <option value="Computer Science" ${election.departmentRestriction === 'Computer Science' ? 'selected' : ''}>Computer Science</option>
-                  <option value="Electrical Engineering" ${election.departmentRestriction === 'Electrical Engineering' ? 'selected' : ''}>Electrical Engineering</option>
-                  <option value="Mechanical Engineering" ${election.departmentRestriction === 'Mechanical Engineering' ? 'selected' : ''}>Mechanical Engineering</option>
-                  <option value="Medicine" ${election.departmentRestriction === 'Medicine' ? 'selected' : ''}>Medicine</option>
-                  <option value="Law" ${election.departmentRestriction === 'Law' ? 'selected' : ''}>Law</option>
-                  <option value="Business Administration" ${election.departmentRestriction === 'Business Administration' ? 'selected' : ''}>Business Administration</option>
-                  <option value="Economics" ${election.departmentRestriction === 'Economics' ? 'selected' : ''}>Economics</option>
-                  <option value="Political Science" ${election.departmentRestriction === 'Political Science' ? 'selected' : ''}>Political Science</option>
+                <label class="form-label" for="departmentRestrictions">Department Restrictions</label>
+                <select id="departmentRestrictions" class="form-control form-select" multiple>
+                  <!-- Options will be populated based on faculty selection -->
                 </select>
+                <small class="text-gray">Hold Ctrl/Cmd to select multiple departments</small>
               </div>
               
               <div class="form-group">
@@ -519,6 +648,37 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         
         document.getElementById('admin-content').innerHTML = html;
+        
+        // Populate departments based on faculty
+        const facultyRestriction = document.getElementById('facultyRestriction');
+        const departmentRestrictions = document.getElementById('departmentRestrictions');
+        
+        // Function to populate departments
+        const populateDepartments = () => {
+          departmentRestrictions.innerHTML = '';
+          
+          const selectedFaculty = facultyRestriction.value;
+          if (selectedFaculty && facultyDepartments[selectedFaculty]) {
+            facultyDepartments[selectedFaculty].forEach(department => {
+              const option = document.createElement('option');
+              option.value = department;
+              option.textContent = department;
+              
+              // Check if this department is in the election's restrictions
+              if (election.departmentRestrictions && election.departmentRestrictions.includes(department)) {
+                option.selected = true;
+              }
+              
+              departmentRestrictions.appendChild(option);
+            });
+          }
+        };
+        
+        // Initial population
+        populateDepartments();
+        
+        // Update departments when faculty changes
+        facultyRestriction.addEventListener('change', populateDepartments);
         
         // Add event listeners
         document.querySelector('.add-candidate').addEventListener('click', () => {
@@ -564,8 +724,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const description = document.getElementById('description').value;
       const endDate = document.getElementById('endDate').value;
       const isActive = document.getElementById('isActive').checked;
-      const universityRestriction = document.getElementById('universityRestriction').value || null;
-      const departmentRestriction = document.getElementById('departmentRestriction').value || null;
+      const facultyRestriction = document.getElementById('facultyRestriction').value || null;
+      
+      // Get selected departments
+      const departmentRestrictions = [];
+      const selectedOptions = document.getElementById('departmentRestrictions').selectedOptions;
+      for (let i = 0; i < selectedOptions.length; i++) {
+        departmentRestrictions.push(selectedOptions[i].value);
+      }
+      
       const candidateInputs = document.querySelectorAll('.candidate-name');
       
       const candidates = Array.from(candidateInputs)
@@ -595,14 +762,15 @@ document.addEventListener('DOMContentLoaded', () => {
             candidates, 
             endDate,
             isActive,
-            universityRestriction,
-            departmentRestriction
+            facultyRestriction,
+            departmentRestrictions
           })
         });
         
+        const data = await res.json();
+        
         if (!res.ok) {
-          const error = await res.json().catch(() => ({}));
-          throw new Error(error.message || `Failed to update election (Status: ${res.status})`);
+          throw new Error(data.message || `Failed to update election (Status: ${res.status})`);
         }
         
         adminJS.showSuccess('Election updated successfully!');
@@ -717,24 +885,24 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Format restriction badges
             let restrictionBadges = '';
-            if (election.universityRestriction && election.universityRestriction !== 'All Universities') {
+            if (election.facultyRestriction) {
               restrictionBadges += `
                 <span class="election-restriction">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                   </svg>
-                  ${election.universityRestriction}
+                  ${election.facultyRestriction} Faculty
                 </span>
               `;
             }
             
-            if (election.departmentRestriction && election.departmentRestriction !== 'All Departments') {
+            if (election.departmentRestrictions && election.departmentRestrictions.length > 0) {
               restrictionBadges += `
                 <span class="election-restriction" style="background-color: var(--secondary);">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                   </svg>
-                  ${election.departmentRestriction}
+                  ${election.departmentRestrictions.join(', ')}
                 </span>
               `;
             }
@@ -758,7 +926,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="result-header">
                   <div>
                     <h3 class="result-title">${election.title}</h3>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
                       ${restrictionBadges}
                       <span class="result-status ${election.isActive ? 'status-active' : 'status-inactive'}">
                         ${election.isActive ? 'Active' : 'Completed'}
@@ -871,24 +1039,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Format restriction badges
         let restrictionBadges = '';
-        if (election.universityRestriction && election.universityRestriction !== 'All Universities') {
+        if (election.facultyRestriction) {
           restrictionBadges += `
             <span class="election-restriction">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
               </svg>
-              ${election.universityRestriction}
+              ${election.facultyRestriction} Faculty
             </span>
           `;
         }
         
-        if (election.departmentRestriction && election.departmentRestriction !== 'All Departments') {
+        if (election.departmentRestrictions && election.departmentRestrictions.length > 0) {
           restrictionBadges += `
             <span class="election-restriction" style="background-color: var(--secondary);">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
               </svg>
-              ${election.departmentRestriction}
+              ${election.departmentRestrictions.join(', ')}
             </span>
           `;
         }
@@ -911,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="admin-header">
             <div>
               <h1 class="admin-title">Votes for: ${election.title}</h1>
-              <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
                 ${restrictionBadges}
                 <span class="result-status ${election.isActive ? 'status-active' : 'status-inactive'}">
                   ${election.isActive ? 'Active' : 'Completed'}
@@ -960,8 +1128,8 @@ document.addEventListener('DOMContentLoaded', () => {
                   <table class="voters-table">
                     <thead>
                       <tr>
-                        <th>Voter ID</th>
-                        <th>University</th>
+                        <th>Matric Number</th>
+                        <th>Faculty</th>
                         <th>Department</th>
                         <th>Candidate</th>
                         <th>Timestamp</th>
@@ -972,7 +1140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       ${votes.map(vote => `
                         <tr>
                           <td>${vote.user ? vote.user.matricNumber : 'Unknown'}</td>
-                          <td>${vote.user ? vote.user.university : 'N/A'}</td>
+                          <td>${vote.user ? vote.user.faculty : 'N/A'}</td>
                           <td>${vote.user ? vote.user.department : 'N/A'}</td>
                           <td>${vote.candidate}</td>
                           <td>${new Date(vote.timestamp).toLocaleString()}</td>
@@ -1063,7 +1231,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="card" style="margin-bottom: 1.5rem;">
             <div class="card-body">
               <div class="search-bar">
-                <input type="text" id="voter-search" class="form-control" placeholder="Search voters by matric number, university, or department...">
+                <input type="text" id="voter-search" class="form-control" placeholder="Search voters by matric number, faculty, or department...">
               </div>
             </div>
           </div>
@@ -1080,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <thead>
                       <tr>
                         <th>Matric Number</th>
-                        <th>University</th>
+                        <th>Faculty</th>
                         <th>Department</th>
                         <th>Voted Elections</th>
                         <th>Actions</th>
@@ -1090,7 +1258,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       ${voters.map(voter => `
                         <tr>
                           <td>${voter.matricNumber}</td>
-                          <td>${voter.university}</td>
+                          <td>${voter.faculty}</td>
                           <td>${voter.department}</td>
                           <td>${voter.hasVoted ? voter.hasVoted.length : 0}</td>
                           <td>
@@ -1165,6 +1333,64 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     },
     
+    copyVotingLink: async (link) => {
+      try {
+        await navigator.clipboard.writeText(link);
+        
+        // Show success message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-success';
+        alertDiv.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Voting link copied to clipboard!
+        `;
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.zIndex = '9999';
+        alertDiv.style.maxWidth = '400px';
+        alertDiv.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+        document.body.appendChild(alertDiv);
+        
+        alertDiv.style.display = 'flex';
+        
+        setTimeout(() => {
+          alertDiv.style.display = 'none';
+          document.body.removeChild(alertDiv);
+        }, 3000);
+      } catch (err) {
+        console.error('Error copying voting link:', err);
+        
+        // Show error message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        alertDiv.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          Failed to copy voting link
+        `;
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.zIndex = '9999';
+        alertDiv.style.maxWidth = '400px';
+        alertDiv.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+        document.body.appendChild(alertDiv);
+        
+        alertDiv.style.display = 'flex';
+        
+        setTimeout(() => {
+          alertDiv.style.display = 'none';
+          document.body.removeChild(alertDiv);
+        }, 5000);
+      }
+    },
+    
     showSuccess: (message) => {
       adminJS.showAlert(message, 'success');
     },
@@ -1215,4 +1441,4 @@ document.addEventListener('DOMContentLoaded', () => {
       adminJS.init();
     }, 100);
   });
-});        
+});
