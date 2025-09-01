@@ -44,16 +44,17 @@
             </div>
             
             <div class="form-group">
-              <label for="university" class="form-label">University</label>
-              <select id="university" class="form-control form-select" required>
-                <option value="" disabled selected>Select your university</option>
-                <option value="University of Lagos">University of Lagos</option>
-                <option value="Covenant University">Covenant University</option>
-                <option value="University of Ibadan">University of Ibadan</option>
-                <option value="Obafemi Awolowo University">Obafemi Awolowo University</option>
-                <option value="University of Benin">University of Benin</option>
-                <option value="Ahmadu Bello University">Ahmadu Bello University</option>
-                <option value="Other">Other University</option>
+              <label for="faculty" class="form-label">Faculty</label>
+              <select id="faculty" class="form-control form-select" required>
+                <option value="" disabled selected>Select your faculty</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Sciences">Sciences</option>
+                <option value="Arts & Humanities">Arts & Humanities</option>
+                <option value="Social Sciences">Social Sciences</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Law">Law</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="Education">Education</option>
               </select>
             </div>
             
@@ -61,15 +62,7 @@
               <label for="department" class="form-label">Department</label>
               <select id="department" class="form-control form-select" required>
                 <option value="" disabled selected>Select your department</option>
-                <option value="Computer Science">Computer Science</option>
-                <option value="Electrical Engineering">Electrical Engineering</option>
-                <option value="Mechanical Engineering">Mechanical Engineering</option>
-                <option value="Medicine">Medicine</option>
-                <option value="Law">Law</option>
-                <option value="Business Administration">Business Administration</option>
-                <option value="Economics">Economics</option>
-                <option value="Political Science">Political Science</option>
-                <option value="Other">Other Department</option>
+                <!-- Options will be populated based on faculty selection -->
               </select>
             </div>
             
@@ -88,22 +81,62 @@
               <input type="password" id="password2" class="form-control" placeholder="Confirm your password" required minlength="6">
             </div>
             
+            <div class="form-group">
+              <div class="form-check">
+                <input type="checkbox" id="terms" class="form-check-input" required>
+                <label for="terms" class="form-check-label">I agree to the <a href="#" id="terms-modal-trigger">Terms and Conditions</a></label>
+              </div>
+            </div>
+            
             <div id="error-message" class="alert alert-danger hidden"></div>
             
             <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
+            
+            <div class="text-center mt-4">
+              <p>Already have an account? <a href="login.html" class="auth-link">Login</a></p>
+            </div>
           </form>
-        </div>
-        
-        <div class="auth-footer">
-          <p>Already have an account? <a href="login.html" class="auth-link">Login</a></p>
         </div>
       </div>
     </div>
   </main>
 
+  <!-- Terms and Conditions Modal -->
+  <div id="terms-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2>Terms and Conditions</h2>
+      <div class="modal-body">
+        <h3>1. Acceptance of Terms</h3>
+        <p>By accessing and using VoteSphere, you accept and agree to be bound by the terms and conditions of this agreement.</p>
+        
+        <h3>2. Use of Service</h3>
+        <p>VoteSphere is intended for use by students of educational institutions for participating in student union elections.</p>
+        
+        <h3>3. Account Registration</h3>
+        <p>You must provide accurate and complete information when creating an account. You are responsible for maintaining the confidentiality of your account and password.</p>
+        
+        <h3>4. Voting Integrity</h3>
+        <p>Each student is allowed to vote only once per election. Attempting to vote multiple times is strictly prohibited.</p>
+        
+        <h3>5. Prohibited Activities</h3>
+        <p>You agree not to use the service for any unlawful purpose or in any way that could damage, disable, overburden, or impair the service.</p>
+        
+        <h3>6. Security</h3>
+        <p>We implement various security measures to maintain the safety of your personal information. However, no electronic transmission is 100% secure.</p>
+        
+        <h3>7. Changes to Terms</h3>
+        <p>We reserve the right to modify these terms at any time. Continued use of the service after changes constitutes acceptance of the new terms.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="accept-terms" class="btn btn-primary">Accept</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <div class="container footer-content">
-      <p>&copy; 2025 VoteSphere. All rights reserved.</p>
+      <p>&copy; 2023 VoteSphere. All rights reserved.</p>
       <div>
         <a href="#" class="text-gray" style="margin-right: 1rem;">Privacy Policy</a>
         <a href="#" class="text-gray">Terms of Service</a>
@@ -112,65 +145,217 @@
   </footer>
 
   <script>
-    // Form validation enhancements
     document.addEventListener('DOMContentLoaded', function() {
-      const signupForm = document.getElementById('signup-form');
+      // Terms and Conditions Modal
+      const termsModal = document.getElementById('terms-modal');
+      const termsModalTrigger = document.getElementById('terms-modal-trigger');
+      const modalClose = document.querySelector('.modal-close');
+      const acceptTermsBtn = document.getElementById('accept-terms');
       
-      if (signupForm) {
-        // Add validation feedback for required fields
-        const requiredFields = signupForm.querySelectorAll('[required]');
-        requiredFields.forEach(field => {
-          field.addEventListener('blur', function() {
-            if (!this.value) {
-              this.style.borderColor = 'var(--danger)';
-            } else {
-              this.style.borderColor = '';
-            }
-          });
-          
-          field.addEventListener('focus', function() {
-            this.style.borderColor = '';
-          });
-        });
+      termsModalTrigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        termsModal.classList.remove('hidden');
+      });
+      
+      modalClose.addEventListener('click', () => {
+        termsModal.classList.add('hidden');
+      });
+      
+      acceptTermsBtn.addEventListener('click', () => {
+        document.getElementById('terms').checked = true;
+        termsModal.classList.add('hidden');
+      });
+      
+      // Close modal when clicking outside
+      window.addEventListener('click', (e) => {
+        if (e.target === termsModal) {
+          termsModal.classList.add('hidden');
+        }
+      });
+      
+      // Faculty to department mapping
+      const facultyDepartments = {
+        'Engineering': [
+          'Computer Science',
+          'Electrical Engineering',
+          'Mechanical Engineering',
+          'Civil Engineering',
+          'Chemical Engineering'
+        ],
+        'Sciences': [
+          'Physics',
+          'Chemistry',
+          'Mathematics',
+          'Biology',
+          'Geology'
+        ],
+        'Arts & Humanities': [
+          'English',
+          'History',
+          'Philosophy',
+          'Linguistics',
+          'Theatre Arts'
+        ],
+        'Social Sciences': [
+          'Economics',
+          'Political Science',
+          'Sociology',
+          'Psychology',
+          'Geography'
+        ],
+        'Medicine': [
+          'Medicine',
+          'Nursing',
+          'Dentistry',
+          'Pharmacy',
+          'Public Health'
+        ],
+        'Law': [
+          'Law'
+        ],
+        'Business Administration': [
+          'Accounting',
+          'Finance',
+          'Marketing',
+          'Management',
+          'Human Resources'
+        ],
+        'Education': [
+          'Primary Education',
+          'Secondary Education',
+          'Adult Education',
+          'Special Education',
+          'Curriculum Studies'
+        ]
+      };
+      
+      // Handle faculty selection change
+      const facultySelect = document.getElementById('faculty');
+      const departmentSelect = document.getElementById('department');
+      
+      facultySelect.addEventListener('change', function() {
+        departmentSelect.innerHTML = '<option value="" disabled selected>Select your department</option>';
         
-        // Add department validation
-        const departmentSelect = document.getElementById('department');
-        departmentSelect.addEventListener('change', function() {
-          if (this.value && this.value !== "Select your department") {
-            this.style.borderColor = 'var(--success)';
+        const selectedFaculty = this.value;
+        if (selectedFaculty && facultyDepartments[selectedFaculty]) {
+          facultyDepartments[selectedFaculty].forEach(department => {
+            const option = document.createElement('option');
+            option.value = department;
+            option.textContent = department;
+            departmentSelect.appendChild(option);
+          });
+        }
+      });
+      
+      // Handle signup
+      const signupForm = document.getElementById('signup-form');
+      if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const matricNumber = document.getElementById('matricNumber').value;
+          const faculty = document.getElementById('faculty').value;
+          const department = document.getElementById('department').value;
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+          const password2 = document.getElementById('password2').value;
+          const errorDiv = document.getElementById('error-message');
+          
+          // Validate department selection
+          if (!department || department === "" || department === "Select your department") {
+            errorDiv.innerHTML = 'Please select your department';
+            errorDiv.classList.remove('hidden');
+            
             setTimeout(() => {
-              this.style.borderColor = '';
-            }, 1000);
+              errorDiv.classList.add('hidden');
+            }, 5000);
+            return;
+          }
+          
+          if (password !== password2) {
+            errorDiv.innerHTML = 'Passwords do not match';
+            errorDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+              errorDiv.classList.add('hidden');
+            }, 5000);
+            return;
+          }
+          
+          try {
+            const res = await fetch('/api/auth/signup', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ 
+                matricNumber, 
+                faculty, 
+                department, 
+                email, 
+                password 
+              })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+              localStorage.setItem('token', data.token);
+              localStorage.setItem('role', data.role);
+              localStorage.setItem('faculty', data.faculty);
+              localStorage.setItem('department', data.department);
+              
+              // Redirect to dashboard
+              window.location.href = 'user-dashboard.html';
+            } else {
+              let errorMessage = 'Registration failed';
+              if (data.errors && Array.isArray(data.errors)) {
+                errorMessage = data.errors.map(err => err.msg).join('<br>');
+              } else if (data.message) {
+                errorMessage = data.message;
+              }
+              
+              errorDiv.innerHTML = errorMessage;
+              errorDiv.classList.remove('hidden');
+              
+              setTimeout(() => {
+                errorDiv.classList.add('hidden');
+              }, 5000);
+            }
+          } catch (err) {
+            console.error('Signup error:', err);
+            errorDiv.innerHTML = 'Server error. Please try again.';
+            errorDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+              errorDiv.classList.add('hidden');
+            }, 5000);
           }
         });
       }
-    });
-  </script>
-  
-  <script src="js/script.js"></script>
-  
-  <script>
-    // Theme toggle functionality
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    
-    // Check for saved theme preference or prefer-color-scheme
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      themeIcon.textContent = '☀️';
-    }
-    
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
+      // Theme toggle functionality
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
       
-      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+      // Check for saved theme preference or prefer-color-scheme
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+      }
+      
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+      });
     });
   </script>
 </body>
