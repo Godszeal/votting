@@ -3,6 +3,11 @@ const Election = require('../models/Election');
 const Vote = require('../models/Vote');
 const jwtConfig = require('../config/jwt');
 
+// Initialize exports at the top to prevent circular dependency issues
+exports.getUserElections = () => {};
+exports.castVote = () => {};
+exports.getElectionResults = () => {};
+
 // @desc    Get user elections
 // @route   GET /api/user/elections
 // @access  Private
