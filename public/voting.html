@@ -146,7 +146,13 @@
         return;
       }
       
-      loadElectionDetails(token);
+      // Check if user is already logged in
+      const tokenFromStorage = localStorage.getItem('token');
+      if (tokenFromStorage) {
+        verifyUserAndRedirect(token);
+      } else {
+        loadElectionDetails(token);
+      }
       
       // Faculty to department mapping
       const facultyDepartments = {
@@ -288,6 +294,39 @@
       }
     });
     
+    async function verifyUserAndRedirect(token) {
+      const loadingSection = document.getElementById('loading-section');
+      const errorSection = document.getElementById('error-section');
+      
+      try {
+        const tokenFromStorage = localStorage.getItem('token');
+        if (!tokenFromStorage) {
+          loadElectionDetails(token);
+          return;
+        }
+        
+        // Verify the token is still valid
+        const res = await fetch('/api/user/voting-link/' + token, {
+          headers: {
+            'x-auth-token': tokenFromStorage
+          }
+        });
+        
+        if (!res.ok) {
+          loadElectionDetails(token);
+          return;
+        }
+        
+        const data = await res.json();
+        
+        // Redirect to dashboard with election ID
+        window.location.href = `user-dashboard.html?election=${data.electionId}`;
+      } catch (err) {
+        console.error('Error verifying user:', err);
+        loadElectionDetails(token);
+      }
+    }
+    
     function loadElectionDetails(token) {
       const loadingSection = document.getElementById('loading-section');
       const errorSection = document.getElementById('error-section');
@@ -295,8 +334,13 @@
       const votingInstructions = document.getElementById('voting-instructions');
       const electionTitle = document.getElementById('election-title');
       
-      fetch(`/api/auth/voting-link/${token}`)
-        .then(response => response.json())
+      fetch(`/api/user/voting-link/${token}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
         .then(data => {
           loadingSection.style.display = 'none';
           
