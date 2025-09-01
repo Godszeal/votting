@@ -21,7 +21,7 @@ const validateEnvVars = () => {
     console.error('Please create a .env file with these variables or set them in your environment');
     console.error('Example .env file content:');
     console.error('MONGODB_URI=mongodb+srv://godwinhephzibah25_db_user:Ku66Sbbtcb8sIwbJ@cluster0.v4tzdiq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
-    console.error('JWT_SECRET=your_strong_secret_here');
+    console.error('JWT_SECRET=a3f8c1d4e5b6a7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2');
     console.error('JWT_EXPIRES_IN=1h');
     console.error('ADMIN_EMAIL=babalolahephzibah2@gmail.com');
     console.error('ADMIN_PASSWORD=Godszeal');
