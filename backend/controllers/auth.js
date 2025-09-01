@@ -2,14 +2,20 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Election = require('../models/Election');
-const Vote = require('../models/Vote');
 const jwtConfig = require('../config/jwt');
+
+// Initialize exports at the top to prevent circular dependency issues
+exports.signup = () => {};
+exports.login = () => {};
+exports.adminLogin = () => {};
+exports.getVotingLinkDetails = () => {};
 
 // @desc    Register user
 // @route   POST /api/auth/signup
 // @access  Public
 exports.signup = async (req, res) => {
-  const { matricNumber, faculty, department, email, password, facultyToken } = req.body;
+  const { matricNumber, faculty, department, email, password, facultyToken, votingLinkToken } = req.body;
+  const token = votingLinkToken || facultyToken; // Handle both parameter names
   
   try {
     // Check if user already exists
@@ -23,8 +29,8 @@ exports.signup = async (req, res) => {
     }
     
     // Verify faculty token if provided
-    if (facultyToken) {
-      const election = await Election.findOne({ votingLinkToken: facultyToken });
+    if (token) {
+      const election = await Election.findOne({ votingLinkToken: token });
       if (!election) {
         return res.status(400).json({ 
           errors: [{ msg: 'Invalid voting link' }], 
@@ -60,7 +66,7 @@ exports.signup = async (req, res) => {
       department,
       email,
       password,
-      facultyToken: facultyToken || null
+      facultyToken: token || null
     });
     
     // Encrypt password
