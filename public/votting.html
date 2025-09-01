@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoteSphere - Secure Student Voting System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+</head>
+<body>
+  <header>
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="images/logo.svg" alt="VoteSphere Logo">
+        <span class="logo-text">VoteSphere</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="login.html" class="nav-link">Student Login</a>
+        <a href="admin-login.html" class="nav-link">Admin</a>
+        <button class="theme-toggle" id="theme-toggle">
+          <span id="theme-icon">🌙</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h1 class="auth-title">Join This Election</h1>
+          <p class="auth-subtitle" id="election-title">Loading election details...</p>
+        </div>
+        
+        <div class="auth-body">
+          <div id="loading-section" class="text-center">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔄</div>
+            <h2 style="margin-bottom: 0.5rem;">Loading Election Details</h2>
+            <p style="color: var(--gray);">Please wait while we verify this voting link</p>
+          </div>
+          
+          <div id="error-section" class="hidden">
+            <div class="alert alert-danger">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span id="error-message">Invalid voting link</span>
+            </div>
+          </div>
+          
+          <form id="voting-signup-form" class="auth-form hidden">
+            <div class="form-group">
+              <label for="matricNumber" class="form-label">Matriculation Number</label>
+              <input type="text" id="matricNumber" class="form-control" placeholder="E.g., CSC/2019/001" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="faculty" class="form-label">Faculty</label>
+              <select id="faculty" class="form-control form-select" required>
+                <option value="" disabled selected>Select your faculty</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Sciences">Sciences</option>
+                <option value="Arts & Humanities">Arts & Humanities</option>
+                <option value="Social Sciences">Social Sciences</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Law">Law</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="Education">Education</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="department" class="form-label">Department</label>
+              <select id="department" class="form-control form-select" required>
+                <option value="" disabled selected>Select your department</option>
+                <!-- Options will be populated based on faculty selection -->
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="email" class="form-label">Email (Optional)</label>
+              <input type="email" id="email" class="form-control" placeholder="you@example.com">
+            </div>
+            
+            <div class="form-group">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" id="password" class="form-control" placeholder="Create a strong password" required minlength="6">
+            </div>
+            
+            <div class="form-group">
+              <label for="password2" class="form-label">Confirm Password</label>
+              <input type="password" id="password2" class="form-control" placeholder="Confirm your password" required minlength="6">
+            </div>
+            
+            <div id="error-message" class="alert alert-danger hidden"></div>
+            
+            <button type="submit" class="btn btn-primary btn-lg">Create Account & Vote</button>
+            
+            <div class="text-center mt-4">
+              <p>Already have an account? <a href="login.html" class="auth-link">Login</a></p>
+            </div>
+          </form>
+          
+          <div id="voting-instructions" class="hidden">
+            <div class="card">
+              <h3 class="card-title">Election Restrictions</h3>
+              <div class="card-body">
+                <p>This election is restricted to:</p>
+                <ul id="restriction-list" style="list-style: inside; padding-left: 1rem; margin-bottom: 1.5rem;"></ul>
+                <p>Please ensure you meet these requirements before proceeding.</p>
+              </div>
+            </div>
+            
+            <div class="text-center mt-4">
+              <a href="login.html" class="btn btn-primary btn-lg">Login to Vote</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <p>&copy; 2023 VoteSphere. All rights reserved.</p>
+      <div>
+        <a href="#" class="text-gray" style="margin-right: 1rem;">Privacy Policy</a>
+        <a href="#" class="text-gray">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      
+      if (!token) {
+        showError('Invalid voting link. Please check the link and try again.');
+        return;
+      }
+      
+      loadElectionDetails(token);
+      
+      // Faculty to department mapping
+      const facultyDepartments = {
+        'Engineering': [
+          'Computer Science',
+          'Electrical Engineering',
+          'Mechanical Engineering',
+          'Civil Engineering',
+          'Chemical Engineering'
+        ],
+        'Sciences': [
+          'Physics',
+          'Chemistry',
+          'Mathematics',
+          'Biology',
+          'Geology'
+        ],
+        'Arts & Humanities': [
+          'English',
+          'History',
+          'Philosophy',
+          'Linguistics',
+          'Theatre Arts'
+        ],
+        'Social Sciences': [
+          'Economics',
+          'Political Science',
+          'Sociology',
+          'Psychology',
+          'Geography'
+        ],
+        'Medicine': [
+          'Medicine',
+          'Nursing',
+          'Dentistry',
+          'Pharmacy',
+          'Public Health'
+        ],
+        'Law': [
+          'Law'
+        ],
+        'Business Administration': [
+          'Accounting',
+          'Finance',
+          'Marketing',
+          'Management',
+          'Human Resources'
+        ],
+        'Education': [
+          'Primary Education',
+          'Secondary Education',
+          'Adult Education',
+          'Special Education',
+          'Curriculum Studies'
+        ]
+      };
+      
+      // Handle faculty selection change
+      const facultySelect = document.getElementById('faculty');
+      facultySelect.addEventListener('change', function() {
+        const departmentSelect = document.getElementById('department');
+        departmentSelect.innerHTML = '<option value="" disabled selected>Select your department</option>';
+        
+        const selectedFaculty = this.value;
+        if (selectedFaculty && facultyDepartments[selectedFaculty]) {
+          facultyDepartments[selectedFaculty].forEach(department => {
+            const option = document.createElement('option');
+            option.value = department;
+            option.textContent = department;
+            departmentSelect.appendChild(option);
+          });
+        }
+      });
+      
+      // Handle form submission
+      const votingSignupForm = document.getElementById('voting-signup-form');
+      if (votingSignupForm) {
+        votingSignupForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const matricNumber = document.getElementById('matricNumber').value;
+          const faculty = document.getElementById('faculty').value;
+          const department = document.getElementById('department').value;
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+          const password2 = document.getElementById('password2').value;
+          const errorMessage = document.getElementById('error-message');
+          
+          // Validate passwords
+          if (password !== password2) {
+            errorMessage.textContent = 'Passwords do not match';
+            errorMessage.classList.remove('hidden');
+            return;
+          }
+          
+          try {
+            const res = await fetch('/api/auth/voting-signup', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ 
+                matricNumber, 
+                faculty, 
+                department, 
+                email, 
+                password,
+                votingLinkToken: token
+              })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+              localStorage.setItem('token', data.token);
+              localStorage.setItem('role', data.role);
+              localStorage.setItem('faculty', data.faculty);
+              localStorage.setItem('department', data.department);
+              
+              // Redirect to the election voting page
+              window.location.href = `user-dashboard.html?election=${data.electionId}`;
+            } else {
+              let errorMessageText = 'Registration failed';
+              if (data.errors && Array.isArray(data.errors)) {
+                errorMessageText = data.errors.map(err => err.msg).join('<br>');
+              } else if (data.message) {
+                errorMessageText = data.message;
+              }
+              
+              errorMessage.textContent = errorMessageText;
+              errorMessage.classList.remove('hidden');
+            }
+          } catch (err) {
+            console.error('Signup error:', err);
+            errorMessage.textContent = 'Server error. Please try again.';
+            errorMessage.classList.remove('hidden');
+          }
+        });
+      }
+    });
+    
+    function loadElectionDetails(token) {
+      const loadingSection = document.getElementById('loading-section');
+      const errorSection = document.getElementById('error-section');
+      const votingSignupForm = document.getElementById('voting-signup-form');
+      const votingInstructions = document.getElementById('voting-instructions');
+      const electionTitle = document.getElementById('election-title');
+      
+      fetch(`/api/auth/voting-link/${token}`)
+        .then(response => response.json())
+        .then(data => {
+          loadingSection.style.display = 'none';
+          
+          if (data.message) {
+            showError(data.message);
+            return;
+          }
+          
+          // Update the election title
+          electionTitle.textContent = data.title;
+          
+          // Show restrictions
+          const restrictionList = document.getElementById('restriction-list');
+          restrictionList.innerHTML = '';
+          
+          if (data.facultyRestriction) {
+            const li = document.createElement('li');
+            li.textContent = `Faculty: ${data.facultyRestriction}`;
+            restrictionList.appendChild(li);
+          }
+          
+          if (data.departmentRestrictions && data.departmentRestrictions.length > 0) {
+            const li = document.createElement('li');
+            li.textContent = `Departments: ${data.departmentRestrictions.join(', ')}`;
+            restrictionList.appendChild(li);
+          }
+          
+          if (!data.facultyRestriction && data.departmentRestrictions.length === 0) {
+            const li = document.createElement('li');
+            li.textContent = 'All students are eligible to vote';
+            restrictionList.appendChild(li);
+          }
+          
+          // Show the appropriate section
+          votingSignupForm.classList.remove('hidden');
+          votingInstructions.classList.remove('hidden');
+        })
+        .catch(error => {
+          console.error('Error loading election details:', error);
+          loadingSection.style.display = 'none';
+          showError('Could not load election details. Please check the link and try again.');
+        });
+    }
+    
+    function showError(message) {
+      const loadingSection = document.getElementById('loading-section');
+      const errorSection = document.getElementById('error-section');
+      const errorMessage = document.getElementById('error-message');
+      
+      loadingSection.style.display = 'none';
+      errorSection.classList.remove('hidden');
+      errorMessage.textContent = message;
+    }
+    
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    // Check for saved theme preference or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeIcon.textContent = '☀️';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+  </script>
+</body>
+</html>
