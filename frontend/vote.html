@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vote - Student Voting System</title>
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/vote.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="vote-container">
-        <!-- Header -->
-        <header class="dashboard-header">
+    <!-- Header -->
+    <header class="vote-header">
+        <div class="container">
             <div class="header-left">
                 <a href="dashboard.html" class="back-btn">
                     <i class="fas fa-arrow-left"></i>
@@ -29,34 +29,72 @@
                     <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- Main Content -->
-        <main class="vote-content">
+    <!-- Main Content -->
+    <main class="vote-content">
+        <div class="container">
             <div class="vote-info">
-                <h2 id="election-title">Student Union President</h2>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <i class="fas fa-university"></i>
-                        <span>Faculty: <strong id="election-faculty">Engineering</strong></span>
+                <div class="election-header">
+                    <div class="election-details">
+                        <h2 id="election-title">Student Union President</h2>
+                        <div class="election-meta">
+                            <span><i class="fas fa-university"></i> <strong id="election-faculty">Engineering</strong></span>
+                            <span><i class="fas fa-building"></i> <strong id="election-department">Computer Science</strong></span>
+                        </div>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-building"></i>
-                        <span>Department: <strong id="election-department">Computer Science</strong></span>
+                    <div class="election-status">
+                        <span class="status active">Active</span>
+                        <div class="timer">
+                            <i class="fas fa-clock"></i> Ends in: <span id="election-timer">3d 12h 45m</span>
+                        </div>
                     </div>
                 </div>
-                <p class="vote-instructions">Select your preferred candidate below and click "Vote" to cast your ballot. You can only vote once for this election.</p>
+                <p class="vote-instructions">Select your preferred candidate below and confirm your vote. You can only vote once for this election.</p>
             </div>
 
-            <div class="candidates-section">
-                <h2>Candidates</h2>
-                <div class="candidates-list" id="candidates-list">
-                    <!-- Candidates will be loaded here dynamically -->
+            <div class="voting-process">
+                <div class="vote-selection">
+                    <h2>Choose Your Candidate</h2>
+                    <div class="candidates-list" id="candidates-list">
+                        <!-- Candidates will be loaded here dynamically -->
+                    </div>
+                </div>
+                <div class="vote-confirmation">
+                    <h2>Confirm Your Vote</h2>
+                    <div class="confirmation-card">
+                        <div class="confirmation-header">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Ready to Vote</h3>
+                        </div>
+                        <div class="confirmation-details">
+                            <p>You are about to vote for <strong id="selected-candidate">[Candidate Name]</strong> for <strong id="selected-position">[Position]</strong>.</p>
+                            <p class="warning"><i class="fas fa-exclamation-triangle"></i> This action cannot be undone. Once you confirm your vote, it will be securely recorded and encrypted.</p>
+                        </div>
+                        <div class="confirmation-buttons">
+                            <button class="btn secondary" id="back-btn">Back</button>
+                            <button class="btn primary" id="confirm-vote-btn">Confirm Vote</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="vote-verified">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Vote Verified</h2>
+                    <p>Your vote has been securely recorded and encrypted. Thank you for participating in this election!</p>
+                    <div class="verification-details">
+                        <p><strong>Transaction ID:</strong> <span id="transaction-id">a1b2c3d4e5f6g7h8</span></p>
+                        <p><strong>Time:</strong> <span id="vote-time">2023-09-15 14:30:45</span></p>
+                    </div>
+                    <div class="verified-buttons">
+                        <button class="btn secondary" id="view-results-btn">View Results</button>
+                        <button class="btn primary" id="return-dashboard-btn">Return to Dashboard</button>
+                    </div>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 
-    <script src="js/dashboard.js"></script>
+    <script src="js/vote.js"></script>
 </body>
 </html>
