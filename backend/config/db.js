@@ -1,126 +1,113 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
-const fs = require('fs');
 
-// Load environment variables from multiple possible locations
-const loadEnvironment = () => {
-  // Define possible .env file locations
-  const possibleEnvPaths = [
-    path.resolve(process.cwd(), '.env'),
-    path.resolve(process.cwd(), '.env.local'),
-    path.resolve(__dirname, '../.env'),
-    path.resolve(__dirname, '../../.env'),
-    path.resolve(process.cwd(), '../.env')
-  ];
+// Load environment variables from .env file
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
+// Validate required environment variables
+const validateEnvVars = () => {
+  const requiredVars = ['MONGODB_URI'];
+  const missingVars = [];
   
-  let envLoaded = false;
-  
-  // Try each location
-  for (const envPath of possibleEnvPaths) {
-    if (fs.existsSync(envPath)) {
-      dotenv.config({ path: envPath });
-      console.log(`✓ Environment variables loaded from: ${envPath}`);
-      envLoaded = true;
-      break;
+  requiredVars.forEach(varName => {
+    if (!process.env[varName]) {
+      missingVars.push(varName);
     }
-  }
+  });
   
-  // If no .env file found, check if variables are set in system
-  if (!envLoaded) {
-    console.warn('⚠️ Warning: .env file not found in standard locations');
+  if (missingVars.length > 0) {
+    console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
+    console.error('Please create a .env file with these variables or set them in your environment');
+    console.error('Example .env file content:');
+    console.error('MONGODB_URI=mongodb://localhost:27017/votesphere');
+    console.error('JWT_SECRET=your_strong_secret_here');
+    console.error('JWT_EXPIRES_IN=1h');
+    console.error('ADMIN_EMAIL=babalolahephzibah2@gmail.com');
+    console.error('ADMIN_PASSWORD=Godszeal');
+    console.error('BASE_URL=http://localhost:3000');
     
-    // Check if MONGODB_URI is at least set in system environment
-    if (!process.env.MONGODB_URI) {
-      console.error('✗ Critical Error: MONGODB_URI is not defined!');
-      console.error('\nPlease create a .env file with these required variables:');
-      console.error(`
-MONGODB_URI=mongodb://localhost:27017/votesphere
-JWT_SECRET=your_strong_secret_here
-JWT_EXPIRES_IN=1h
-ADMIN_EMAIL=babalolahephzibah2@gmail.com
-ADMIN_PASSWORD=Godszeal
-BASE_URL=http://localhost:3000
-PORT=5000
-      `);
-      
-      // Exit with specific error code for missing env variables
-      process.exit(10);
+    // Don't throw here, just log and provide fallback for development
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('⚠️ Using fallback MongoDB URI for development only!');
+      process.env.MONGODB_URI = 'mongodb://localhost:27017/votesphere';
     } else {
-      console.log('✓ Environment variables found in system environment');
+      throw new Error('Missing required environment variables');
     }
   }
 };
 
-// Call the environment loader
-loadEnvironment();
-
 const connectDB = async () => {
   try {
-    // Verify MONGODB_URI is defined
-    if (!process.env.MONGODB_URI) {
-      throw new Error('MONGODB_URI is not defined. Please check your environment configuration.');
+    // Validate environment variables first
+    validateEnvVars();
+    
+    // Get MongoDB URI
+    const mongoURI = process.env.MONGODB_URI;
+    
+    if (!mongoURI) {
+      throw new Error('MongoDB URI is not defined after validation');
     }
     
-    // Mask credentials for safe logging
-    const maskedURI = process.env.MONGODB_URI.replace(/\/\/(.*):(.*)@/, '//****:****@');
-    console.log(`Attempting to connect to MongoDB: ${maskedURI}`);
+    console.log(`Attempting to connect to MongoDB at: ${mongoURI.replace(/\/\/(.*):(.*)@/, '//[hidden]:[hidden]@')}`);
     
-    // Add connection options for better reliability
-    const connectionOptions = {
+    // Set mongoose options - REMOVED useCreateIndex as it's no longer supported in Mongoose 6+
+    const options = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useCreateIndex: true,
-      connectTimeoutMS: 10000,     // 10 seconds
-      socketTimeoutMS: 45000,      // 45 seconds
-      serverSelectionTimeoutMS: 5000, // 5 seconds
-      family: 4                    // Use IPv4, skip trying IPv6
+      // useCreateIndex: true,  // REMOVED - no longer supported in Mongoose 6+
+      useFindAndModify: false,
+      connectTimeoutMS: 30000,
+      serverSelectionTimeoutMS: 30000
     };
     
     // Connect to MongoDB
-    const conn = await mongoose.connect(process.env.MONGODB_URI, connectionOptions);
+    const conn = await mongoose.connect(mongoURI, options);
     
-    console.log(`✓ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     
-    // Add connection event listeners for better error handling
+    // Add connection event listeners
     mongoose.connection.on('error', (err) => {
-      console.error('✗ MongoDB connection error:', err);
+      console.error('❌ MongoDB connection error:', err);
     });
     
     mongoose.connection.on('disconnected', () => {
-      console.warn('⚠️ MongoDB disconnected. Attempting to reconnect...');
+      console.warn('⚠️ MongoDB disconnected');
     });
     
     mongoose.connection.on('reconnected', () => {
-      console.log('✓ MongoDB reconnected successfully');
+      console.log('✅ MongoDB reconnected');
+    });
+    
+    // Handle process termination
+    process.on('SIGINT', async () => {
+      await mongoose.connection.close();
+      console.log('🔌 MongoDB connection closed through app termination');
+      process.exit(0);
     });
     
     return conn;
   } catch (err) {
-    console.error(`✗ MongoDB Connection Failed: ${err.message}`);
+    console.error('❌ MongoDB Connection Error:', err);
     
-    // Provide specific guidance based on error type
+    // Provide more specific error messages
     if (err.name === 'MongoParseError') {
-      console.error('Possible issue: Invalid MongoDB connection string format');
-      console.error('Make sure your MONGODB_URI follows the format: mongodb://username:password@host:port/database');
-    } else if (err.name === 'MongoNetworkError') {
-      console.error('Possible issue: Could not connect to MongoDB server');
-      console.error('Is MongoDB running? Try starting it with:');
-      console.error('  - Linux: sudo service mongod start');
-      console.error('  - Windows: Start the "MongoDB" service');
-      console.error('  - macOS: brew services start mongodb-community');
-    } else if (err.code === 'ENOTFOUND') {
-      console.error('Possible issue: Could not resolve hostname in connection string');
+      console.error('The MongoDB URI format is incorrect. It should look like:');
+      console.error('mongodb://username:password@host:port/database');
+    } else if (err.name === 'MongoNetworkError' || err.message.includes('ECONNREFUSED')) {
+      console.error('Cannot connect to MongoDB server. Make sure MongoDB is running.');
+      console.error('Try starting MongoDB with: mongod');
+    } else if (err.message.includes('usecreateindex')) {
+      console.error('The "useCreateIndex" option is no longer supported in Mongoose 6+. It has been removed from connection options.');
     }
     
-    console.error('\nTroubleshooting steps:');
-    console.error('1. Verify MongoDB is installed and running on your system');
-    console.error('2. Check if you can connect to MongoDB using a GUI tool like MongoDB Compass');
-    console.error('3. If using a cloud MongoDB service, verify your IP is whitelisted');
-    console.error('4. Ensure your .env file exists in the project root with correct values');
+    // Don't throw in development to allow server to start
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('⚠️ Continuing in development mode without database connection');
+      return null;
+    }
     
-    // Exit with specific error code for connection failure
-    process.exit(1);
+    throw err;
   }
 };
 
