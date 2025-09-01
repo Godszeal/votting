@@ -1,15 +1,74 @@
 :root {
+    /* Colors */
     --primary: #4361ee;
     --primary-dark: #3a56d4;
+    --primary-light: #eef2ff;
     --secondary: #7209b7;
-    --success: #4cc9f0;
-    --dark: #212529;
+    --success: #06d6a0;
+    --danger: #ef476f;
+    --warning: #ffd166;
+    --info: #118ab2;
+    --dark: #073b4c;
     --light: #f8f9fa;
     --gray: #6c757d;
     --light-gray: #e9ecef;
-    --danger: #f72585;
-    --warning: #f8961e;
-    --info: #4cc9f0;
+    --border: #dee2e6;
+    --text: #212529;
+    --text-light: #6c757d;
+    --background: #ffffff;
+    --card-bg: #ffffff;
+    --sidebar-bg: #1a1a2e;
+    --sidebar-text: #f8f9fa;
+    --sidebar-active: #4cc9f0;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    
+    /* Typography */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --font-size-base: 1rem;
+    --font-size-sm: 0.875rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-xxl: 2.5rem;
+    --line-height: 1.5;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --spacing-xxl: 4rem;
+    
+    /* Borders */
+    --border-radius: 0.5rem;
+    --border-radius-lg: 1rem;
+    --border-width: 1px;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+    
+    /* Transitions */
+    --transition-fast: all 0.2s ease;
+    --transition-normal: all 0.3s ease;
+    --transition-slow: all 0.4s ease;
+}
+
+/* Dark mode variables */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text: #f8f9fa;
+        --text-light: #adb5bd;
+        --background: #121212;
+        --card-bg: #1e1e1e;
+        --border: #343a40;
+        --light: #212529;
+    }
 }
 
 * {
@@ -18,30 +77,67 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    background-color: #f8f9ff;
+html {
+    font-size: 16px;
 }
 
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height);
+    color: var(--text);
+    background-color: #f8f9ff;
+    overflow-x: hidden;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+a {
+    text-decoration: none;
+    color: var(--text);
+    transition: var(--transition-normal);
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: var(--font-family);
+    transition: var(--transition-normal);
+}
+
+input, textarea, select {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    transition: var(--transition-normal);
+}
+
+/* Layout */
 .admin-container {
     display: flex;
     min-height: 100vh;
 }
 
-/* Sidebar Styles */
+/* Sidebar */
 .sidebar {
     width: 280px;
-    background: var(--dark);
-    color: white;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
     padding: 20px 0;
-    transition: all 0.3s ease;
+    transition: var(--transition-normal);
     z-index: 100;
     height: 100vh;
     position: fixed;
     left: 0;
     top: 0;
+    overflow-y: auto;
 }
 
 .sidebar.active {
@@ -53,7 +149,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    border-bottom: 1px solid #495057;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 20px;
 }
 
@@ -81,21 +177,21 @@ body {
     align-items: center;
     gap: 15px;
     padding: 12px 20px;
-    color: #adb5bd;
+    color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
     border-radius: 8px;
-    transition: all 0.3s ease;
+    transition: var(--transition-normal);
     font-weight: 500;
 }
 
 .admin-nav ul li a:hover {
-    background: #495057;
+    background: rgba(255, 255, 255, 0.1);
     color: white;
 }
 
 .admin-nav ul li.active a {
-    background: var(--primary);
-    color: white;
+    background: var(--sidebar-active);
+    color: var(--sidebar-bg);
 }
 
 .admin-nav ul li a i {
@@ -116,7 +212,7 @@ body {
     align-items: center;
     gap: 15px;
     padding: 15px;
-    background: #495057;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     margin-bottom: 15px;
 }
@@ -135,7 +231,7 @@ body {
 
 .user-profile p {
     font-size: 0.9rem;
-    color: #adb5bd;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .logout {
@@ -145,28 +241,28 @@ body {
     gap: 10px;
     justify-content: center;
     padding: 10px;
-    background: #495057;
+    background: rgba(255, 255, 255, 0.1);
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--transition-normal);
 }
 
 .logout:hover {
-    background: #343a40;
+    background: rgba(255, 255, 255, 0.2);
 }
 
-/* Main Content Styles */
+/* Main Content */
 .main-content {
     flex: 1;
     margin-left: 280px;
-    transition: all 0.3s ease;
+    transition: var(--transition-normal);
 }
 
 .admin-header {
     background-color: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-sm);
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
@@ -216,7 +312,7 @@ body {
     border-radius: 30px;
     background: var(--light);
     width: 250px;
-    transition: all 0.3s ease;
+    transition: var(--transition-normal);
 }
 
 .search-box input:focus {
@@ -258,6 +354,13 @@ body {
     justify-content: center;
 }
 
+.user-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 /* Dashboard Content */
 .dashboard-stats {
     display: grid;
@@ -267,13 +370,14 @@ body {
 }
 
 .stat-card {
-    background: white;
-    border-radius: 15px;
+    background: var(--card-bg);
+    border-radius: var(--border-radius-lg);
     padding: 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
     gap: 15px;
+    border: 1px solid var(--border);
 }
 
 .stat-icon {
@@ -292,18 +396,18 @@ body {
 }
 
 .bg-success {
-    background: rgba(76, 201, 240, 0.1);
+    background: rgba(6, 214, 160, 0.1);
     color: var(--success);
 }
 
 .bg-warning {
-    background: rgba(248, 150, 30, 0.1);
-    color: var(--warning);
+    background: rgba(253, 71, 111, 0.1);
+    color: var(--danger);
 }
 
-.bg-danger {
-    background: rgba(247, 37, 133, 0.1);
-    color: var(--danger);
+.bg-info {
+    background: rgba(17, 138, 178, 0.1);
+    color: var(--info);
 }
 
 .stat-info h3 {
@@ -312,7 +416,7 @@ body {
 }
 
 .stat-info p {
-    color: var(--gray);
+    color: var(--text-light);
     font-size: 1rem;
 }
 
@@ -336,15 +440,16 @@ body {
 }
 
 .card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    background: var(--card-bg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
+    border: 1px solid var(--border);
 }
 
 .card-header {
     padding: 20px;
-    border-bottom: 1px solid var(--light-gray);
+    border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -359,6 +464,7 @@ body {
     color: var(--primary);
     text-decoration: none;
     font-weight: 500;
+    transition: var(--transition-normal);
 }
 
 .view-all:hover {
@@ -377,15 +483,15 @@ table {
 table th {
     padding: 15px 20px;
     text-align: left;
-    font-weight: 600;
-    color: var(--dark);
-    border-bottom: 2px solid var(--light-gray);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text);
+    border-bottom: 2px solid var(--border);
 }
 
 table td {
     padding: 15px 20px;
-    border-bottom: 1px solid var(--light-gray);
-    color: var(--gray);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-light);
 }
 
 table tr:last-child td {
@@ -400,18 +506,18 @@ table tr:hover {
     padding: 5px 12px;
     border-radius: 20px;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: var(--font-weight-semibold);
     display: inline-block;
 }
 
 .status.active {
-    background: rgba(76, 201, 240, 0.1);
+    background: rgba(6, 214, 160, 0.1);
     color: var(--success);
 }
 
 .status.upcoming {
-    background: rgba(248, 150, 30, 0.1);
-    color: var(--warning);
+    background: rgba(253, 209, 102, 0.1);
+    color: #e69e00;
 }
 
 .status.completed {
@@ -430,7 +536,7 @@ table tr:hover {
     border: none;
     color: var(--gray);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--transition-normal);
     margin-left: 5px;
 }
 
@@ -484,12 +590,13 @@ table tr:hover {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     color: white;
     text-align: center;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: var(--transition-normal);
     height: 100px;
+    box-shadow: var(--shadow-sm);
 }
 
 .action-card i {
@@ -498,434 +605,119 @@ table tr:hover {
 }
 
 .action-card span {
-    font-weight: 600;
-}
-
-.bg-primary {
-    background: var(--primary);
-}
-
-.bg-success {
-    background: var(--success);
-}
-
-.bg-warning {
-    background: var(--warning);
-}
-
-.bg-info {
-    background: var(--info);
+    font-weight: var(--font-weight-semibold);
 }
 
 .action-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-md);
 }
 
-/* Create Election Page */
-.create-election-container {
-    padding: 20px 30px 30px;
-}
-
-.form-section {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-.form-section h3 {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    color: var(--dark);
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--light-gray);
-}
-
-.form-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.half {
-    flex: 1;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: var(--gray);
-}
-
-form input,
-form select,
-form textarea {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid var(--light-gray);
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-form input:focus,
-form select:focus,
-form textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-}
-
-.candidate-item {
-    background: var(--light);
-    border-radius: 10px;
+.system-health {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
     padding: 20px;
-    margin-bottom: 20px;
 }
 
-.candidate-header {
+.health-metric {
+    padding: 15px;
+    border-radius: var(--border-radius);
+    background: var(--light);
+}
+
+.metric-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: var(--text-light);
 }
 
-.candidate-header h4 {
-    font-size: 1.2rem;
-    color: var(--dark);
-}
-
-.remove-candidate {
-    background: none;
-    border: none;
-    color: var(--danger);
-    cursor: pointer;
+.metric-header i {
     font-size: 1.2rem;
 }
 
-.file-upload {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.file-upload input[type="file"] {
-    display: none;
-}
-
-.file-upload .file-name {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: var(--gray);
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    padding: 20px 30px 30px;
-}
-
-/* Manage Elections Page */
-.filters {
-    padding: 0 30px 15px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-.filter-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.filter-group label {
-    font-weight: 500;
-    color: var(--gray);
-}
-
-.filter-group select {
-    padding: 8px 15px;
-    border: 1px solid var(--light-gray);
-    border-radius: 8px;
-    background: white;
-}
-
-.elections-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
-    padding: 20px 30px 30px;
-}
-
-.election-card {
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
-    border: 1px solid var(--light-gray);
-}
-
-.election-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.election-header {
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    border-bottom: 1px solid var(--light-gray);
-}
-
-.election-header h3 {
-    font-size: 1.3rem;
-    color: var(--dark);
-    margin-bottom: 5px;
-}
-
-.election-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.election-body {
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.election-info {
-    color: var(--gray);
-}
-
-.election-info p {
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.election-stats {
-    padding: 15px 20px;
-    background: var(--light);
-    display: flex;
-    justify-content: space-between;
-    border-top: 1px solid var(--light-gray);
-    border-bottom: 1px solid var(--light-gray);
-}
-
-.stat {
-    text-align: center;
-}
-
-.value {
-    display: block;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--dark);
-    margin-bottom: 5px;
-}
-
-.label {
-    font-size: 0.9rem;
-    color: var(--gray);
-}
-
-.election-footer {
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-/* Results Page */
-.results-container {
-    padding: 20px 30px 30px;
-}
-
-.results-summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 25px;
-}
-
-.summary-card {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.summary-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.metric-value {
     font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 10px;
 }
 
-.summary-info h3 {
-    font-size: 1.8rem;
-    margin-bottom: 5px;
+.metric-progress {
+    height: 8px;
+    background: var(--light-gray);
+    border-radius: 4px;
+    overflow: hidden;
 }
 
-.summary-info p {
-    color: var(--gray);
-    font-size: 1rem;
+.progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--primary);
+    transition: width 0.5s ease;
 }
 
-.results-content {
-    display: grid;
-    grid-template-columns: 2fr 3fr;
-    gap: 20px;
+.success {
+    color: var(--success);
 }
 
-.results-chart {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+.activity-log {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0 20px 20px;
 }
 
-.results-chart h3 {
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-    color: var(--dark);
-}
-
-.results-table {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-.results-table h3 {
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-    color: var(--dark);
-}
-
-.candidate-info {
+.activity-item {
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border);
     display: flex;
-    align-items: center;
-    gap: 10px;
+    gap: 15px;
 }
 
-.candidate-info img {
+.activity-icon {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.winner td {
-    background: rgba(67, 97, 238, 0.05);
-    font-weight: 600;
-    color: var(--dark);
-}
-
-.voting-stats {
-    grid-column: span 2;
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-.voting-stats h3 {
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-    color: var(--dark);
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 20px;
-}
-
-.stat-card {
     border-radius: 10px;
-    overflow: hidden;
-}
-
-.audit-section {
-    grid-column: span 2;
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-.audit-section h3 {
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-    color: var(--dark);
-}
-
-.audit-log {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.audit-entry {
-    display: flex;
-    gap: 15px;
-}
-
-.audit-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    background: rgba(67, 97, 238, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-icon.login {
+    background: rgba(6, 214, 160, 0.1);
+    color: var(--success);
+}
+
+.activity-icon.election {
+    background: rgba(67, 97, 238, 0.1);
     color: var(--primary);
-    font-size: 1.3rem;
 }
 
-.audit-details h4 {
-    font-size: 1.1rem;
+.activity-icon.user {
+    background: rgba(114, 9, 183, 0.1);
+    color: var(--secondary);
+}
+
+.activity-details {
+    flex: 1;
+}
+
+.activity-details h4 {
     margin-bottom: 5px;
-    color: var(--dark);
+    font-size: 1rem;
 }
 
-.audit-details p {
-    color: var(--gray);
-    margin-bottom: 5px;
-}
-
-.audit-timestamp {
+.activity-time {
     font-size: 0.85rem;
-    color: #adb5bd;
+    color: var(--text-light);
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
     .dashboard-content,
-    .results-content {
+    .system-health {
         grid-template-columns: 1fr;
     }
     
@@ -990,5 +782,24 @@ form textarea:focus {
     .elections-grid {
         padding: 15px;
         grid-template-columns: 1fr;
+    }
+    
+    .header-right .search-box input {
+        width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-right .search-box input {
+        width: 150px;
+    }
+    
+    .header-right {
+        gap: 10px;
+    }
+    
+    .header-right .notifications,
+    .header-right .user-avatar {
+        display: none;
     }
 }
