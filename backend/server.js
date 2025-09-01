@@ -4,11 +4,11 @@ const path = require('path');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from .env file
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Connect to database
-connectDB();
+const dbConnection = connectDB();
 
 const app = express();
 
@@ -81,21 +81,53 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Handle database connection errors
+if (dbConnection && typeof dbConnection.catch === 'function') {
+  dbConnection.catch(err => {
+    console.error('Database connection failed:', err);
+  });
+}
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-  console.log('Server is ready to handle requests');
+  console.log(`\n🚀 Server started on port ${PORT}`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Only show DB connection status if we have a valid connection
+  if (process.env.MONGODB_URI) {
+    const maskedURI = process.env.MONGODB_URI.replace(/\/\/(.*):(.*)@/, '//[hidden]:[hidden]@');
+    console.log(`🗄️  Database: ${maskedURI}`);
+  }
+  
+  console.log('✅ Server is ready to handle requests\n');
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+  console.error('❌ Uncaught Exception:', error);
   // Don't exit the process, keep the server running
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (error) => {
-  console.error('Unhandled Promise Rejection:', error);
+  console.error('❌ Unhandled Promise Rejection:', error);
   // Don't exit the process, keep the server running
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  const healthStatus = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    database: process.env.MONGODB_URI ? 'connected' : 'not connected'
+  };
+  
+  // Check if we're in development and don't have a DB connection
+  if (process.env.NODE_ENV === 'development' && !process.env.MONGODB_URI) {
+    healthStatus.warning = 'Running in development mode without database connection';
+  }
+  
+  res.json(healthStatus);
 });
