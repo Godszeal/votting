@@ -18,9 +18,9 @@ router.post('/vote', auth, userController.castVote);
 // @access  Private
 router.get('/results/:id', auth, userController.getElectionResults);
 
-// @route   GET /api/user/voting-link/:token
-// @desc    Verify voting link token
-// @access  Public
-router.get('/voting-link/:token', userController.getVotingLinkDetails);
+// @route   GET /api/user/elections/:id/eligibility
+// @desc    Check if user is eligible for an election
+// @access  Private
+router.get('/elections/:id/eligibility', auth, userController.checkElectionEligibility);
 
 module.exports = router;
