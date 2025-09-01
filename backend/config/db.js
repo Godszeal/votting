@@ -20,7 +20,7 @@ const validateEnvVars = () => {
     console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
     console.error('Please create a .env file with these variables or set them in your environment');
     console.error('Example .env file content:');
-    console.error('MONGODB_URI=mongodb://localhost:27017/votesphere');
+    console.error('MONGODB_URI=mongodb+srv://godwinhephzibah25_db_user:Ku66Sbbtcb8sIwbJ@cluster0.v4tzdiq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
     console.error('JWT_SECRET=your_strong_secret_here');
     console.error('JWT_EXPIRES_IN=1h');
     console.error('ADMIN_EMAIL=babalolahephzibah2@gmail.com');
