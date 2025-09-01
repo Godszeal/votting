@@ -1,127 +1,129 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+const express = require('express');
+const connectDB = require('./config/db');
 const path = require('path');
-const fs = require('fs');
+const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 
-// Load environment variables from multiple possible locations
-const loadEnvironment = () => {
-  // Define possible .env file locations
-  const possibleEnvPaths = [
-    path.resolve(process.cwd(), '.env'),
-    path.resolve(process.cwd(), '.env.local'),
-    path.resolve(__dirname, '../.env'),
-    path.resolve(__dirname, '../../.env'),
-    path.resolve(process.cwd(), '../.env')
-  ];
-  
-  let envLoaded = false;
-  
-  // Try each location
-  for (const envPath of possibleEnvPaths) {
-    if (fs.existsSync(envPath)) {
-      dotenv.config({ path: envPath });
-      console.log(`✓ Environment variables loaded from: ${envPath}`);
-      envLoaded = true;
-      break;
-    }
-  }
-  
-  // If no .env file found, check if variables are set in system
-  if (!envLoaded) {
-    console.warn('⚠️ Warning: .env file not found in standard locations');
-    
-    // Check if MONGODB_URI is at least set in system environment
-    if (!process.env.MONGODB_URI) {
-      console.error('✗ Critical Error: MONGODB_URI is not defined!');
-      console.error('\nPlease create a .env file with these required variables:');
-      console.error(`
-MONGODB_URI=mongodb://localhost:27017/votesphere
-JWT_SECRET=your_strong_secret_here
-JWT_EXPIRES_IN=1h
-ADMIN_EMAIL=babalolahephzibah2@gmail.com
-ADMIN_PASSWORD=Godszeal
-BASE_URL=http://localhost:3000
-PORT=5000
-      `);
-      
-      // Exit with specific error code for missing env variables
-      process.exit(10);
-    } else {
-      console.log('✓ Environment variables found in system environment');
-    }
-  }
-};
+// Load environment variables early
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-// Call the environment loader
-loadEnvironment();
+// Connect to database first
+let dbConnection;
+try {
+  // We need to properly handle the async connection
+  dbConnection = connectDB();
+} catch (err) {
+  console.error('Database connection setup failed:', err);
+  // The db.js file already exits on critical errors, but this is a safeguard
+  process.exit(1);
+}
 
-const connectDB = async () => {
-  try {
-    // Verify MONGODB_URI is defined
-    if (!process.env.MONGODB_URI) {
-      throw new Error('MONGODB_URI is not defined. Please check your environment configuration.');
-    }
-    
-    // Mask credentials for safe logging
-    const maskedURI = process.env.MONGODB_URI.replace(/\/\/(.*):(.*)@/, '//****:****@');
-    console.log(`Attempting to connect to MongoDB: ${maskedURI}`);
-    
-    // Add connection options for better reliability
-    const connectionOptions = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      connectTimeoutMS: 10000,     // 10 seconds
-      socketTimeoutMS: 45000,      // 45 seconds
-      serverSelectionTimeoutMS: 5000, // 5 seconds
-      family: 4                    // Use IPv4, skip trying IPv6
-    };
-    
-    // Connect to MongoDB
-    const conn = await mongoose.connect(process.env.MONGODB_URI, connectionOptions);
-    
-    console.log(`✓ MongoDB Connected: ${conn.connection.host}`);
-    
-    // Add connection event listeners for better error handling
-    mongoose.connection.on('error', (err) => {
-      console.error('✗ MongoDB connection error:', err);
+// Create express app after ensuring DB connection is being established
+const app = express();
+
+// Middleware
+app.use(express.json({ extended: false }));
+app.use(cookieParser());
+
+// Define Routes with error handling
+let authRoutes, userRoutes, adminRoutes;
+
+try {
+  authRoutes = require('./routes/auth');
+} catch (err) {
+  console.error('Error loading auth routes:', err);
+  authRoutes = express.Router();
+  authRoutes.use((req, res) => {
+    res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Auth routes loading error'
     });
-    
-    mongoose.connection.on('disconnected', () => {
-      console.warn('⚠️ MongoDB disconnected. Attempting to reconnect...');
-    });
-    
-    mongoose.connection.on('reconnected', () => {
-      console.log('✓ MongoDB reconnected successfully');
-    });
-    
-    return conn;
-  } catch (err) {
-    console.error(`✗ MongoDB Connection Failed: ${err.message}`);
-    
-    // Provide specific guidance based on error type
-    if (err.name === 'MongoParseError') {
-      console.error('Possible issue: Invalid MongoDB connection string format');
-      console.error('Make sure your MONGODB_URI follows the format: mongodb://username:password@host:port/database');
-    } else if (err.name === 'MongoNetworkError') {
-      console.error('Possible issue: Could not connect to MongoDB server');
-      console.error('Is MongoDB running? Try starting it with:');
-      console.error('  - Linux: sudo service mongod start');
-      console.error('  - Windows: Start the "MongoDB" service');
-      console.error('  - macOS: brew services start mongodb-community');
-    } else if (err.code === 'ENOTFOUND') {
-      console.error('Possible issue: Could not resolve hostname in connection string');
-    }
-    
-    console.error('\nTroubleshooting steps:');
-    console.error('1. Verify MongoDB is installed and running on your system');
-    console.error('2. Check if you can connect to MongoDB using a GUI tool like MongoDB Compass');
-    console.error('3. If using a cloud MongoDB service, verify your IP is whitelisted');
-    console.error('4. Ensure your .env file exists in the project root with correct values');
-    
-    // Exit with specific error code for connection failure
-    process.exit(1);
-  }
-};
+  });
+}
 
-module.exports = connectDB;
+try {
+  userRoutes = require('./routes/user');
+} catch (err) {
+  console.error('Error loading user routes:', err);
+  userRoutes = express.Router();
+  userRoutes.use((req, res) => {
+    res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'User routes loading error'
+    });
+  });
+}
+
+try {
+  adminRoutes = require('./routes/admin');
+} catch (err) {
+  console.error('Error loading admin routes:', err);
+  adminRoutes = express.Router();
+  adminRoutes.use((req, res) => {
+    res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Admin routes loading error'
+    });
+  });
+}
+
+// Register routes
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
+
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  app.use(express.static('public'));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+  });
+} else {
+  // Set static folder
+  app.use(express.static(path.join(__dirname, 'public')));
+  
+  // API test route
+  app.get('/api', (req, res) => {
+    res.json({ message: 'API is running' });
+  });
+}
+
+const PORT = process.env.PORT || 5000;
+
+// Start server only after DB connection is successful
+dbConnection.then(() => {
+  const server = app.listen(PORT, () => {
+    console.log(`✓ Server started on port ${PORT}`);
+    console.log('✓ Server is ready to handle requests');
+    
+    // Handle graceful shutdown
+    process.on('SIGINT', () => {
+      console.log('\nStopping server...');
+      server.close(() => {
+        console.log('✓ Server stopped');
+        mongoose.connection.close(false, () => {
+          console.log('✓ MongoDB connection closed');
+          process.exit(0);
+        });
+      });
+    });
+  });
+}).catch(err => {
+  console.error('Failed to establish database connection:', err);
+  // This shouldn't happen as connectDB() already exits on error
+  process.exit(1);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('✗ Uncaught Exception:', error);
+  // Exit with specific error code
+  process.exit(128);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+  console.error('✗ Unhandled Promise Rejection:', error);
+});
