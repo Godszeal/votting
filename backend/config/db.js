@@ -1,44 +1,20 @@
-require('dotenv').config(); // Must be at the very top
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const connectDB = async () => {
   try {
-    // Get environment variables
-    const MONGO_URI = process.env.MONGO_URI;
-    const MONGO_LOCAL = process.env.MONGO_LOCAL || 'mongodb://localhost:27017/studentvoting';
-    const NODE_ENV = process.env.NODE_ENV || 'development';
-    
-    // Validate required environment variables
-    if (NODE_ENV === 'production' && !MONGO_URI) {
-      throw new Error('MONGO_URI is required in production environment. Please set it in your Render dashboard.');
-    }
-    
-    // Determine which URI to use
-    const uri = NODE_ENV === 'production' ? MONGO_URI : MONGO_LOCAL;
-    
-    // Log connection attempt (but mask sensitive info)
-    console.log(`Attempting to connect to MongoDB in ${NODE_ENV} mode`);
-    if (NODE_ENV === 'production') {
-      console.log('Using production MongoDB URI (masked)');
-    } else {
-      console.log(`Using local MongoDB: ${MONGO_LOCAL.replace(/:(.*)@/, ':*****@')}`);
-    }
-    
-    // Connect to MongoDB with Mongoose 7.x+ compatible options
-    const conn = await mongoose.connect(uri, {
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
-      // Removed deprecated options: useCreateIndex, useFindAndModify
+      useUnifiedTopology: true,
+      useCreateIndex: true
     });
     
     console.log(`MongoDB Connected: ${conn.connection.host}`);
-    
-    // Set up Mongoose schema options globally
-    mongoose.set('strictQuery', false);
-    
-    return conn;
-  } catch (error) {
-    console.error(`Database connection error: ${error.message}`);
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    // Exit process with failure
     process.exit(1);
   }
 };
