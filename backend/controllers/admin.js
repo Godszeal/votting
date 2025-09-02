@@ -202,3 +202,106 @@ exports.deleteElection = async (req, res) => {
     });
   }
 };
+
+// @desc    Get votes for election
+// @route   GET /api/admin/elections/:id/votes
+// @access  Private (Admin)
+exports.getVotesForElection = async (req, res) => {
+  try {
+    // Get votes with populated user details
+    const votes = await Vote.find({ election: req.params.id })
+      .populate('user', 'matricNumber faculty department')
+      .sort({ timestamp: -1 });
+    
+    res.json(votes);
+  } catch (err) {
+    console.error('Get Votes Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching votes',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+};
+
+// @desc    Get all voters
+// @route   GET /api/admin/voters
+// @access  Private (Admin)
+exports.getAllVoters = async (req, res) => {
+  try {
+    const voters = await User.find({ role: 'user' }).select('-password');
+    res.json(voters);
+  } catch (err) {
+    console.error('Get Voters Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching voters',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+};
+
+// @desc    Reset voter votes
+// @route   PUT /api/admin/voters/:id/reset-votes
+// @access  Private (Admin)
+exports.resetVoterVotes = async (req, res) => {
+  try {
+    const voter = await User.findById(req.params.id);
+    
+    if (!voter) {
+      return res.status(404).json({ message: 'Voter not found' });
+    }
+    
+    voter.hasVoted = [];
+    await voter.save();
+    
+    res.json({ 
+      message: 'Voter votes reset successfully',
+      voter: {
+        _id: voter._id,
+        matricNumber: voter.matricNumber,
+        faculty: voter.faculty,
+        department: voter.department,
+        hasVoted: voter.hasVoted
+      }
+    });
+  } catch (err) {
+    console.error('Reset Votes Error:', err);
+    res.status(500).json({ 
+      message: 'Server error resetting votes',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+};
+
+// @desc    Get voting link for election
+// @route   GET /api/admin/elections/:id/link
+// @access  Private (Admin)
+exports.getElectionVotingLink = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    
+    if (!election) {
+      return res.status(404).json({ 
+        message: 'Election not found' 
+      });
+    }
+    
+    const votingLink = `${process.env.BASE_URL}/voting/${election.votingLinkToken}`;
+    
+    res.json({
+      votingLink,
+      electionId: election._id,
+      title: election.title,
+      facultyRestriction: election.facultyRestriction,
+      departmentRestrictions: election.departmentRestrictions
+    });
+  } catch (err) {
+    console.error('Get Voting Link Error:', err);
+    res.status(500).json({ 
+      message: 'Server error getting voting link',
+      error: err.message
+    });
+  }
+};
