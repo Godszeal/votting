@@ -75,7 +75,7 @@ try {
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/voting', votingRoutes);
+app.use('/api/user', votingRoutes); // This handles the /api/user/voting-link/:token route
 app.use('/voting', votingRoutes); // This handles the /voting/:token route
 
 // Serve static assets in production
