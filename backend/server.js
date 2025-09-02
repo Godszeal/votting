@@ -71,20 +71,25 @@ try {
   });
 }
 
-// Register routes
+// Register routes - CRITICAL ORDER FIX
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/user', votingRoutes); // This handles the /api/user/voting-link/:token route
-app.use('/voting', votingRoutes); // This handles the /voting/:token route
+app.use('/api/voting', votingRoutes); // API endpoints for voting
+app.use('/voting', votingRoutes); // Frontend voting page routes
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   // Set static folder
   app.use(express.static('public'));
   
-  // Serve index.html for all other routes
+  // Serve index.html for all other routes EXCEPT voting links
   app.get('*', (req, res) => {
+    // Don't interfere with voting links
+    if (req.path.startsWith('/voting/')) {
+      return next();
+    }
+    
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
   });
 } else {
