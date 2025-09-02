@@ -58,11 +58,11 @@ if (process.env.NODE_ENV === 'production') {
   // Set static folder
   app.use(express.static('public'));
   
-  // Serve index.html for all other routes EXCEPT voting links
+  // Serve index.html for all other routes
   app.get('*', (req, res) => {
-    // CRITICAL FIX: Don't interfere with voting links
-    if (req.path.startsWith('/voting/')) {
-      return next();
+    // CRITICAL FIX: Don't try to call next() - just check for problematic paths
+    if (req.path.startsWith('/voting/') && req.path.includes('user-dashboard')) {
+      return res.redirect('/');
     }
     
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
