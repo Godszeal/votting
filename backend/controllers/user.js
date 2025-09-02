@@ -1,38 +1,275 @@
+const User = require('../models/User');
 const Election = require('../models/Election');
-const path = require('path');
+const Vote = require('../models/Vote');
+const jwtConfig = require('../config/jwt');
 
-// @desc    Serve the voting page with token
-// @route   GET /voting/:token
-exports.serveVotingPage = async (req, res) => {
+// Define all controller functions first
+const getUserElections = async (req, res) => {
   try {
-    const token = req.params.token;
+    console.log('Fetching user elections for user ID:', req.user.id);
     
-    // Verify the token exists in an election
-    const election = await Election.findOne({ votingLinkToken: token });
+    const user = await User.findById(req.user.id);
     
-    if (!election) {
-      console.error(`Invalid voting link token: ${token}`);
-      // Return the voting page but with an error parameter
-      return res.sendFile(path.join(__dirname, '../../public/voting.html'));
+    if (!user) {
+      console.error('User not found for ID:', req.user.id);
+      return res.status(404).json({ message: 'User not found' });
     }
     
-    // Token is valid, serve the voting page
-    res.sendFile(path.join(__dirname, '../../public/voting.html'));
+    // Get all active elections
+    const elections = await Election.find({ 
+      isActive: true,
+      endDate: { $gt: new Date() }
+    });
+    
+    console.log(`Found ${elections.length} active elections`);
+    
+    // Filter elections based on user's faculty and department
+    const eligibleElections = elections.filter(election => {
+      // If no restrictions, user is eligible
+      if (!election.facultyRestriction && election.departmentRestrictions.length === 0) {
+        return true;
+      }
+      
+      // Check faculty restriction
+      if (election.facultyRestriction && election.facultyRestriction !== user.faculty) {
+        return false;
+      }
+      
+      // Check department restrictions
+      if (election.departmentRestrictions.length > 0 && 
+          !election.departmentRestrictions.includes(user.department)) {
+        return false;
+      }
+      
+      // Check if user has already voted
+      if (user.hasVoted.some(vote => vote.election.toString() === election._id.toString())) {
+        return false;
+      }
+      
+      return true;
+    });
+    
+    console.log(`Found ${eligibleElections.length} eligible elections for user`);
+    
+    res.json(eligibleElections);
   } catch (err) {
-    console.error('Error serving voting page:', err);
-    res.status(500).send('Server error');
+    console.error('Get User Elections Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching elections',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 };
 
-// @desc    Verify voting link token
-// @route   GET /api/voting/link/:token
-exports.verifyVotingLink = async (req, res) => {
+const castVote = async (req, res) => {
+  const { electionId, candidate } = req.body;
+  
+  try {
+    const user = await User.findById(req.user.id);
+    const election = await Election.findById(electionId);
+    
+    if (!user || !election) {
+      return res.status(404).json({ 
+        message: 'User or election not found' 
+      });
+    }
+    
+    // Check if user has already voted in this election
+    if (user.hasVoted.some(vote => vote.election.toString() === electionId)) {
+      return res.status(400).json({ 
+        message: 'You have already voted in this election' 
+      });
+    }
+    
+    // Check if election is still active
+    if (!election.isActive || new Date() > new Date(election.endDate)) {
+      return res.status(400).json({ 
+        message: 'This election is no longer active' 
+      });
+    }
+    
+    // Check if user is eligible to vote in this election
+    if (election.facultyRestriction && election.facultyRestriction !== user.faculty) {
+      return res.status(400).json({ 
+        message: `This election is restricted to ${election.facultyRestriction} faculty` 
+      });
+    }
+    
+    if (election.departmentRestrictions.length > 0 && 
+        !election.departmentRestrictions.includes(user.department)) {
+      return res.status(400).json({ 
+        message: 'This election is restricted to specific departments' 
+      });
+    }
+    
+    // Check if candidate exists
+    const candidateObj = election.candidates.find(c => c.name === candidate);
+    if (!candidateObj) {
+      return res.status(400).json({ 
+        message: 'Invalid candidate selection' 
+      });
+    }
+    
+    // Record the vote
+    candidateObj.votes += 1;
+    
+    // Add to user's voted elections
+    user.hasVoted.push({ election: electionId });
+    
+    // Save changes
+    await election.save();
+    await user.save();
+    
+    // Create vote record
+    const vote = new Vote({
+      user: user._id,
+      election: electionId,
+      candidate
+    });
+    
+    await vote.save();
+    
+    res.json({ 
+      message: 'Vote recorded successfully',
+      election: {
+        _id: election._id,
+        title: election.title,
+        description: election.description,
+        candidates: election.candidates,
+        endDate: election.endDate,
+        isActive: election.isActive
+      }
+    });
+  } catch (err) {
+    console.error('Cast Vote Error:', err);
+    res.status(500).json({ 
+      message: 'Server error recording vote',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+};
+
+const getElectionResults = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    
+    if (!election) {
+      return res.status(404).json({ 
+        message: 'Election not found' 
+      });
+    }
+    
+    // Check if user is eligible to view results
+    const user = await User.findById(req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        message: 'User not found' 
+      });
+    }
+    
+    // Check if election has ended
+    if (new Date() < new Date(election.endDate)) {
+      return res.status(400).json({ 
+        message: 'Election results are not available yet' 
+      });
+    }
+    
+    res.json({
+      _id: election._id,
+      title: election.title,
+      description: election.description,
+      candidates: election.candidates,
+      endDate: election.endDate,
+      isActive: election.isActive,
+      facultyRestriction: election.facultyRestriction,
+      departmentRestrictions: election.departmentRestrictions
+    });
+  } catch (err) {
+    console.error('Get Results Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching results',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+};
+
+const checkElectionEligibility = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    
+    if (!election) {
+      return res.status(404).json({ 
+        message: 'Election not found' 
+      });
+    }
+    
+    // Check if user is eligible to vote in this election
+    const user = await User.findById(req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        message: 'User not found' 
+      });
+    }
+    
+    // Check if user has already voted
+    if (user.hasVoted.some(vote => vote.election.toString() === req.params.id)) {
+      return res.json({ 
+        eligible: false,
+        reason: 'You have already voted in this election'
+      });
+    }
+    
+    // Check if election is still active
+    if (!election.isActive || new Date() > new Date(election.endDate)) {
+      return res.json({ 
+        eligible: false,
+        reason: 'This election is no longer active'
+      });
+    }
+    
+    // Check if user is eligible to vote in this election
+    if (election.facultyRestriction && election.facultyRestriction !== user.faculty) {
+      return res.json({ 
+        eligible: false,
+        reason: `This election is restricted to ${election.facultyRestriction} faculty`
+      });
+    }
+    
+    if (election.departmentRestrictions.length > 0 && 
+        !election.departmentRestrictions.includes(user.department)) {
+      return res.json({ 
+        eligible: false,
+        reason: 'This election is restricted to specific departments'
+      });
+    }
+    
+    res.json({ 
+      eligible: true,
+      electionId: election._id,
+      title: election.title
+    });
+  } catch (err) {
+    console.error('Check Election Eligibility Error:', err);
+    res.status(500).json({ 
+      message: 'Server error checking election eligibility',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+};
+
+const getVotingLinkDetails = async (req, res) => {
   try {
     const token = req.params.token;
-    console.log('Verifying voting link token:', token);
+    console.log('Fetching voting link details for token:', token);
     
     // CRITICAL FIX: Check if token is valid format
-    if (!token || token === 'user-dashboard.html' || token === 'index.html' || token.includes('user-dashboard')) {
+    if (!token || token.includes('user-dashboard') || token.includes('index.html')) {
       console.error('Invalid token format:', token);
       return res.status(400).json({ 
         message: 'Invalid voting link token format' 
@@ -48,7 +285,7 @@ exports.verifyVotingLink = async (req, res) => {
       });
     }
     
-    console.log('Voting link verified for election:', election.title);
+    console.log('Voting link details found for election:', election.title);
     res.json({
       electionId: election._id,
       title: election.title,
@@ -62,4 +299,13 @@ exports.verifyVotingLink = async (req, res) => {
       error: err.message 
     });
   }
+};
+
+// Export all controller functions
+module.exports = {
+  getUserElections,
+  castVote,
+  getElectionResults,
+  checkElectionEligibility,
+  getVotingLinkDetails
 };
