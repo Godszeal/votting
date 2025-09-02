@@ -9,8 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/svg+xml" href="images/logo.svg">
-<style>
-  :root {
+  <style>
+    :root {
   --primary: #6366f1;
   --primary-dark: #4f46e5;
   --secondary: #8b5cf6;
@@ -1353,7 +1353,7 @@ footer {
     order: -1;
   }
 }
-</style>
+  </style>
 </head>
 <body>
   <header>
@@ -1483,17 +1483,21 @@ footer {
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Get the token from the URL path
+      // CRITICAL FIX: Only process voting links on the voting page
       const path = window.location.pathname;
+      
+      // Check if we're on the voting page
+      if (!path.includes('/voting/')) {
+        console.error('This page should only be accessed via voting links');
+        window.location.href = '../index.html';
+        return;
+      }
+      
+      // Get the token from the URL path
       const token = path.split('/').pop(); // Extract token from the last part of the path
       
-      // For debugging
-      console.log('Voting page loaded');
-      console.log('Current path:', path);
-      console.log('Extracted token:', token);
-      
       // If token is empty or equals 'voting', show error
-      if (!token || token === 'voting' || token === 'index.html') {
+      if (!token || token === 'voting' || token === 'index.html' || token === 'user-dashboard.html') {
         console.error('Invalid token format');
         showError('Invalid voting link. Please check the link and try again.');
         return;
@@ -1664,7 +1668,7 @@ footer {
         console.log('Verifying user eligibility with token:', token);
         
         // Verify the token is still valid
-        const res = await fetch(`/api/user/voting-link/${token}`, {
+        const res = await fetch(`/api/voting/link/${token}`, {
           headers: {
             'x-auth-token': tokenFromStorage
           }
@@ -1680,7 +1684,7 @@ footer {
         }
         
         const data = await res.json();
-        console.log('Election ', data);
+        console.log('Election data:', data);
         
         // Redirect to dashboard with election ID
         console.log('Redirecting to dashboard with election ID:', data.electionId);
@@ -1700,7 +1704,7 @@ footer {
       
       console.log('Loading election details for token:', token);
       
-      fetch(`/api/user/voting-link/${token}`)
+      fetch(`/api/voting/link/${token}`)
         .then(response => {
           console.log('API response status:', response.status);
           
@@ -1714,7 +1718,7 @@ footer {
           return response.json();
         })
         .then(data => {
-          console.log('Successfully loaded election ', data);
+          console.log('Successfully loaded election data:', data);
           loadingSection.style.display = 'none';
           
           if (data.message && data.message.includes('Invalid')) {
