@@ -67,7 +67,13 @@ router.post(
             console.error('JWT Sign Error:', err);
             return res.status(500).send('Token generation error');
           }
-          res.json({ token, role: user.role, faculty, department, electionId: user.facultyToken ? getElectionIdFromToken(user.facultyToken) : null });
+          res.json({ 
+            token, 
+            role: user.role,
+            faculty,
+            department,
+            electionId: user.facultyToken ? getElectionIdFromToken(user.facultyToken) : null
+          });
         }
       );
     } catch (err) {
