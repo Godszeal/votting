@@ -71,12 +71,14 @@ try {
   });
 }
 
-// Register routes - CRITICAL ORDER FIX
+// Register routes - CORRECT ORDER
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/voting', votingRoutes); // API endpoints for voting
-app.use('/voting', votingRoutes); // Frontend voting page routes
+app.use('/api/voting', votingRoutes);
+
+// Voting page route - must come before static files
+app.use('/voting', votingRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
@@ -85,7 +87,7 @@ if (process.env.NODE_ENV === 'production') {
   
   // Serve index.html for all other routes EXCEPT voting links
   app.get('*', (req, res) => {
-    // Don't interfere with voting links
+    // CRITICAL FIX: Don't interfere with voting links
     if (req.path.startsWith('/voting/')) {
       return next();
     }
@@ -101,6 +103,19 @@ if (process.env.NODE_ENV === 'production') {
     res.json({ message: 'API is running' });
   });
 }
+
+// CRITICAL FIX: Add error handling for file not found
+app.use((err, req, res, next) => {
+  if (err.code === 'ENOENT') {
+    console.error('File not found:', err.path);
+    // If it's a voting path issue, redirect to home
+    if (req.path.includes('/voting/') && req.path.includes('user-dashboard')) {
+      return res.redirect('/');
+    }
+    return res.status(404).send('File not found');
+  }
+  next(err);
+});
 
 const PORT = process.env.PORT || 5000;
 
