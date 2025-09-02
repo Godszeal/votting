@@ -23,4 +23,9 @@ router.get('/results/:id', auth, userController.getElectionResults);
 // @access  Private
 router.get('/elections/:id/eligibility', auth, userController.checkElectionEligibility);
 
+// @route   GET /api/user/voting-link/:token
+// @desc    Get voting link details
+// @access  Public
+router.get('/voting-link/:token', userController.getVotingLinkDetails);
+
 module.exports = router;
