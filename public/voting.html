@@ -9,8 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/svg+xml" href="images/logo.svg">
-  <style>
-    :root {
+<style>
+  :root {
   --primary: #6366f1;
   --primary-dark: #4f46e5;
   --secondary: #8b5cf6;
@@ -1353,7 +1353,7 @@ footer {
     order: -1;
   }
 }
-  </style>
+</style>
 </head>
 <body>
   <header>
@@ -1483,23 +1483,17 @@ footer {
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // CRITICAL FIX: Only process voting links on the voting page
+      // CRITICAL FIX: Get the token from the URL path
       const path = window.location.pathname;
-      
-      // Check if we're on the voting page
-      if (!path.includes('/voting/')) {
-        console.error('This page should only be accessed via voting links');
-        window.location.href = '../index.html';
-        return;
-      }
-      
-      // Get the token from the URL path
       const token = path.split('/').pop(); // Extract token from the last part of the path
       
-      // If token is empty or equals 'voting', show error
-      if (!token || token === 'voting' || token === 'index.html' || token === 'user-dashboard.html') {
-        console.error('Invalid token format');
-        showError('Invalid voting link. Please check the link and try again.');
+      // Check if we're actually on the voting page
+      const isVotingPage = path.includes('/voting/');
+      
+      // CRITICAL FIX: If we're not on the voting page or token is invalid, redirect
+      if (!isVotingPage || !token || token === 'voting' || token.includes('user-dashboard')) {
+        console.log('Not on voting page or invalid token, redirecting to home');
+        window.location.href = '../index.html';
         return;
       }
       
@@ -1631,9 +1625,9 @@ footer {
               localStorage.setItem('faculty', data.faculty);
               localStorage.setItem('department', data.department);
               
-              // Redirect to the election voting page
+              // CRITICAL FIX: Redirect to the root path, NOT within /voting/
               console.log('Redirecting to dashboard with election ID:', data.electionId);
-              window.location.href = `user-dashboard.html?election=${data.electionId}`;
+              window.location.href = `/user-dashboard.html?election=${data.electionId}`;
             } else {
               let errorMessageText = 'Registration failed';
               if (data.errors && Array.isArray(data.errors)) {
@@ -1684,11 +1678,11 @@ footer {
         }
         
         const data = await res.json();
-        console.log('Election data:', data);
+        console.log('Election ', data);
         
-        // Redirect to dashboard with election ID
+        // CRITICAL FIX: Redirect to the root path, NOT within /voting/
         console.log('Redirecting to dashboard with election ID:', data.electionId);
-        window.location.href = `user-dashboard.html?election=${data.electionId}`;
+        window.location.href = `/user-dashboard.html?election=${data.electionId}`;
       } catch (err) {
         console.error('Error verifying user:', err);
         loadElectionDetails(token);
@@ -1718,7 +1712,7 @@ footer {
           return response.json();
         })
         .then(data => {
-          console.log('Successfully loaded election data:', data);
+          console.log('Successfully loaded election ', data);
           loadingSection.style.display = 'none';
           
           if (data.message && data.message.includes('Invalid')) {
