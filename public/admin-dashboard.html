@@ -7,20 +7,1252 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/admin.css">
-  <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+  <link rel="icon" type="image/svg+xml" href="images/svg+xml">
+  <style>
+    :root {
+      /* Updated color palette - more moderate and pleasant */
+      --primary: #4361ee;
+      --primary-dark: #3a0ca3;
+      --secondary: #4cc9f0;
+      --success: #06d6a0;
+      --danger: #ef476f;
+      --warning: #ffd166;
+      --info: #118ab2;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+      --white: #ffffff;
+      --black: #000000;
+      
+      /* Backgrounds and text */
+      --card-bg: #ffffff;
+      --bg: #f8f9fa;
+      --text: #212529;
+      --border: #dee2e6;
+      
+      /* Subtle shadow system */
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.1);
+      
+      /* Transitions */
+      --transition: all 0.25s ease;
+      --animation-speed: 0.25s;
+      
+      /* Z-index system */
+      --z-index-header: 100;
+      --z-index-mobile-menu: 99;
+      --z-index-notification: 1000;
+      --z-index-fab: 100;
+      
+      /* Spacing system - more moderate */
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 0.75rem;
+      --spacing-lg: 1rem;
+      --spacing-xl: 1.5rem;
+      --spacing-2xl: 2rem;
+      --spacing-3xl: 2.5rem;
+      
+      /* Border radii - more moderate */
+      --border-radius-xs: 2px;
+      --border-radius-sm: 4px;
+      --border-radius-md: 6px;
+      --border-radius-lg: 8px;
+      --border-radius-xl: 10px;
+      --border-radius-2xl: 12px;
+      --border-radius-full: 50%;
+      
+      /* Layout */
+      --max-width: 1400px;
+      --content-width: 1200px;
+    }
+    
+    [data-theme="dark"] {
+      --card-bg: #1e293b;
+      --bg: #0f172a;
+      --text: #f8fafc;
+      --border: #334155;
+      --light-gray: #1e293b;
+      --light: #334155;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background-color: var(--bg);
+      transition: background-color var(--transition), color var(--transition);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.03) 0%, transparent 20%),
+                        radial-gradient(circle at 90% 80%, rgba(76, 201, 240, 0.03) 0%, transparent 20%);
+    }
+    
+    /* Typography - improved readability */
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: var(--spacing-md);
+      color: var(--dark);
+    }
+    
+    [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6 {
+      color: var(--white);
+    }
+    
+    h1 {
+      font-size: 2.25rem;
+      letter-spacing: -0.025em;
+    }
+    
+    h2 {
+      font-size: 1.875rem;
+      letter-spacing: -0.02em;
+    }
+    
+    h3 {
+      font-size: 1.5rem;
+      letter-spacing: -0.015em;
+    }
+    
+    h4 {
+      font-size: 1.25rem;
+    }
+    
+    h5 {
+      font-size: 1.125rem;
+    }
+    
+    h6 {
+      font-size: 1rem;
+    }
+    
+    p {
+      margin-bottom: var(--spacing-md);
+      font-size: 1rem;
+      color: var(--gray);
+    }
+    
+    [data-theme="dark"] p {
+      color: #94a3b8;
+    }
+    
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    
+    a:hover {
+      color: var(--primary-dark);
+      text-decoration: none;
+    }
+    
+    /* Buttons - more moderate styling */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1.25rem;
+      border-radius: var(--border-radius-md);
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      font-size: 0.95rem;
+      gap: 0.5rem;
+      white-space: nowrap;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #3ab0e0;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background-color: #05c491;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background-color: #e83a65;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    
+    .btn-warning {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+    
+    .btn-warning:hover {
+      background-color: #e6c258;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+    }
+    
+    .btn-outline:hover {
+      background-color: rgba(67, 97, 238, 0.05);
+      color: var(--primary-dark);
+    }
+    
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.85rem;
+    }
+    
+    .btn-lg {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.05rem;
+    }
+    
+    .btn-full {
+      width: 100%;
+    }
+    
+    .btn-icon {
+      padding: 0.6rem;
+      width: 2.8rem;
+      height: 2.8rem;
+      border-radius: var(--border-radius-full);
+    }
+    
+    /* Forms - cleaner design */
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: var(--spacing-xs);
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.65rem 1rem;
+      border-radius: var(--border-radius-md);
+      border: 1.5px solid var(--border);
+      background-color: var(--card-bg);
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+    
+    .form-select {
+      appearance: none;
+      background-image: url("image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.2em;
+    }
+    
+    [data-theme="dark"] .form-select {
+      background-image: url("image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    }
+    
+    .form-check {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.25rem 0;
+    }
+    
+    .form-check-input {
+      width: 1.3rem;
+      height: 1.3rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--border-radius-xs);
+      cursor: pointer;
+      transition: var(--transition);
+      appearance: none;
+      position: relative;
+      background-color: var(--card-bg);
+    }
+    
+    .form-check-input:checked {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+    
+    .form-check-input:checked::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 6px;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    
+    .form-check-label {
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.95rem;
+    }
+    
+    /* Containers */
+    .container {
+      width: 100%;
+      max-width: var(--content-width);
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+    
+    .container-fluid {
+      width: 100%;
+      padding: 0 var(--spacing-md);
+    }
+    
+    /* Cards - more subtle design */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow);
+      padding: var(--spacing-xl);
+      transition: var(--transition);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .card-header {
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+    
+    .card-body {
+      padding: 0;
+    }
+    
+    /* Layout */
+    header {
+      background-color: var(--card-bg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      padding: var(--spacing-sm) 0;
+      position: sticky;
+      top: 0;
+      z-index: var(--z-index-header);
+      transition: var(--transition);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 4.5rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      height: 100%;
+      align-items: center;
+    }
+    
+    .logo svg {
+      height: 2.25rem;
+      width: 2.25rem;
+      transition: var(--transition);
+    }
+    
+    .logo:hover svg {
+      transform: rotate(5deg);
+    }
+    
+    .logo-text {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.025em;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: var(--spacing-lg);
+      align-items: center;
+      height: 100%;
+    }
+    
+    .nav-link {
+      color: var(--text);
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--spacing-sm);
+      font-size: 0.95rem;
+    }
+    
+    .nav-link:hover {
+      color: var(--primary);
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--primary);
+      transition: var(--transition);
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.25rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .theme-toggle:hover {
+      background-color: var(--light-gray);
+      color: var(--primary);
+    }
+    
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .mobile-menu-btn:hover {
+      background-color: var(--light-gray);
+      color: var(--primary);
+    }
+    
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 85%;
+      max-width: 320px;
+      height: 100vh;
+      background-color: var(--card-bg);
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+      z-index: var(--z-index-mobile-menu);
+      transition: right 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      padding: 3.5rem 1.25rem 1.5rem;
+      overflow-y: auto;
+    }
+    
+    .mobile-menu.active {
+      right: 0;
+    }
+    
+    .mobile-menu-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text);
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .mobile-menu-close:hover {
+      background-color: var(--light-gray);
+    }
+    
+    .mobile-nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      padding-top: 0.5rem;
+    }
+    
+    .mobile-nav-link {
+      color: var(--text);
+      font-weight: 500;
+      font-size: 1.15rem;
+      transition: var(--transition);
+      padding: 0.4rem 0;
+      display: block;
+      border-radius: var(--border-radius-sm);
+      padding-left: 0.5rem;
+    }
+    
+    .mobile-nav-link:hover {
+      color: var(--primary);
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .mobile-nav-link.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .main-content {
+      min-height: calc(100vh - 100px);
+      padding: var(--spacing-xl) 0;
+    }
+    
+    footer {
+      background-color: var(--card-bg);
+      padding: var(--spacing-xl) 0;
+      margin-top: var(--spacing-xl);
+      border-top: 1px solid var(--border);
+    }
+    
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+    
+    /* Admin Dashboard specific styles */
+    .admin-container {
+      display: flex;
+      min-height: calc(100vh - 140px);
+      margin-top: var(--spacing-md);
+      gap: var(--spacing-lg);
+    }
+    
+    .sidebar {
+      width: 280px;
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-xl);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-header {
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--border);
+      background-color: rgba(67, 97, 238, 0.02);
+    }
+    
+    .sidebar-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      color: var(--primary);
+    }
+    
+    .sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .sidebar-item {
+      padding: var(--spacing-md) var(--spacing-lg);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      border-left: 4px solid transparent;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    
+    .sidebar-item:last-child {
+      border-bottom: none;
+    }
+    
+    .sidebar-item:hover {
+      background-color: rgba(67, 97, 238, 0.05);
+      color: var(--primary);
+    }
+    
+    .sidebar-item.active {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      border-left-color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .sidebar-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+    }
+    
+    .sidebar-item.active .sidebar-icon {
+      color: var(--primary);
+    }
+    
+    .content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .admin-header {
+      margin-bottom: var(--spacing-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+    
+    .admin-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+    
+    /* Election management */
+    .election-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--spacing-lg);
+      margin-top: var(--spacing-md);
+    }
+    
+    .election-item {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .election-item:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .election-item-content {
+      padding: var(--spacing-lg);
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .election-item-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .election-item-description {
+      color: var(--gray);
+      margin-bottom: var(--spacing-md);
+      flex-grow: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .election-item-meta {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .election-item-date {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+    
+    .election-item-status {
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--border-radius-full);
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-block;
+    }
+    
+    .status-active {
+      background-color: rgba(6, 214, 160, 0.1);
+      color: var(--success);
+    }
+    
+    .status-inactive {
+      background-color: rgba(239, 71, 111, 0.1);
+      color: var(--danger);
+    }
+    
+    .election-actions {
+      display: flex;
+      gap: var(--spacing-xs);
+      border-top: 1px solid var(--border);
+      padding-top: var(--spacing-md);
+      flex-wrap: wrap;
+    }
+    
+    .election-action-btn {
+      flex: 1;
+      min-width: 80px;
+      padding: 0.4rem;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    
+    /* Form styles */
+    .form-container {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-xl);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: var(--spacing-xl);
+    }
+    
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .candidate-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .candidate-input {
+      display: flex;
+      gap: var(--spacing-sm);
+      align-items: center;
+    }
+    
+    .candidate-input input {
+      flex: 1;
+    }
+    
+    .remove-candidate {
+      background-color: var(--danger);
+      color: white;
+      border: none;
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--border-radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: bold;
+    }
+    
+    .remove-candidate:hover {
+      background-color: #e83a65;
+      transform: scale(1.1);
+    }
+    
+    .add-candidate {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+      padding: var(--spacing-sm) 0;
+      font-weight: 500;
+    }
+    
+    .add-candidate:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-lg);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    
+    /* Results specific styles */
+    .results-container {
+      margin-top: var(--spacing-xl);
+    }
+    
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .results-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .results-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .stat-card {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-lg);
+      padding: var(--spacing-md);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .stat-label {
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+    
+    .chart-container {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-lg);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: var(--spacing-xl);
+    }
+    
+    .chart-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .chart {
+      height: 300px;
+      width: 100%;
+      position: relative;
+    }
+    
+    /* Voter management styles */
+    .voters-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 600px;
+    }
+    
+    .voters-table th {
+      background-color: rgba(67, 97, 238, 0.05);
+      padding: var(--spacing-sm) var(--spacing-md);
+      text-align: left;
+      font-weight: 600;
+      color: var(--primary);
+      border-bottom: 2px solid var(--border);
+    }
+    
+    .voters-table td {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .voters-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .voters-table tr:hover {
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .voter-actions {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+    
+    .action-btn {
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--border-radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: bold;
+    }
+    
+    .remove-btn {
+      background-color: var(--danger);
+      color: white;
+    }
+    
+    .remove-btn:hover {
+      background-color: #e83a65;
+      transform: scale(1.1);
+    }
+    
+    /* Utility classes */
+    .text-center {
+      text-align: center;
+    }
+    
+    .mt-0 { margin-top: 0; }
+    .mt-1 { margin-top: var(--spacing-xs); }
+    .mt-2 { margin-top: var(--spacing-sm); }
+    .mt-3 { margin-top: var(--spacing-md); }
+    .mt-4 { margin-top: var(--spacing-lg); }
+    .mt-5 { margin-top: var(--spacing-xl); }
+    .mt-6 { margin-top: var(--spacing-2xl); }
+    .mt-7 { margin-top: var(--spacing-3xl); }
+    
+    .mb-0 { margin-bottom: 0; }
+    .mb-1 { margin-bottom: var(--spacing-xs); }
+    .mb-2 { margin-bottom: var(--spacing-sm); }
+    .mb-3 { margin-bottom: var(--spacing-md); }
+    .mb-4 { margin-bottom: var(--spacing-lg); }
+    .mb-5 { margin-bottom: var(--spacing-xl); }
+    .mb-6 { margin-bottom: var(--spacing-2xl); }
+    .mb-7 { margin-bottom: var(--spacing-3xl); }
+    
+    .pt-0 { padding-top: 0; }
+    .pt-1 { padding-top: var(--spacing-xs); }
+    .pt-2 { padding-top: var(--spacing-sm); }
+    .pt-3 { padding-top: var(--spacing-md); }
+    .pt-4 { padding-top: var(--spacing-lg); }
+    .pt-5 { padding-top: var(--spacing-xl); }
+    
+    .pb-0 { padding-bottom: 0; }
+    .pb-1 { padding-bottom: var(--spacing-xs); }
+    .pb-2 { padding-bottom: var(--spacing-sm); }
+    .pb-3 { padding-bottom: var(--spacing-md); }
+    .pb-4 { padding-bottom: var(--spacing-lg); }
+    .pb-5 { padding-bottom: var(--spacing-xl); }
+    
+    .hidden {
+      display: none;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn var(--animation-speed) ease forwards;
+      opacity: 0;
+    }
+    
+    /* Notification system */
+    .notification {
+      position: fixed;
+      top: var(--spacing-md);
+      right: var(--spacing-md);
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--border-radius-md);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      z-index: var(--z-index-notification);
+      box-shadow: var(--shadow);
+      max-width: 350px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all var(--animation-speed) ease;
+    }
+    
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .notification.success {
+      background-color: var(--success);
+    }
+    
+    .notification.error {
+      background-color: var(--danger);
+    }
+    
+    .notification.warning {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+    
+    .notification.info {
+      background-color: var(--info);
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-close {
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity var(--animation-speed);
+      font-weight: bold;
+      width: 1.5rem;
+      height: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--border-radius-full);
+    }
+    
+    .notification-close:hover {
+      opacity: 1;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Floating action button */
+    .fab {
+      position: fixed;
+      bottom: var(--spacing-2xl);
+      right: var(--spacing-2xl);
+      width: 3.25rem;
+      height: 3.25rem;
+      border-radius: var(--border-radius-full);
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: var(--z-index-fab);
+      font-size: 1.35rem;
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    
+    .fab.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    .fab:hover {
+      transform: scale(1.05);
+      background-color: var(--primary-dark);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    /* Responsive design */
+    @media (min-width: 768px) {
+      .container {
+        padding: 0 var(--spacing-lg);
+      }
+      
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 1024px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h2 {
+        font-size: 1.75rem;
+      }
+      
+      .election-list {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+    }
+    
+    @media (max-width: 768px) {
+      :root {
+        --max-width: 100%;
+        --content-width: 100%;
+      }
+      
+      .container {
+        padding: 0 var(--spacing-md);
+      }
+      
+      .admin-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        margin-bottom: var(--spacing-md);
+      }
+      
+      .election-list {
+        grid-template-columns: 1fr;
+      }
+      
+      .results-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.625rem;
+      }
+      
+      h2 {
+        font-size: 1.375rem;
+      }
+      
+      .fab {
+        bottom: var(--spacing-lg);
+        right: var(--spacing-lg);
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.25rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
     <div class="container nav-container">
       <a href="../index.html" class="logo">
-        <img src="images/logo.svg" alt="VoteSphere Logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="40" height="40">
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#4361ee;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#3a0ca3;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <circle cx="100" cy="100" r="90" fill="url(#grad1)" />
+          <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="60" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle" dy=".3em">VS</text>
+          <circle cx="60" cy="60" r="15" fill="rgba(255,255,255,0.2)" />
+          <path d="M90 125 L110 125 L100 145 Z" fill="white" />
+          <path d="M85 85 L115 85 L115 105 L85 105 Z" fill="none" stroke="white" stroke-width="4" />
+        </svg>
         <span class="logo-text">VoteSphere</span>
       </a>
       <nav class="nav-links">
         <span style="color: var(--gray);">Admin Panel</span>
-        <button id="logout-btn" class="btn btn-danger">Logout</button>
+        <button id="logout-btn" class="btn btn-danger btn-sm">Logout</button>
         <button class="theme-toggle" id="theme-toggle">
           <span id="theme-icon">🌙</span>
         </button>
@@ -100,7 +1332,7 @@
     <div class="container footer-content">
       <p>&copy; 2025 VoteSphere. All rights reserved.</p>
       <div>
-        <a href="#" class="text-gray" style="margin-right: 1rem;">Privacy Policy</a>
+        <a href="#" class="text-gray" style="margin-right: var(--spacing-md);">Privacy Policy</a>
         <a href="#" class="text-gray">Terms of Service</a>
       </div>
     </div>
@@ -125,32 +1357,1034 @@
         window.adminJS.copyVotingLink(link);
       }
     };
-  </script>
-  <script src="js/admin.js"></script>
-  
-  <script>
-    // Theme toggle functionality
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
     
-    // Check for saved theme preference or prefer-color-scheme
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      themeIcon.textContent = '☀️';
-    }
-    
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    // Admin JavaScript interface
+    window.adminJS = {
+      // Initialize admin dashboard
+      init: function() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = '../login.html';
+          return;
+        }
+        
+        // Set up event listeners
+        this.setupEventListeners();
+        
+        // Load initial content
+        this.loadElections();
+      },
       
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
+      // Setup event listeners for the admin dashboard
+      setupEventListeners: function() {
+        // Sidebar navigation
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+          item.addEventListener('click', () => {
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            
+            const view = item.getAttribute('data-view');
+            this.loadView(view);
+          });
+        });
+        
+        // Create election button
+        document.getElementById('create-election-btn').addEventListener('click', () => {
+          this.showCreateElectionForm();
+        });
+        
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click', () => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('role');
+          window.location.href = '../index.html';
+        });
+      },
       
-      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+      // Load the appropriate view based on the sidebar selection
+      loadView: function(view) {
+        const contentDiv = document.getElementById('admin-content');
+        
+        if (view === 'elections') {
+          contentDiv.innerHTML = `
+            <div class="form-title">Active Elections</div>
+            <div class="election-list" id="election-list">
+              <div class="text-center" style="padding: 2rem; grid-column: 1 / -1;">
+                <div style="font-size: 2rem; color: var(--gray); margin-bottom: 1rem;">🔄</div>
+                <h3>Loading elections...</h3>
+              </div>
+            </div>
+          `;
+          this.loadElections();
+        } 
+        else if (view === 'results') {
+          contentDiv.innerHTML = `
+            <div class="form-title">Election Results</div>
+            <div class="results-container">
+              <div class="results-header">
+                <h2 class="results-title">Latest Election Results</h2>
+                <div class="results-actions">
+                  <button class="btn btn-outline btn-sm">Export Data</button>
+                </div>
+              </div>
+              
+              <div class="results-stats">
+                <div class="stat-card">
+                  <div class="stat-value">24</div>
+                  <div class="stat-label">Total Elections</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">1,245</div>
+                  <div class="stat-label">Total Votes</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">78%</div>
+                  <div class="stat-label">Voter Turnout</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">42</div>
+                  <div class="stat-label">Active Voters</div>
+                </div>
+              </div>
+              
+              <div class="chart-container">
+                <h3 class="chart-title">Election Participation Over Time</h3>
+                <div class="chart" id="participation-chart">
+                  <div style="height: 100%; display: flex; align-items: flex-end; justify-content: space-around; gap: 1rem;">
+                    <div style="background-color: var(--primary); width: 30px; height: 60%; border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;"></div>
+                    <div style="background-color: var(--secondary); width: 30px; height: 75%; border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;"></div>
+                    <div style="background-color: var(--success); width: 30px; height: 45%; border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;"></div>
+                    <div style="background-color: var(--danger); width: 30px; height: 90%; border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;"></div>
+                    <div style="background-color: var(--warning); width: 30px; height: 65%; border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="chart-container">
+                <h3 class="chart-title">Current Election Results</h3>
+                <div class="election-list" id="results-election-list">
+                  <div class="text-center" style="padding: 2rem; grid-column: 1 / -1;">
+                    <div style="font-size: 2rem; color: var(--gray); margin-bottom: 1rem;">📊</div>
+                    <h3>Loading results...</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          this.loadResults();
+        } 
+        else if (view === 'voters') {
+          contentDiv.innerHTML = `
+            <div class="form-title">Manage Voters</div>
+            <div class="voters-table-container">
+              <div class="table-responsive">
+                <table class="voters-table">
+                  <thead>
+                    <tr>
+                      <th>Matriculation Number</th>
+                      <th>Faculty</th>
+                      <th>Department</th>
+                      <th>Has Voted</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="voters-table-body">
+                    <tr>
+                      <td colspan="5" class="text-center" style="padding: 2rem;">
+                        <div style="font-size: 2rem; color: var(--gray); margin-bottom: 1rem;">🔄</div>
+                        <h3>Loading voters...</h3>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+          this.loadVoters();
+        }
+      },
+      
+      // Load elections for the elections management view
+      loadElections: function() {
+        const token = localStorage.getItem('token');
+        
+        fetch('/api/admin/elections', {
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load elections');
+          }
+          return response.json();
+        })
+        .then(elections => {
+          const electionList = document.getElementById('election-list');
+          
+          if (elections.length === 0) {
+            electionList.innerHTML = `
+              <div class="text-center" style="padding: 2rem; grid-column: 1 / -1;">
+                <div style="font-size: 2rem; color: var(--gray); margin-bottom: 1rem;">🗳️</div>
+                <h3>No elections found</h3>
+                <p style="color: var(--gray);">Create your first election to get started</p>
+                <button id="create-first-election" class="btn btn-primary" style="margin-top: 1rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  Create Election
+                </button>
+              </div>
+            `;
+            
+            document.getElementById('create-first-election').addEventListener('click', () => {
+              this.showCreateElectionForm();
+            });
+            return;
+          }
+          
+          electionList.innerHTML = '';
+          
+          elections.forEach(election => {
+            const statusClass = election.isActive ? 'status-active' : 'status-inactive';
+            const statusText = election.isActive ? 'Active' : 'Inactive';
+            
+            const electionItem = document.createElement('div');
+            electionItem.className = 'election-item';
+            electionItem.innerHTML = `
+              <div class="election-item-content">
+                <h3 class="election-item-title">${election.title}</h3>
+                <p class="election-item-description">${election.description}</p>
+                <div class="election-item-meta">
+                  <div class="election-item-date">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    ${new Date(election.startDate).toLocaleDateString()} - ${new Date(election.endDate).toLocaleDateString()}
+                  </div>
+                  <span class="election-item-status ${statusClass}">${statusText}</span>
+                </div>
+              </div>
+              <div class="election-actions">
+                <button class="btn btn-outline election-action-btn" onclick="adminFunctions.editElection('${election._id}')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                  Edit
+                </button>
+                <button class="btn btn-outline election-action-btn" onclick="adminFunctions.toggleElection('${election._id}', ${!election.isActive})">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                  </svg>
+                  ${election.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <button class="btn btn-danger election-action-btn" onclick="adminFunctions.deleteElection('${election._id}')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                  Delete
+                </button>
+              </div>
+            `;
+            
+            electionList.appendChild(electionItem);
+          });
+        })
+        .catch(error => {
+          console.error('Error loading elections:', error);
+          document.getElementById('election-list').innerHTML = `
+            <div class="text-center" style="padding: 2rem; grid-column: 1 / -1;">
+              <div style="font-size: 2rem; color: var(--danger); margin-bottom: 1rem;">⚠️</div>
+              <h3>Error Loading Elections</h3>
+              <p style="color: var(--gray);">${error.message}</p>
+              <button class="btn btn-primary" style="margin-top: 1rem;" onclick="window.adminJS.loadElections()">Retry</button>
+            </div>
+          `;
+        });
+      },
+      
+      // Load results for the results view
+      loadResults: function() {
+        const token = localStorage.getItem('token');
+        
+        fetch('/api/admin/results', {
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load results');
+          }
+          return response.json();
+        })
+        .then(results => {
+          const resultsList = document.getElementById('results-election-list');
+          
+          if (results.length === 0) {
+            resultsList.innerHTML = `
+              <div class="text-center" style="padding: 2rem; grid-column: 1 / -1;">
+                <div style="font-size: 2rem; color: var(--gray); margin-bottom: 1rem;">📊</div>
+                <h3>No results available</h3>
+                <p style="color: var(--gray);">Start an election to see results</p>
+              </div>
+            `;
+            return;
+          }
+          
+          resultsList.innerHTML = '';
+          
+          results.forEach(result => {
+            const resultItem = document.createElement('div');
+            resultItem.className = 'election-item';
+            resultItem.innerHTML = `
+              <div class="election-item-content">
+                <h3 class="election-item-title">${result.election.title}</h3>
+                <p class="election-item-description">${result.election.description}</p>
+                <div class="election-item-meta">
+                  <div class="election-item-date">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    ${new Date(result.election.startDate).toLocaleDateString()} - ${new Date(result.election.endDate).toLocaleDateString()}
+                  </div>
+                  <div class="candidate-results">
+                    ${result.candidates.map(candidate => `
+                      <div class="candidate">
+                        <div class="candidate-name">${candidate.name}</div>
+                        <div class="candidate-votes">${candidate.votes} votes</div>
+                        <div class="progress-bar">
+                          <div class="progress" style="width: ${Math.round((candidate.votes / result.totalVotes) * 100)}%"></div>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+              <div class="election-actions">
+                <button class="btn btn-outline election-action-btn" onclick="adminFunctions.copyVotingLink('${window.location.origin}/vote?election=${result.election._id}')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  Copy Link
+                </button>
+                <button class="btn btn-outline election-action-btn" onclick="window.adminJS.exportResults('${result.election._id}')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Export
+                </button>
+              </div>
+            `;
+            
+            resultsList.appendChild(resultItem);
+          });
+        })
+        .catch(error => {
+          console.error('Error loading results:', error);
+          document.getElementById('results-election-list').innerHTML = `
+            <div class="text-center" style="padding: 2rem; grid-column: 1 / -1;">
+              <div style="font-size: 2rem; color: var(--danger); margin-bottom: 1rem;">⚠️</div>
+              <h3>Error Loading Results</h3>
+              <p style="color: var(--gray);">${error.message}</p>
+              <button class="btn btn-primary" style="margin-top: 1rem;" onclick="window.adminJS.loadResults()">Retry</button>
+            </div>
+          `;
+        });
+      },
+      
+      // Load voters for the voter management view
+      loadVoters: function() {
+        const token = localStorage.getItem('token');
+        
+        fetch('/api/admin/voters', {
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load voters');
+          }
+          return response.json();
+        })
+        .then(voters => {
+          const votersTableBody = document.getElementById('voters-table-body');
+          
+          if (voters.length === 0) {
+            votersTableBody.innerHTML = `
+              <tr>
+                <td colspan="5" class="text-center" style="padding: 2rem;">
+                  <div style="font-size: 2rem; color: var(--gray); margin-bottom: 1rem;">👥</div>
+                  <h3>No voters found</h3>
+                  <p style="color: var(--gray);">Add voters to manage voting access</p>
+                </td>
+              </tr>
+            `;
+            return;
+          }
+          
+          votersTableBody.innerHTML = '';
+          
+          voters.forEach(voter => {
+            const voterRow = document.createElement('tr');
+            voterRow.innerHTML = `
+              <td>${voter.matricNumber}</td>
+              <td>${voter.faculty}</td>
+              <td>${voter.department}</td>
+              <td>${voter.hasVoted ? '<span style="color: var(--success);">✓ Yes</span>' : '<span style="color: var(--danger);">✗ No</span>'}</td>
+              <td class="voter-actions">
+                <button class="action-btn remove-btn" title="Remove voter" onclick="adminFunctions.removeVote('${voter._id}', '${voter.electionId}')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </td>
+            `;
+            
+            votersTableBody.appendChild(voterRow);
+          });
+        })
+        .catch(error => {
+          console.error('Error loading voters:', error);
+          document.getElementById('voters-table-body').innerHTML = `
+            <tr>
+              <td colspan="5" class="text-center" style="padding: 2rem;">
+                <div style="font-size: 2rem; color: var(--danger); margin-bottom: 1rem;">⚠️</div>
+                <h3>Error Loading Voters</h3>
+                <p style="color: var(--gray);">${error.message}</p>
+                <button class="btn btn-primary" style="margin-top: 1rem; width: auto;" onclick="window.adminJS.loadVoters()">Retry</button>
+              </td>
+            </tr>
+          `;
+        });
+      },
+      
+      // Show form to create a new election
+      showCreateElectionForm: function() {
+        const contentDiv = document.getElementById('admin-content');
+        contentDiv.innerHTML = `
+          <div class="form-title">Create New Election</div>
+          <form id="create-election-form" class="auth-form">
+            <div class="form-group">
+              <label for="election-title" class="form-label">Election Title</label>
+              <input type="text" id="election-title" class="form-control" placeholder="E.g., Student Union President 2025" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="election-description" class="form-label">Description</label>
+              <textarea id="election-description" class="form-control" rows="4" placeholder="Describe the election and its purpose" required></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="faculty-restriction" class="form-label">Faculty Restriction (Optional)</label>
+              <select id="faculty-restriction" class="form-control form-select">
+                <option value="">No Restriction (All Faculties)</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Sciences">Sciences</option>
+                <option value="Arts & Humanities">Arts & Humanities</option>
+                <option value="Social Sciences">Social Sciences</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Law">Law</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="Education">Education</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="department-restrictions" class="form-label">Department Restrictions (Optional)</label>
+              <div id="department-restrictions-container">
+                <select id="department-restrictions" class="form-control form-select">
+                  <option value="">No Restriction (All Departments)</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Election Dates</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                  <label for="start-date" class="form-label" style="margin-bottom: 0.25rem;">Start Date</label>
+                  <input type="datetime-local" id="start-date" class="form-control" required>
+                </div>
+                <div>
+                  <label for="end-date" class="form-label" style="margin-bottom: 0.25rem;">End Date</label>
+                  <input type="datetime-local" id="end-date" class="form-control" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Candidates</label>
+              <div class="candidate-inputs" id="candidate-inputs">
+                <div class="candidate-input">
+                  <input type="text" class="form-control" placeholder="Candidate Name" required>
+                  <button type="button" class="remove-candidate" style="display: none;">×</button>
+                </div>
+                <div class="candidate-input">
+                  <input type="text" class="form-control" placeholder="Candidate Name" required>
+                  <button type="button" class="remove-candidate">×</button>
+                </div>
+              </div>
+              <button type="button" id="add-candidate" class="add-candidate">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Candidate
+              </button>
+            </div>
+            
+            <div id="form-error" class="alert alert-danger hidden"></div>
+            
+            <div class="form-actions">
+              <button type="button" id="cancel-creation" class="btn btn-outline">Cancel</button>
+              <button type="submit" class="btn btn-primary">Create Election</button>
+            </div>
+          </form>
+        `;
+        
+        // Setup form event listeners
+        this.setupCreateElectionForm();
+      },
+      
+      // Setup event listeners for the create election form
+      setupCreateElectionForm: function() {
+        // Add candidate button
+        document.getElementById('add-candidate').addEventListener('click', () => {
+          const candidateInputs = document.getElementById('candidate-inputs');
+          const newInput = document.createElement('div');
+          newInput.className = 'candidate-input';
+          newInput.innerHTML = `
+            <input type="text" class="form-control" placeholder="Candidate Name" required>
+            <button type="button" class="remove-candidate">×</button>
+          `;
+          candidateInputs.appendChild(newInput);
+          
+          // Setup remove button for the new input
+          newInput.querySelector('.remove-candidate').addEventListener('click', () => {
+            newInput.remove();
+            this.updateRemoveButtons();
+          });
+          
+          this.updateRemoveButtons();
+        });
+        
+        // Setup remove buttons for existing inputs
+        document.querySelectorAll('.remove-candidate').forEach(button => {
+          button.addEventListener('click', function() {
+            this.closest('.candidate-input').remove();
+            window.adminJS.updateRemoveButtons();
+          });
+        });
+        
+        // Cancel button
+        document.getElementById('cancel-creation').addEventListener('click', () => {
+          this.loadElections();
+        });
+        
+        // Form submission
+        document.getElementById('create-election-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.submitElectionForm();
+        });
+      },
+      
+      // Update remove buttons visibility
+      updateRemoveButtons: function() {
+        const inputs = document.querySelectorAll('.candidate-input');
+        inputs.forEach((input, index) => {
+          const removeBtn = input.querySelector('.remove-candidate');
+          if (index > 1) {
+            removeBtn.style.display = 'flex';
+          } else {
+            removeBtn.style.display = index === 1 ? 'flex' : 'none';
+          }
+        });
+      },
+      
+      // Submit the election creation form
+      submitElectionForm: function() {
+        const formError = document.getElementById('form-error');
+        formError.classList.add('hidden');
+        formError.innerHTML = '';
+        
+        // Get form values
+        const title = document.getElementById('election-title').value;
+        const description = document.getElementById('election-description').value;
+        const facultyRestriction = document.getElementById('faculty-restriction').value;
+        const departmentRestrictions = document.getElementById('department-restrictions').value;
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+        
+        // Get candidates
+        const candidateInputs = document.querySelectorAll('#candidate-inputs .form-control');
+        const candidates = [];
+        for (const input of candidateInputs) {
+          if (input.value.trim() !== '') {
+            candidates.push({ name: input.value.trim(), votes: 0 });
+          }
+        }
+        
+        // Validate form
+        if (candidates.length < 2) {
+          formError.innerHTML = 'At least two candidates are required';
+          formError.classList.remove('hidden');
+          return;
+        }
+        
+        if (new Date(startDate) >= new Date(endDate)) {
+          formError.innerHTML = 'End date must be after start date';
+          formError.classList.remove('hidden');
+          return;
+        }
+        
+        // Prepare data
+        const electionData = {
+          title,
+          description,
+          facultyRestriction: facultyRestriction || null,
+          departmentRestrictions: departmentRestrictions ? [departmentRestrictions] : [],
+          startDate,
+          endDate,
+          candidates,
+          isActive: false
+        };
+        
+        // Submit to API
+        const token = localStorage.getItem('token');
+        
+        fetch('/api/admin/elections', {
+          method: 'POST',
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(electionData)
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message || 'Failed to create election'); });
+          }
+          return response.json();
+        })
+        .then(() => {
+          this.showNotification('Election created successfully!', 'success');
+          this.loadElections();
+        })
+        .catch(error => {
+          formError.innerHTML = error.message;
+          formError.classList.remove('hidden');
+        });
+      },
+      
+      // Edit an election
+      editElection: function(id) {
+        const token = localStorage.getItem('token');
+        
+        fetch(`/api/admin/elections/${id}`, {
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load election details');
+          }
+          return response.json();
+        })
+        .then(election => {
+          const contentDiv = document.getElementById('admin-content');
+          contentDiv.innerHTML = `
+            <div class="form-title">Edit Election: ${election.title}</div>
+            <form id="edit-election-form" class="auth-form">
+              <div class="form-group">
+                <label for="election-title" class="form-label">Election Title</label>
+                <input type="text" id="election-title" class="form-control" value="${election.title}" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="election-description" class="form-label">Description</label>
+                <textarea id="election-description" class="form-control" rows="4" required>${election.description}</textarea>
+              </div>
+              
+              <div class="form-group">
+                <label for="faculty-restriction" class="form-label">Faculty Restriction (Optional)</label>
+                <select id="faculty-restriction" class="form-control form-select">
+                  <option value="" ${!election.facultyRestriction ? 'selected' : ''}>No Restriction (All Faculties)</option>
+                  <option value="Engineering" ${election.facultyRestriction === 'Engineering' ? 'selected' : ''}>Engineering</option>
+                  <option value="Sciences" ${election.facultyRestriction === 'Sciences' ? 'selected' : ''}>Sciences</option>
+                  <option value="Arts & Humanities" ${election.facultyRestriction === 'Arts & Humanities' ? 'selected' : ''}>Arts & Humanities</option>
+                  <option value="Social Sciences" ${election.facultyRestriction === 'Social Sciences' ? 'selected' : ''}>Social Sciences</option>
+                  <option value="Medicine" ${election.facultyRestriction === 'Medicine' ? 'selected' : ''}>Medicine</option>
+                  <option value="Law" ${election.facultyRestriction === 'Law' ? 'selected' : ''}>Law</option>
+                  <option value="Business Administration" ${election.facultyRestriction === 'Business Administration' ? 'selected' : ''}>Business Administration</option>
+                  <option value="Education" ${election.facultyRestriction === 'Education' ? 'selected' : ''}>Education</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Election Dates</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                  <div>
+                    <label for="start-date" class="form-label" style="margin-bottom: 0.25rem;">Start Date</label>
+                    <input type="datetime-local" id="start-date" class="form-control" value="${new Date(election.startDate).toISOString().slice(0, 16)}" required>
+                  </div>
+                  <div>
+                    <label for="end-date" class="form-label" style="margin-bottom: 0.25rem;">End Date</label>
+                    <input type="datetime-local" id="end-date" class="form-control" value="${new Date(election.endDate).toISOString().slice(0, 16)}" required>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Candidates</label>
+                <div class="candidate-inputs" id="candidate-inputs">
+                  ${election.candidates.map((candidate, index) => `
+                    <div class="candidate-input">
+                      <input type="text" class="form-control" value="${candidate.name}" placeholder="Candidate Name" required>
+                      <button type="button" class="remove-candidate" ${index < 2 ? 'style="display: none;"' : ''}>×</button>
+                    </div>
+                  `).join('')}
+                </div>
+                <button type="button" id="add-candidate" class="add-candidate">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  Add Candidate
+                </button>
+              </div>
+              
+              <div id="form-error" class="alert alert-danger hidden"></div>
+              
+              <div class="form-actions">
+                <button type="button" id="cancel-edit" class="btn btn-outline">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Election</button>
+              </div>
+            </form>
+          `;
+          
+          // Setup form event listeners
+          this.setupEditElectionForm(id);
+        })
+        .catch(error => {
+          this.showNotification(`Error: ${error.message}`, 'error');
+        });
+      },
+      
+      // Setup event listeners for the edit election form
+      setupEditElectionForm: function(id) {
+        // Add candidate button
+        document.getElementById('add-candidate').addEventListener('click', () => {
+          const candidateInputs = document.getElementById('candidate-inputs');
+          const newInput = document.createElement('div');
+          newInput.className = 'candidate-input';
+          newInput.innerHTML = `
+            <input type="text" class="form-control" placeholder="Candidate Name" required>
+            <button type="button" class="remove-candidate">×</button>
+          `;
+          candidateInputs.appendChild(newInput);
+          
+          // Setup remove button for the new input
+          newInput.querySelector('.remove-candidate').addEventListener('click', () => {
+            newInput.remove();
+            this.updateRemoveButtons();
+          });
+          
+          this.updateRemoveButtons();
+        });
+        
+        // Setup remove buttons for existing inputs
+        document.querySelectorAll('.remove-candidate').forEach(button => {
+          button.addEventListener('click', function() {
+            this.closest('.candidate-input').remove();
+            window.adminJS.updateRemoveButtons();
+          });
+        });
+        
+        // Cancel button
+        document.getElementById('cancel-edit').addEventListener('click', () => {
+          this.loadElections();
+        });
+        
+        // Form submission
+        document.getElementById('edit-election-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.submitEditElectionForm(id);
+        });
+      },
+      
+      // Submit the election edit form
+      submitEditElectionForm: function(id) {
+        const formError = document.getElementById('form-error');
+        formError.classList.add('hidden');
+        formError.innerHTML = '';
+        
+        // Get form values
+        const title = document.getElementById('election-title').value;
+        const description = document.getElementById('election-description').value;
+        const facultyRestriction = document.getElementById('faculty-restriction').value;
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+        
+        // Get candidates
+        const candidateInputs = document.querySelectorAll('#candidate-inputs .form-control');
+        const candidates = [];
+        for (const input of candidateInputs) {
+          if (input.value.trim() !== '') {
+            candidates.push({ name: input.value.trim() });
+          }
+        }
+        
+        // Validate form
+        if (candidates.length < 2) {
+          formError.innerHTML = 'At least two candidates are required';
+          formError.classList.remove('hidden');
+          return;
+        }
+        
+        if (new Date(startDate) >= new Date(endDate)) {
+          formError.innerHTML = 'End date must be after start date';
+          formError.classList.remove('hidden');
+          return;
+        }
+        
+        // Prepare data
+        const electionData = {
+          title,
+          description,
+          facultyRestriction: facultyRestriction || null,
+          startDate,
+          endDate,
+          candidates
+        };
+        
+        // Submit to API
+        const token = localStorage.getItem('token');
+        
+        fetch(`/api/admin/elections/${id}`, {
+          method: 'PUT',
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(electionData)
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message || 'Failed to update election'); });
+          }
+          return response.json();
+        })
+        .then(() => {
+          this.showNotification('Election updated successfully!', 'success');
+          this.loadElections();
+        })
+        .catch(error => {
+          formError.innerHTML = error.message;
+          formError.classList.remove('hidden');
+        });
+      },
+      
+      // Toggle election active status
+      toggleElection: function(id, isActive) {
+        const token = localStorage.getItem('token');
+        
+        fetch(`/api/admin/elections/${id}/status`, {
+          method: 'PUT',
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ isActive })
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message || 'Failed to update election status'); });
+          }
+          return response.json();
+        })
+        .then(() => {
+          this.showNotification(`Election ${isActive ? 'activated' : 'deactivated'} successfully!`, 'success');
+          this.loadElections();
+        })
+        .catch(error => {
+          this.showNotification(`Error: ${error.message}`, 'error');
+        });
+      },
+      
+      // Delete an election
+      deleteElection: function(id) {
+        if (!confirm('Are you sure you want to delete this election? This action cannot be undone.')) {
+          return;
+        }
+        
+        const token = localStorage.getItem('token');
+        
+        fetch(`/api/admin/elections/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message || 'Failed to delete election'); });
+          }
+          return response.json();
+        })
+        .then(() => {
+          this.showNotification('Election deleted successfully!', 'success');
+          this.loadElections();
+        })
+        .catch(error => {
+          this.showNotification(`Error: ${error.message}`, 'error');
+        });
+      },
+      
+      // Remove a vote
+      removeVote: function(voteId, electionId) {
+        if (!confirm('Are you sure you want to remove this vote? This action cannot be undone.')) {
+          return;
+        }
+        
+        const token = localStorage.getItem('token');
+        
+        fetch(`/api/admin/votes/${voteId}`, {
+          method: 'DELETE',
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message || 'Failed to remove vote'); });
+          }
+          return response.json();
+        })
+        .then(() => {
+          this.showNotification('Vote removed successfully!', 'success');
+          this.loadVoters();
+        })
+        .catch(error => {
+          this.showNotification(`Error: ${error.message}`, 'error');
+        });
+      },
+      
+      // Copy voting link
+      copyVotingLink: function(link) {
+        navigator.clipboard.writeText(link)
+          .then(() => {
+            this.showNotification('Voting link copied to clipboard!', 'success');
+          })
+          .catch(err => {
+            this.showNotification(`Failed to copy link: ${err.message}`, 'error');
+          });
+      },
+      
+      // Export results
+      exportResults: function(electionId) {
+        this.showNotification('Results exported successfully!', 'success');
+        
+        // In a real implementation, this would trigger a download
+        setTimeout(() => {
+          const link = document.createElement('a');
+          link.href = `/api/admin/results/${electionId}/export`;
+          link.download = `election-results-${electionId}.csv`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }, 1000);
+      },
+      
+      // Show notification
+      showNotification: function(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+          <div class="notification-content">${message}</div>
+          <div class="notification-close">&times;</div>
+        `;
+        document.getElementById('notification-container').appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => {
+          notification.classList.add('show');
+        }, 10);
+        
+        // Auto close
+        setTimeout(() => {
+          notification.classList.remove('show');
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 300);
+        }, 5000);
+        
+        // Close on click
+        notification.querySelector('.notification-close').addEventListener('click', () => {
+          notification.classList.remove('show');
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 300);
+        });
+      }
+    };
+    
+    // Initialize admin dashboard when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize admin JS
+      window.adminJS.init();
+      
+      // Theme toggle functionality
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      
+      // Check for saved theme preference or prefer-color-scheme
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+      }
+      
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+      });
     });
   </script>
+  <div id="notification-container"></div>
 </body>
 </html>
