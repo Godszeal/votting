@@ -39,8 +39,8 @@ const electionSchema = new mongoose.Schema({
   // Unique voting link
   votingLinkToken: {
     type: String,
-    required: true,
-    unique: true,
+    required: false,
+    unique: false,
     default: function() {
       return Math.random().toString(36).substr(2, 15);
     }
