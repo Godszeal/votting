@@ -31,8 +31,8 @@ exports.verifyVotingLink = async (req, res) => {
     const token = req.params.token;
     console.log('Verifying voting link token:', token);
     
-    // Check if token is valid for a voting link
-    if (!token || token === 'user-dashboard.html' || token === 'index.html') {
+    // CRITICAL FIX: Check if token is valid format
+    if (!token || token.includes('user-dashboard') || token.includes('index.html')) {
       console.error('Invalid token format:', token);
       return res.status(400).json({ 
         message: 'Invalid voting link token format' 
