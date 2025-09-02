@@ -19,57 +19,30 @@ app.use(cookieParser());
 // Define Routes
 let authRoutes, userRoutes, adminRoutes, votingRoutes;
 
-try {
-  authRoutes = require('./routes/auth');
-} catch (err) {
-  console.error('Error loading auth routes:', err);
-  authRoutes = express.Router();
-  authRoutes.use((req, res) => {
-    res.status(500).json({ 
-      message: 'Service unavailable', 
-      error: 'Auth routes loading error'
+// Helper function to safely load routes
+const loadRoutes = (routePath, routeName) => {
+  try {
+    console.log(`Loading ${routeName} routes...`);
+    const routes = require(routePath);
+    console.log(`${routeName} routes loaded successfully`);
+    return routes;
+  } catch (err) {
+    console.error(`Error loading ${routeName} routes:`, err);
+    const router = express.Router();
+    router.use((req, res) => {
+      res.status(500).json({ 
+        message: `Service unavailable: ${routeName} routes failed to load`,
+        error: err.message
+      });
     });
-  });
-}
+    return router;
+  }
+};
 
-try {
-  userRoutes = require('./routes/user');
-} catch (err) {
-  console.error('Error loading user routes:', err);
-  userRoutes = express.Router();
-  userRoutes.use((req, res) => {
-    res.status(500).json({ 
-      message: 'Service unavailable', 
-      error: 'User routes loading error'
-    });
-  });
-}
-
-try {
-  adminRoutes = require('./routes/admin');
-} catch (err) {
-  console.error('Error loading admin routes:', err);
-  adminRoutes = express.Router();
-  adminRoutes.use((req, res) => {
-    res.status(500).json({ 
-      message: 'Service unavailable', 
-      error: 'Admin routes loading error'
-    });
-  });
-}
-
-try {
-  votingRoutes = require('./routes/voting');
-} catch (err) {
-  console.error('Error loading voting routes:', err);
-  votingRoutes = express.Router();
-  votingRoutes.use((req, res) => {
-    res.status(500).json({ 
-      message: 'Service unavailable', 
-      error: 'Voting routes loading error'
-    });
-  });
-}
+authRoutes = loadRoutes('./routes/auth', 'auth');
+userRoutes = loadRoutes('./routes/user', 'user');
+adminRoutes = loadRoutes('./routes/admin', 'admin');
+votingRoutes = loadRoutes('./routes/voting', 'voting');
 
 // Register routes - CORRECT ORDER
 app.use('/api/auth', authRoutes);
