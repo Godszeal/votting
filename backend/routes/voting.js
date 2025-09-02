@@ -6,8 +6,8 @@ const votingController = require('../controllers/voting');
 // @desc    Serve the voting page with token
 router.get('/:token', votingController.serveVotingPage);
 
-// @route   GET /api/user/voting-link/:token
+// @route   GET /api/voting/link/:token
 // @desc    Verify voting link token
-router.get('/api/user/voting-link/:token', votingController.verifyVotingLink);
+router.get('/api/link/:token', votingController.verifyVotingLink);
 
 module.exports = router;
