@@ -33,6 +33,6 @@ router.put('/voters/:id/reset-votes', admin, adminController.resetVoterVotes);
 
 // @route   GET api/admin/elections/:id/link
 // @desc    Get voting link for election
-router.get('/elections/:id/link', admin, adminController.getElectionVotingLink);
+// router.get('/elections/:id/link', admin, adminController.getElectionVotingLink);
 
 module.exports = router;
