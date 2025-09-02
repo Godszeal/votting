@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Faculty of Computing and Informatics': [
           'Computer Science',
           'Information System Science',
-          'Cyber Security',
+          'Cyber Security'
           ],
         'Engineering': [
           'Computer Science',
@@ -529,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
           'Faculty of Computing and Informatics': [
           'Computer Science',
           'Information System Science',
-          'Cyber Security',
+          'Cyber Security'
           ],
           'Engineering': [
             'Computer Science',
