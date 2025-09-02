@@ -68,8 +68,15 @@
       const urlParams = new URLSearchParams(window.location.search);
       const electionId = urlParams.get('election');
       
-      // Load all eligible elections
-      loadElections();
+      if (electionId) {
+        console.log('Election ID found in URL:', electionId);
+        // Verify if user can vote in this election
+        verifyElectionEligibility(electionId);
+      } else {
+        console.log('No election ID in URL, loading all eligible elections');
+        // Load all eligible elections
+        loadElections();
+      }
       
       // Setup logout
       const logoutBtn = document.getElementById('logout-btn');
@@ -84,6 +91,181 @@
         });
       }
     });
+    
+    async function verifyElectionEligibility(electionId) {
+      try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          throw new Error('Authentication token missing. Please log in again.');
+        }
+        
+        console.log('Verifying election eligibility for ID:', electionId);
+        
+        const res = await fetch(`/api/user/elections/${electionId}/eligibility`, {
+          method: 'GET',
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!res.ok) {
+          // Handle 403 specifically
+          if (res.status === 403) {
+            console.error('403 Forbidden - Authentication token may be invalid');
+            localStorage.removeItem('token');
+            window.location.href = '../login.html';
+            return;
+          }
+          
+          const error = await res.json().catch(() => ({}));
+          console.error('Failed to verify election eligibility:', error);
+          throw new Error(error.message || `Failed to verify election eligibility (Status: ${res.status})`);
+        }
+        
+        const data = await res.json();
+        console.log('Election eligibility ', data);
+        
+        if (data.eligible) {
+          // User is eligible, load the voting interface
+          loadVotingInterface(electionId);
+        } else {
+          // User is not eligible, show error
+          console.error('User not eligible for election:', data.reason);
+          showNotification(`You are not eligible to vote in this election: ${data.reason}`, 'error');
+          loadElections();
+        }
+      } catch (err) {
+        console.error('Error verifying election eligibility:', err);
+        showNotification(`Error: ${err.message}`, 'error');
+        loadElections();
+      }
+    }
+    
+    async function loadVotingInterface(electionId) {
+      try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          throw new Error('Authentication token missing. Please log in again.');
+        }
+        
+        console.log('Loading voting interface for election ID:', electionId);
+        
+        const res = await fetch(`/api/user/elections/${electionId}`, {
+          method: 'GET',
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({}));
+          console.error('Failed to load election:', error);
+          throw new Error(error.message || `Failed to load election (Status: ${res.status})`);
+        }
+        
+        const election = await res.json();
+        console.log('Election data loaded:', election);
+        
+        const electionsContainer = document.getElementById('elections-container');
+        electionsContainer.innerHTML = '';
+        
+        // Format restriction badges
+        let restrictionBadges = '';
+        if (election.facultyRestriction) {
+          restrictionBadges += `
+            <span class="election-restriction">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              ${election.facultyRestriction} Faculty
+            </span>
+          `;
+        }
+        
+        if (election.departmentRestrictions && election.departmentRestrictions.length > 0) {
+          restrictionBadges += `
+            <span class="election-restriction" style="background-color: var(--secondary);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              ${election.departmentRestrictions.join(', ')}
+            </span>
+          `;
+        }
+        
+        if (!restrictionBadges) {
+          restrictionBadges = `
+            <span class="election-restriction" style="background-color: var(--success);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              All Students
+            </span>
+          `;
+        }
+        
+        let candidatesHTML = '';
+        election.candidates.forEach(candidate => {
+          const percentage = calculatePercentage(election.candidates, candidate.votes);
+          candidatesHTML += `
+            <div class="candidate">
+              <div class="candidate-name">${candidate.name}</div>
+              <div class="candidate-votes">${candidate.votes} votes (${percentage}%)</div>
+              <div class="progress-bar">
+                <div class="progress" style="width: ${percentage}%"></div>
+              </div>
+            </div>
+          `;
+        });
+        
+        const electionCard = document.createElement('div');
+        electionCard.className = 'election-card card fade-in';
+        
+        electionCard.innerHTML = `
+          <div class="election-header">
+            <h2 class="election-title">${election.title}</h2>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              ${restrictionBadges}
+            </div>
+          </div>
+          
+          <p class="election-description">${election.description}</p>
+          
+          <div class="election-candidates">
+            ${candidatesHTML}
+          </div>
+          
+          <div class="vote-actions">
+            ${election.candidates.map(c => `
+              <button class="btn btn-primary vote-btn" 
+                      data-election="${election._id}" 
+                      data-candidate="${c.name}">
+                Vote for ${c.name}
+              </button>
+            `).join('')}
+          </div>
+        `;
+        
+        electionsContainer.appendChild(electionCard);
+        
+        // Add vote event listeners
+        document.querySelectorAll('.vote-btn').forEach(btn => {
+          btn.addEventListener('click', handleVote);
+        });
+        
+      } catch (err) {
+        console.error('Error loading election:', err);
+        showNotification(`Error: ${err.message}`, 'error');
+        loadElections();
+      }
+    }
     
     async function loadElections() {
       try {
