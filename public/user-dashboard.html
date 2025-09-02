@@ -59,6 +59,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('token');
       if (!token) {
+        console.log('No token found, redirecting to login');
         window.location.href = '../login.html';
         return;
       }
@@ -68,9 +69,11 @@
       const electionId = urlParams.get('election');
       
       if (electionId) {
+        console.log('Election ID found in URL:', electionId);
         // Verify if user can vote in this election
         verifyElectionEligibility(electionId);
       } else {
+        console.log('No election ID in URL, loading all eligible elections');
         // Load all eligible elections
         loadElections();
       }
@@ -79,6 +82,7 @@
       const logoutBtn = document.getElementById('logout-btn');
       if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
+          console.log('Logging out user');
           localStorage.removeItem('token');
           localStorage.removeItem('role');
           localStorage.removeItem('faculty');
@@ -96,6 +100,8 @@
           throw new Error('Authentication token missing. Please log in again.');
         }
         
+        console.log('Verifying election eligibility for ID:', electionId);
+        
         const res = await fetch(`/api/user/elections/${electionId}/eligibility`, {
           method: 'GET',
           headers: {
@@ -106,17 +112,20 @@
         
         if (!res.ok) {
           const error = await res.json().catch(() => ({}));
+          console.error('Election eligibility check failed:', error);
           throw new Error(error.message || `Failed to verify election eligibility (Status: ${res.status})`);
         }
         
         const data = await res.json();
+        console.log('Election eligibility ', data);
         
         if (data.eligible) {
           // User is eligible, load the voting interface
           loadVotingInterface(electionId);
         } else {
           // User is not eligible, show error
-          showNotification('You are not eligible to vote in this election', 'error');
+          console.error('User not eligible for election:', data.reason);
+          showNotification(`You are not eligible to vote in this election: ${data.reason}`, 'error');
           loadElections();
         }
       } catch (err) {
@@ -134,6 +143,8 @@
           throw new Error('Authentication token missing. Please log in again.');
         }
         
+        console.log('Loading voting interface for election ID:', electionId);
+        
         const res = await fetch(`/api/user/elections/${electionId}`, {
           method: 'GET',
           headers: {
@@ -144,10 +155,12 @@
         
         if (!res.ok) {
           const error = await res.json().catch(() => ({}));
+          console.error('Failed to load election:', error);
           throw new Error(error.message || `Failed to load election (Status: ${res.status})`);
         }
         
         const election = await res.json();
+        console.log('Election data loaded:', election);
         
         const electionsContainer = document.getElementById('elections-container');
         electionsContainer.innerHTML = '';
@@ -256,6 +269,8 @@
           throw new Error('Authentication token missing. Please log in again.');
         }
         
+        console.log('Loading all eligible elections for user');
+        
         const res = await fetch('/api/user/elections', {
           headers: {
             'x-auth-token': token
@@ -264,10 +279,12 @@
         
         if (!res.ok) {
           const error = await res.json().catch(() => ({}));
+          console.error('Failed to load elections:', error);
           throw new Error(error.message || `Failed to load elections (Status: ${res.status})`);
         }
         
         const elections = await res.json();
+        console.log('Eligible elections loaded:', elections);
         
         const electionsContainer = document.getElementById('elections-container');
         electionsContainer.innerHTML = '';
@@ -407,6 +424,8 @@
           throw new Error('Authentication token missing. Please log in again.');
         }
         
+        console.log('Attempting to cast vote for election:', electionId, 'candidate:', candidate);
+        
         const res = await fetch('/api/user/vote', {
           method: 'POST',
           headers: {
@@ -419,6 +438,8 @@
         const data = await res.json();
         
         if (res.ok) {
+          console.log('Vote recorded successfully:', data);
+          
           // Show success message
           const alertDiv = document.createElement('div');
           alertDiv.className = 'alert alert-success';
@@ -450,6 +471,8 @@
           if (data.error) {
             errorMessage += `: ${data.error}`;
           }
+          
+          console.error('Vote recording failed:', errorMessage);
           
           // Show error message
           const alertDiv = document.createElement('div');
