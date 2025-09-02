@@ -18,6 +18,11 @@ router.post('/vote', auth, userController.castVote);
 // @access  Private
 router.get('/results/:id', auth, userController.getElectionResults);
 
+// @route   GET /api/user/elections/:id/eligibility
+// @desc    Check if user is eligible for an election
+// @access  Private
+router.get('/elections/:id/eligibility', auth, userController.checkElectionEligibility);
+
 // @route   GET /api/user/voting-link/:token
 // @desc    Get voting link details
 // @access  Public
