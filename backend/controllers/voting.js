@@ -12,6 +12,7 @@ exports.serveVotingPage = async (req, res) => {
     
     if (!election) {
       console.error(`Invalid voting link token: ${token}`);
+      // Return the voting page but with an error parameter
       return res.sendFile(path.join(__dirname, '../../public/voting.html'));
     }
     
@@ -24,11 +25,19 @@ exports.serveVotingPage = async (req, res) => {
 };
 
 // @desc    Verify voting link token
-// @route   GET /api/user/voting-link/:token
+// @route   GET /api/voting/link/:token
 exports.verifyVotingLink = async (req, res) => {
   try {
     const token = req.params.token;
     console.log('Verifying voting link token:', token);
+    
+    // Check if token is valid for a voting link
+    if (!token || token === 'user-dashboard.html' || token === 'index.html') {
+      console.error('Invalid token format:', token);
+      return res.status(400).json({ 
+        message: 'Invalid voting link token format' 
+      });
+    }
     
     const election = await Election.findOne({ votingLinkToken: token });
     
