@@ -266,3 +266,36 @@ exports.checkElectionEligibility = async (req, res) => {
     });
   }
 };
+
+// @desc    Get voting link details
+// @route   GET /api/user/voting-link/:token
+// @access  Public
+exports.getVotingLinkDetails = async (req, res) => {
+  try {
+    const token = req.params.token;
+    console.log('Fetching voting link details for token:', token);
+    
+    const election = await Election.findOne({ votingLinkToken: token });
+    
+    if (!election) {
+      console.error('Invalid voting link token:', token);
+      return res.status(404).json({ 
+        message: 'Invalid voting link' 
+      });
+    }
+    
+    console.log('Voting link details found for election:', election.title);
+    res.json({
+      electionId: election._id,
+      title: election.title,
+      facultyRestriction: election.facultyRestriction,
+      departmentRestrictions: election.departmentRestrictions
+    });
+  } catch (err) {
+    console.error('Voting Link Error:', err);
+    res.status(500).json({ 
+      message: 'Server error',
+      error: err.message 
+    });
+  }
+};
