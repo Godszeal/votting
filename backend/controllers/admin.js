@@ -1,93 +1,49 @@
 const Election = require('../models/Election');
+const Vote = require('../models/Vote');
 const User = require('../models/User');
-const crypto = require('crypto');
+const jwtConfig = require('../config/jwt');
 
-// @desc    Create a new election
+// @desc    Create election
 // @route   POST /api/admin/elections
-// @access  Private
+// @access  Private (Admin)
 exports.createElection = async (req, res) => {
+  const { title, description, candidates, endDate, isActive, facultyRestriction, departmentRestrictions } = req.body;
+  
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    if (!title || !description || !candidates || !endDate) {
       return res.status(400).json({ 
-        errors: errors.array(),
-        message: 'Validation failed'
+        message: 'Missing required fields',
+        received: Object.keys(req.body)
       });
     }
-
-    const { title, description, facultyRestriction, departmentRestrictions, candidates, endDate } = req.body;
     
-    console.log('Creating new election:', { 
-      title, 
-      description, 
-      facultyRestriction, 
-      departmentRestrictions,
-      candidatesCount: candidates.length,
-      endDate 
-    });
-    
-    // Generate a unique voting link token
-    let votingLinkToken;
-    let isUnique = false;
-    
-    // Keep generating tokens until we get a unique one
-    while (!isUnique) {
-      votingLinkToken = crypto.randomBytes(8).toString('hex');
-      
-      // Check if this token already exists
-      const existingElection = await Election.findOne({ votingLinkToken });
-      if (!existingElection) {
-        isUnique = true;
-      }
+    if (candidates.length < 2) {
+      return res.status(400).json({ 
+        message: 'At least 2 candidates are required' 
+      });
     }
-    
-    console.log('Generated unique voting link token:', votingLinkToken);
     
     const election = new Election({
       title,
       description,
-      facultyRestriction,
-      departmentRestrictions: departmentRestrictions || [],
-      candidates: candidates.map(candidate => ({
-        name: candidate.name,
-        votes: 0
-      })),
+      candidates: candidates.map(name => ({ name })),
       endDate: new Date(endDate),
-      votingLinkToken,
-      createdBy: req.user.id
+      isActive: isActive !== undefined ? isActive : true,
+      facultyRestriction: facultyRestriction || null,
+      departmentRestrictions: departmentRestrictions || []
     });
-
+    
     await election.save();
     
-    console.log('Election created successfully:', election._id);
-    
-    // Return the voting link
-    const votingLink = `${process.env.BASE_URL}/voting/${votingLinkToken}`;
+    // Generate the voting link
+    const votingLink = `${process.env.BASE_URL}/voting/${election.votingLinkToken}`;
     
     res.status(201).json({
-      _id: election._id,
-      title: election.title,
-      description: election.description,
-      facultyRestriction: election.facultyRestriction,
-      departmentRestrictions: election.departmentRestrictions,
-      candidates: election.candidates,
-      endDate: election.endDate,
-      isActive: election.isActive,
-      votingLinkToken: election.votingLinkToken,
-      votingLink: votingLink,
-      message: 'Election created successfully'
+      ...election.toObject(),
+      votingLink
     });
   } catch (err) {
     console.error('Create Election Error:', err);
-    
-    // Handle duplicate key error specifically
-    if (err.code === 11000 && err.keyPattern && err.keyPattern.votingLinkToken) {
-      return res.status(400).json({
-        message: 'Failed to create election - voting link conflict. Please try again.',
-        error: 'Voting link token conflict'
-      });
-    }
-    
     res.status(500).json({ 
       message: 'Server error creating election',
       error: err.message,
@@ -96,109 +52,122 @@ exports.createElection = async (req, res) => {
   }
 };
 
-// @desc    Get all elections
-// @route   GET /api/admin/elections
-// @access  Private
-exports.getElections = async (req, res) => {
-  try {
-    const elections = await Election.find().sort({ createdAt: -1 });
-    res.json(elections);
-  } catch (err) {
-    console.error('Get Elections Error:', err);
-    res.status(500).json({ 
-      message: 'Server error fetching elections',
-      error: err.message 
-    });
-  }
-};
-
-// @desc    Get single election
-// @route   GET /api/admin/elections/:id
-// @access  Private
-exports.getElection = async (req, res) => {
-  try {
-    const election = await Election.findById(req.params.id);
-    
-    if (!election) {
-      return res.status(404).json({ message: 'Election not found' });
-    }
-    
-    res.json(election);
-  } catch (err) {
-    console.error('Get Election Error:', err);
-    res.status(500).json({ 
-      message: 'Server error fetching election',
-      error: err.message 
-    });
-  }
-};
-
 // @desc    Update election
 // @route   PUT /api/admin/elections/:id
-// @access  Private
+// @access  Private (Admin)
 exports.updateElection = async (req, res) => {
+  const { title, description, candidates, endDate, isActive, facultyRestriction, departmentRestrictions } = req.body;
+  
   try {
-    const { title, description, facultyRestriction, departmentRestrictions, candidates, endDate, isActive } = req.body;
-    
-    const electionFields = {
-      title,
-      description,
-      facultyRestriction,
-      departmentRestrictions: departmentRestrictions || [],
-      candidates: candidates.map(candidate => ({
-        name: candidate.name,
-        votes: candidate.votes
-      })),
-      endDate: endDate ? new Date(endDate) : undefined,
-      isActive
-    };
-    
-    // Remove undefined values
-    Object.keys(electionFields).forEach(key => 
-      electionFields[key] === undefined && delete electionFields[key]
-    );
-    
     let election = await Election.findById(req.params.id);
+    if (!election) return res.status(404).json({ message: 'Election not found' });
     
-    if (!election) {
-      return res.status(404).json({ message: 'Election not found' });
+    // Prevent candidate changes after election starts
+    if (election.startDate < new Date() && candidates && election.candidates.length !== candidates.length) {
+      return res.status(400).json({ 
+        message: 'Cannot modify the number of candidates after election starts' 
+      });
     }
     
-    election = await Election.findByIdAndUpdate(
-      req.params.id,
-      { $set: electionFields },
-      { new: true }
-    );
+    election.title = title || election.title;
+    election.description = description || election.description;
+    election.endDate = endDate ? new Date(endDate) : election.endDate;
+    election.isActive = isActive !== undefined ? isActive : election.isActive;
+    election.facultyRestriction = facultyRestriction !== undefined ? facultyRestriction : election.facultyRestriction;
+    election.departmentRestrictions = departmentRestrictions !== undefined ? departmentRestrictions : election.departmentRestrictions;
     
-    res.json(election);
+    if (candidates) {
+      // Update candidates while preserving vote counts
+      const updatedCandidates = [];
+      for (const name of candidates) {
+        const existingCandidate = election.candidates.find(c => c.name === name);
+        updatedCandidates.push({
+          name,
+          votes: existingCandidate ? existingCandidate.votes : 0
+        });
+      }
+      election.candidates = updatedCandidates;
+    }
+    
+    await election.save();
+    
+    // Generate the voting link
+    const votingLink = `${process.env.BASE_URL}/voting/${election.votingLinkToken}`;
+    
+    res.json({
+      ...election.toObject(),
+      votingLink
+    });
   } catch (err) {
     console.error('Update Election Error:', err);
     res.status(500).json({ 
       message: 'Server error updating election',
-      error: err.message 
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
 };
 
 // @desc    Delete election
 // @route   DELETE /api/admin/elections/:id
-// @access  Private
+// @access  Private (Admin)
 exports.deleteElection = async (req, res) => {
   try {
     const election = await Election.findById(req.params.id);
     
     if (!election) {
-      return res.status(404).json({ message: 'Election not found' });
+      return res.status(404).json({ 
+        message: 'Election not found' 
+      });
     }
     
-    await election.remove();
+    // Delete all votes associated with this election
+    await Vote.deleteMany({ election: req.params.id });
     
-    res.json({ message: 'Election removed' });
+    // Remove election from users' hasVoted array
+    await User.updateMany(
+      { 'hasVoted.election': req.params.id },
+      { $pull: { hasVoted: { election: req.params.id } } }
+    );
+    
+    // Delete the election
+    await election.deleteOne();
+    
+    res.json({ 
+      message: 'Election deleted successfully' 
+    });
   } catch (err) {
     console.error('Delete Election Error:', err);
     res.status(500).json({ 
       message: 'Server error deleting election',
-      error: err.message 
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+};
+
+// @desc    Get all elections
+// @route   GET /api/admin/elections
+// @access  Private (Admin)
+exports.getAllElections = async (req, res) => {
+  try {
+    const elections = await Election.find().sort({ createdAt: -1 });
+    
+    // Add voting links to each election
+    const electionsWithLinks = elections.map(election => {
+      return {
+        ...election.toObject(),
+        votingLink: `${process.env.BASE_URL}/voting/${election.votingLinkToken}`
+      };
+    });
+    
+    res.json(electionsWithLinks);
+  } catch (err) {
+    console.error('Get Elections Error:', err);
+    res.status(500).json({ 
+      message: 'Server error fetching elections',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
 };
