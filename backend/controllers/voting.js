@@ -1,5 +1,6 @@
 const Election = require('../models/Election');
 const path = require('path');
+const crypto = require('crypto');
 
 // @desc    Serve the voting page with token
 // @route   GET /voting/:token
