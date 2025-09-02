@@ -14,14 +14,15 @@ module.exports = function(req, res, next) {
   try {
     const decoded = jwt.verify(token, jwtConfig.secret);
     
-    // Check if user is admin
-    if (decoded.user.role !== 'admin' && decoded.user.id !== 'admin') {
-      return res.status(403).json({ msg: 'User is not authorized' });
-    }
-    
+    // Add user to request object
     req.user = decoded.user;
+    
+    // Log for debugging
+    console.log('Token verified for user:', req.user.id);
+    
     next();
   } catch (err) {
+    console.error('Token verification error:', err);
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };
