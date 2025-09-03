@@ -530,7 +530,6 @@ document.addEventListener('DOMContentLoaded', () => {
             'Information System Science',
             'Cyber Security'
           ],
-          
           'Engineering': [
             'Electrical Engineering',
             'Mechanical Engineering',
