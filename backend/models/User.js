@@ -10,7 +10,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
-      'Faculty of Computing and Informatics',
       'Engineering',
       'Sciences',
       'Arts & Humanities',
@@ -25,12 +24,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
-      // Faculty of Computing and Informatics
-      'Computer Science',
-      'Information System Science',
-      'Cyber Security',
-      
       // Engineering
+      'Computer Science',
       'Electrical Engineering',
       'Mechanical Engineering',
       'Civil Engineering',

@@ -1,56 +1,49 @@
 const mongoose = require('mongoose');
-const crypto = require('crypto');
 
-const ElectionSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true
+const candidateSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  votes: { type: Number, default: 0 }
+});
+
+const electionSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  candidates: [candidateSchema],
+  startDate: { type: Date, default: Date.now },
+  endDate: { type: Date, required: true },
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now },
+  
+  // Faculty/Department restrictions
+  facultyRestriction: { 
+    type: String, 
+    default: null,
+    enum: [
+      null,
+      'Engineering',
+      'Sciences',
+      'Arts & Humanities',
+      'Social Sciences',
+      'Medicine',
+      'Law',
+      'Business Administration',
+      'Education'
+    ]
   },
-  description: {
-    type: String,
-    required: true
-  },
-  facultyRestriction: {
-    type: String,
-    default: null
-  },
-  departmentRestrictions: {
+  departmentRestrictions: { 
     type: [String],
     default: []
   },
-  candidates: [{
-    name: String,
-    votes: {
-      type: Number,
-      default: 0
-    }
-  }],
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  startDate: {
-    type: Date,
-    default: Date.now
-  },
-  endDate: {
-    type: Date,
-    required: true
-  },
+  
+  // Unique voting link
   votingLinkToken: {
     type: String,
+    required: true,
     unique: true,
-    sparse: true  // Critical fix: allows null values in unique index
+    default: function() {
+      return Math.random().toString(36).substr(2, 15);
+    }
   }
-}, { timestamps: true });
-
-// Generate voting link token before saving
-ElectionSchema.pre('validate', function(next) {
-  if (!this.votingLinkToken) {
-    // Generate a unique token
-    this.votingLinkToken = crypto.randomBytes(8).toString('hex');
-  }
-  next();
 });
 
-module.exports = mongoose.model('Election', ElectionSchema);
+module.exports = mongoose.model('Election', electionSchema);
