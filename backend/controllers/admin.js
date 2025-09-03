@@ -3,15 +3,6 @@ const Vote = require('../models/Vote');
 const User = require('../models/User');
 const jwtConfig = require('../config/jwt');
 
-// Initialize exports at the top to prevent circular dependency issues
-exports.createElection = () => {};
-exports.updateElection = () => {};
-exports.getAllElections = () => {};
-exports.getVotesForElection = () => {};
-exports.getAllVoters = () => {};
-exports.resetVoterVotes = () => {};
-exports.getElectionVotingLink = () => {};
-
 // @desc    Create election
 // @route   POST /api/admin/elections
 // @access  Private (Admin)
@@ -111,6 +102,44 @@ exports.updateElection = async (req, res) => {
     console.error('Update Election Error:', err);
     res.status(500).json({ 
       message: 'Server error updating election',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+};
+
+// @desc    Delete election
+// @route   DELETE /api/admin/elections/:id
+// @access  Private (Admin)
+exports.deleteElection = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    
+    if (!election) {
+      return res.status(404).json({ 
+        message: 'Election not found' 
+      });
+    }
+    
+    // Delete all votes associated with this election
+    await Vote.deleteMany({ election: req.params.id });
+    
+    // Remove election from users' hasVoted array
+    await User.updateMany(
+      { 'hasVoted.election': req.params.id },
+      { $pull: { hasVoted: { election: req.params.id } } }
+    );
+    
+    // Delete the election
+    await election.deleteOne();
+    
+    res.json({ 
+      message: 'Election deleted successfully' 
+    });
+  } catch (err) {
+    console.error('Delete Election Error:', err);
+    res.status(500).json({ 
+      message: 'Server error deleting election',
       error: err.message,
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
