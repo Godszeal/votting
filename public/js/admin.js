@@ -267,7 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
               <label class="form-label" for="facultyRestriction">Faculty Restriction</label>
               <select id="facultyRestriction" class="form-control form-select">
                 <option value="">No Faculty Restriction (All Faculties)</option>
-                <option value="Faculty of Computing and Informatics">Faculty of Computing and Informatics</option>
                 <option value="Engineering">Engineering</option>
                 <option value="Sciences">Sciences</option>
                 <option value="Arts & Humanities">Arts & Humanities</option>
@@ -316,11 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Faculty to department mapping
       const facultyDepartments = {
-        'Faculty of Computing and Informatics': [
-          'Computer Science',
-          'Information System Science',
-          'Cyber Security'
-          ],
         'Engineering': [
           'Computer Science',
           'Electrical Engineering',
@@ -526,11 +520,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Faculty to department mapping
         const facultyDepartments = {
-          'Faculty of Computing and Informatics': [
-          'Computer Science',
-          'Information System Science',
-          'Cyber Security'
-          ],
           'Engineering': [
             'Computer Science',
             'Electrical Engineering',
