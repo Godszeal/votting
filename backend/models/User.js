@@ -31,7 +31,6 @@ const userSchema = new mongoose.Schema({
       'Cyber Security',
       
       // Engineering
-      'Computer Science',
       'Electrical Engineering',
       'Mechanical Engineering',
       'Civil Engineering',
