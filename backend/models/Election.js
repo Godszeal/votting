@@ -37,7 +37,7 @@ const ElectionSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  votingLinkToken: {
+/*  votingLinkToken: {
     type: String,
     required: true,
     unique: true,
@@ -70,7 +70,7 @@ ElectionSchema.pre('save', async function(next) {
     this.votingLinkToken = token;
   }
   
-  next();
+  next();*/
 });
 
 module.exports = mongoose.model('Election', ElectionSchema);
