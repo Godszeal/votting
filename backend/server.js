@@ -4,11 +4,11 @@ const path = require('path');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from .env file
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Connect to database
-connectDB();
+const dbConnection = connectDB();
 
 const app = express();
 
@@ -16,55 +16,59 @@ const app = express();
 app.use(express.json({ extended: false }));
 app.use(cookieParser());
 
-// Define Routes
-let authRoutes, userRoutes, adminRoutes, votingRoutes;
+// Define Routes with error handling
+let authRoutes, userRoutes, adminRoutes;
 
-// Helper function to safely load routes
-const loadRoutes = (routePath, routeName) => {
-  try {
-    console.log(`Loading ${routeName} routes...`);
-    const routes = require(routePath);
-    console.log(`${routeName} routes loaded successfully`);
-    return routes;
-  } catch (err) {
-    console.error(`Error loading ${routeName} routes:`, err);
-    const router = express.Router();
-    router.use((req, res) => {
-      res.status(500).json({ 
-        message: `Service unavailable: ${routeName} routes failed to load`,
-        error: err.message
-      });
+try {
+  authRoutes = require('./routes/auth');
+} catch (err) {
+  console.error('Error loading auth routes:', err);
+  authRoutes = express.Router();
+  authRoutes.use((req, res) => {
+    res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Auth routes loading error'
     });
-    return router;
-  }
-};
+  });
+}
 
-authRoutes = loadRoutes('./routes/auth', 'auth');
-userRoutes = loadRoutes('./routes/user', 'user');
-adminRoutes = loadRoutes('./routes/admin', 'admin');
-votingRoutes = loadRoutes('./routes/voting', 'voting');
+try {
+  userRoutes = require('./routes/user');
+} catch (err) {
+  console.error('Error loading user routes:', err);
+  userRoutes = express.Router();
+  userRoutes.use((req, res) => {
+    res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'User routes loading error'
+    });
+  });
+}
 
-// Register routes - CORRECT ORDER
+try {
+  adminRoutes = require('./routes/admin');
+} catch (err) {
+  console.error('Error loading admin routes:', err);
+  adminRoutes = express.Router();
+  adminRoutes.use((req, res) => {
+    res.status(500).json({ 
+      message: 'Service unavailable', 
+      error: 'Admin routes loading error'
+    });
+  });
+}
+
+// Register routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/voting', votingRoutes);
-
-// Voting page route - must come before static files
-app.use('/voting', votingRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   // Set static folder
   app.use(express.static('public'));
   
-  // Serve index.html for all other routes EXCEPT voting links
-  app.get('*', (req, res, next) => {
-    // CRITICAL FIX: Don't interfere with voting links
-    if (req.path.startsWith('/voting/')) {
-      return next('route'); // Proper way to skip this middleware
-    }
-    
+  app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
   });
 } else {
@@ -77,34 +81,53 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// CRITICAL FIX: Add error handling for file not found
-app.use((err, req, res, next) => {
-  if (err.code === 'ENOENT') {
-    console.error('File not found:', err.path);
-    // If it's a voting path issue, redirect to home
-    if (req.path.includes('/voting/') && req.path.includes('user-dashboard')) {
-      return res.redirect('/');
-    }
-    return res.status(404).send('File not found');
-  }
-  next(err);
-});
+// Handle database connection errors
+if (dbConnection && typeof dbConnection.catch === 'function') {
+  dbConnection.catch(err => {
+    console.error('Database connection failed:', err);
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-  console.log('Server is ready to handle requests');
+  console.log(`\n🚀 Server started on port ${PORT}`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Only show DB connection status if we have a valid connection
+  if (process.env.MONGODB_URI) {
+    const maskedURI = process.env.MONGODB_URI.replace(/\/\/(.*):(.*)@/, '//[hidden]:[hidden]@');
+    console.log(`🗄️  Database: ${maskedURI}`);
+  }
+  
+  console.log('✅ Server is ready to handle requests\n');
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+  console.error('❌ Uncaught Exception:', error);
   // Don't exit the process, keep the server running
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (error) => {
-  console.error('Unhandled Promise Rejection:', error);
+  console.error('❌ Unhandled Promise Rejection:', error);
   // Don't exit the process, keep the server running
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  const healthStatus = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    database: process.env.MONGODB_URI ? 'connected' : 'not connected'
+  };
+  
+  // Check if we're in development and don't have a DB connection
+  if (process.env.NODE_ENV === 'development' && !process.env.MONGODB_URI) {
+    healthStatus.warning = 'Running in development mode without database connection';
+  }
+  
+  res.json(healthStatus);
 });
