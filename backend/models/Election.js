@@ -37,40 +37,20 @@ const ElectionSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-/*  votingLinkToken: {
+  votingLinkToken: {
     type: String,
-    required: true,
     unique: true,
-    default: function() {
-      return crypto.randomBytes(8).toString('hex');
-    }
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+    sparse: true  // Critical fix: allows null values in unique index
   }
-});
+}, { timestamps: true });
 
-// Pre-save hook to generate unique token if not provided
-ElectionSchema.pre('save', async function(next) {
-  // Only generate token if it's a new document or token is not set
-  if (this.isNew || !this.votingLinkToken) {
-    let token;
-    let isUnique = false;
-    
-    // Keep generating tokens until we get a unique one
-    while (!isUnique) {
-      token = crypto.randomBytes(8).toString('hex');
-      
-      // Check if token already exists
-      const existingElection = await this.constructor.findOne({ votingLinkToken: token });
-      isUnique = !existingElection;
-    }
-    
-    this.votingLinkToken = token;
+// Generate voting link token before saving
+ElectionSchema.pre('validate', function(next) {
+  if (!this.votingLinkToken) {
+    // Generate a unique token
+    this.votingLinkToken = crypto.randomBytes(8).toString('hex');
   }
-  
-  next();*/
+  next();
 });
 
 module.exports = mongoose.model('Election', ElectionSchema);
