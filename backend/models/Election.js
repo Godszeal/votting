@@ -20,7 +20,7 @@ const electionSchema = new mongoose.Schema({
     default: null,
     enum: [
       null,
-      'Faculty of Computing and Informatics',
+      'Faculty Of Computing and Informatics',
       'Engineering',
       'Sciences',
       'Arts & Humanities',
