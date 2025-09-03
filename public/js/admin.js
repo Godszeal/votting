@@ -267,8 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
               <label class="form-label" for="facultyRestriction">Faculty Restriction</label>
               <select id="facultyRestriction" class="form-control form-select">
                 <option value="">No Faculty Restriction (All Faculties)</option>
-                <option value="Engineering">Engineering</option>
                 <option value="Faculty Of Computing and Informatics">Faculty Of Computing and Informatics</option>
+                <option value="Engineering">Engineering</option>
                 <option value="Sciences">Sciences</option>
                 <option value="Arts & Humanities">Arts & Humanities</option>
                 <option value="Social Sciences">Social Sciences</option>
