@@ -3,15 +3,19 @@ const Election = require('../models/Election');
 const Vote = require('../models/Vote');
 const jwtConfig = require('../config/jwt');
 
-// Define all controller functions first
-const getUserElections = async (req, res) => {
+// Initialize exports at the top to prevent circular dependency issues
+exports.getUserElections = () => {};
+exports.castVote = () => {};
+exports.getElectionResults = () => {};
+
+// @desc    Get user elections
+// @route   GET /api/user/elections
+// @access  Private
+exports.getUserElections = async (req, res) => {
   try {
-    console.log('Fetching user elections for user ID:', req.user.id);
-    
     const user = await User.findById(req.user.id);
     
     if (!user) {
-      console.error('User not found for ID:', req.user.id);
       return res.status(404).json({ message: 'User not found' });
     }
     
@@ -20,8 +24,6 @@ const getUserElections = async (req, res) => {
       isActive: true,
       endDate: { $gt: new Date() }
     });
-    
-    console.log(`Found ${elections.length} active elections`);
     
     // Filter elections based on user's faculty and department
     const eligibleElections = elections.filter(election => {
@@ -49,8 +51,6 @@ const getUserElections = async (req, res) => {
       return true;
     });
     
-    console.log(`Found ${eligibleElections.length} eligible elections for user`);
-    
     res.json(eligibleElections);
   } catch (err) {
     console.error('Get User Elections Error:', err);
@@ -62,7 +62,10 @@ const getUserElections = async (req, res) => {
   }
 };
 
-const castVote = async (req, res) => {
+// @desc    Cast a vote
+// @route   POST /api/user/vote
+// @access  Private
+exports.castVote = async (req, res) => {
   const { electionId, candidate } = req.body;
   
   try {
@@ -151,7 +154,10 @@ const castVote = async (req, res) => {
   }
 };
 
-const getElectionResults = async (req, res) => {
+// @desc    Get election results
+// @route   GET /api/user/results/:id
+// @access  Private
+exports.getElectionResults = async (req, res) => {
   try {
     const election = await Election.findById(req.params.id);
     
@@ -195,117 +201,4 @@ const getElectionResults = async (req, res) => {
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
-};
-
-const checkElectionEligibility = async (req, res) => {
-  try {
-    const election = await Election.findById(req.params.id);
-    
-    if (!election) {
-      return res.status(404).json({ 
-        message: 'Election not found' 
-      });
-    }
-    
-    // Check if user is eligible to vote in this election
-    const user = await User.findById(req.user.id);
-    
-    if (!user) {
-      return res.status(404).json({ 
-        message: 'User not found' 
-      });
-    }
-    
-    // Check if user has already voted
-    if (user.hasVoted.some(vote => vote.election.toString() === req.params.id)) {
-      return res.json({ 
-        eligible: false,
-        reason: 'You have already voted in this election'
-      });
-    }
-    
-    // Check if election is still active
-    if (!election.isActive || new Date() > new Date(election.endDate)) {
-      return res.json({ 
-        eligible: false,
-        reason: 'This election is no longer active'
-      });
-    }
-    
-    // Check if user is eligible to vote in this election
-    if (election.facultyRestriction && election.facultyRestriction !== user.faculty) {
-      return res.json({ 
-        eligible: false,
-        reason: `This election is restricted to ${election.facultyRestriction} faculty`
-      });
-    }
-    
-    if (election.departmentRestrictions.length > 0 && 
-        !election.departmentRestrictions.includes(user.department)) {
-      return res.json({ 
-        eligible: false,
-        reason: 'This election is restricted to specific departments'
-      });
-    }
-    
-    res.json({ 
-      eligible: true,
-      electionId: election._id,
-      title: election.title
-    });
-  } catch (err) {
-    console.error('Check Election Eligibility Error:', err);
-    res.status(500).json({ 
-      message: 'Server error checking election eligibility',
-      error: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
-  }
-};
-
-const getVotingLinkDetails = async (req, res) => {
-  try {
-    const token = req.params.token;
-    console.log('Fetching voting link details for token:', token);
-    
-    // CRITICAL FIX: Check if token is valid format
-    if (!token || token.includes('user-dashboard') || token.includes('index.html')) {
-      console.error('Invalid token format:', token);
-      return res.status(400).json({ 
-        message: 'Invalid voting link token format' 
-      });
-    }
-    
-    const election = await Election.findOne({ votingLinkToken: token });
-    
-    if (!election) {
-      console.error('Invalid voting link token:', token);
-      return res.status(404).json({ 
-        message: 'Invalid voting link' 
-      });
-    }
-    
-    console.log('Voting link details found for election:', election.title);
-    res.json({
-      electionId: election._id,
-      title: election.title,
-      facultyRestriction: election.facultyRestriction,
-      departmentRestrictions: election.departmentRestrictions
-    });
-  } catch (err) {
-    console.error('Voting Link Error:', err);
-    res.status(500).json({ 
-      message: 'Server error',
-      error: err.message 
-    });
-  }
-};
-
-// Export all controller functions
-module.exports = {
-  getUserElections,
-  castVote,
-  getElectionResults,
-  checkElectionEligibility,
-  getVotingLinkDetails
 };
