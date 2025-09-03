@@ -268,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <select id="facultyRestriction" class="form-control form-select">
                 <option value="">No Faculty Restriction (All Faculties)</option>
                 <option value="Engineering">Engineering</option>
+                <option value="Faculty Of Computing and Informatics">Faculty Of Computing and Informatics</option>
                 <option value="Sciences">Sciences</option>
                 <option value="Arts & Humanities">Arts & Humanities</option>
                 <option value="Social Sciences">Social Sciences</option>
@@ -315,8 +316,12 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Faculty to department mapping
       const facultyDepartments = {
-        'Engineering': [
+        'Faculty Of Computing and Informatics': [
           'Computer Science',
+          'Information System Science',
+          'Cyber Security'
+          ],
+        'Engineering': [
           'Electrical Engineering',
           'Mechanical Engineering',
           'Civil Engineering',
@@ -520,8 +525,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Faculty to department mapping
         const facultyDepartments = {
-          'Engineering': [
+          'Faculty Of Computing and Informatics': [
             'Computer Science',
+            'Information System Science',
+            'Cyber Security'
+          ],
+          
+          'Engineering': [
             'Electrical Engineering',
             'Mechanical Engineering',
             'Civil Engineering',
@@ -607,6 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <label class="form-label" for="facultyRestriction">Faculty Restriction</label>
                 <select id="facultyRestriction" class="form-control form-select">
                   <option value="" ${!election.facultyRestriction ? 'selected' : ''}>No Faculty Restriction (All Faculties)</option>
+                  <option value="Faculty Of Computing and Informatics" ${election.facultyRestriction === 'Faculty Of Computing and Informatics' ? 'selected' : ''}>Faculty Of Computing and Informatics</option>
                   <option value="Engineering" ${election.facultyRestriction === 'Engineering' ? 'selected' : ''}>Engineering</option>
                   <option value="Sciences" ${election.facultyRestriction === 'Sciences' ? 'selected' : ''}>Sciences</option>
                   <option value="Arts & Humanities" ${election.facultyRestriction === 'Arts & Humanities' ? 'selected' : ''}>Arts & Humanities</option>
