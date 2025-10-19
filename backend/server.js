@@ -8,7 +8,7 @@ const cron = require('node-cron');
 const axios = require('axios');
 const ora = require('ora');
 const c = require('chalk');
-const selfPingUrl = process.env.SELF_PING_URL || `http://localhost:${PORT}`;
+const selfPingUrl = process.env.SELF_PING_URL || `https://votting-ktve.onrender.com`;
 
 cron.schedule('* * * * *', async () => {
   const spinner = ora({
