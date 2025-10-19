@@ -8,8 +8,6 @@ const cron = require('node-cron');
 const axios = require('axios');
 const ora = require('ora');
 const c = require('chalk');
-
-const PORT = process.env.PORT || 3000;
 const selfPingUrl = process.env.SELF_PING_URL || `http://localhost:${PORT}`;
 
 cron.schedule('* * * * *', async () => {
