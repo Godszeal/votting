@@ -3,6 +3,28 @@ const connectDB = require('./config/db');
 const path = require('path');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+// 🕒 Keep-Alive Cron Script
+const cron = require('node-cron');
+const axios = require('axios');
+const ora = require('ora');
+const c = require('chalk');
+
+const PORT = process.env.PORT || 3000;
+const selfPingUrl = process.env.SELF_PING_URL || `http://localhost:${PORT}`;
+
+cron.schedule('* * * * *', async () => {
+  const spinner = ora({
+    text: c.cyan(`🔁 Pinging self to keep app awake...`),
+    spinner: 'dots'
+  }).start();
+
+  try {
+    await axios.get(selfPingUrl);
+    spinner.succeed(c.green(`✅ Self-ping successful at ${new Date().toLocaleTimeString()}`));
+  } catch (err) {
+    spinner.fail(c.red(`⚠️ Self-ping failed at ${new Date().toLocaleTimeString()}: ${err.message}`));
+  }
+});
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
